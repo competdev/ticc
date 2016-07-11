@@ -1,0 +1,30 @@
+.box .box-body .table tr th, .info-table-first-row td {
+    border-top: none !important;
+}
+
+.status-in-progress {
+    color: #339933;
+}
+.status-ended {
+    color: #990000;
+}
+
+#participantes-table input {
+    max-width: 60px;
+}
+
+#map {
+    max-width: none;
+    margin: 0px;
+    height: 91%;
+    width: 100%;
+    position: absolute;
+}
+
+#map label {
+    width: auto;
+}
+
+#map img {
+    max-width: none;
+}

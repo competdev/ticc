@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>TICC CEFET-MG</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    {% include "css.html" %}
+    {% block css %}
+    {% endblock css %}
+</head>
+
+<body class="hold-transition skin-black layout-top-nav" onload="initMap()">
+    <div class="wrapper">
+        {% include "header.html" %}
+        <div class="content-wrapper">
+            <div class="container">
+                <section class="content-header">
+                    <h1>
+                        {% block content-title %}
+                        {% endblock content-title %}
+                    </h1>
+                        {% block breadcrumb %}
+                        {% endblock breadcrumb %}
+                </section>
+
+                <section class="content">
+                    {% block content %}
+                    {% endblock content %}
+                </section>
+            </div>
+        </div>
+        {% include "footer.html" %}
+    </div>
+
+    {% include "js.html" %}
+    {% block js %}
+    {% endblock js %}
+</body>
+</html>
