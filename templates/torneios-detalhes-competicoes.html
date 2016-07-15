@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box" id="brexit">
+            <div class="box-header with-border">
+                <h3 class="box-title">Competições</h3>
+                <div class="box-tools pull-right">
+                    <a href="/competicoes/novo/{{ torneio.pk }}" class="btn btn-box-tool">Adicionar</a>
+                </div>
+            </div>
+            <div class="box-body">
+                <table class="table">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Status</th>
+                    </tr>
+
+                    {% for competicao in torneio.competicoes.all %}
+                        <tr>
+                            <td><a href="/competicoes/{{competicao.pk}}">{{ competicao }}</a></td>
+                            <td class="{{ torneio.status }}"></td>
+                        </tr>    
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

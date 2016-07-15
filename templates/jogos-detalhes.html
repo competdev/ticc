@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content-title %}
+    {{ jogo }}
+{% endblock content-title %}
+
+{% block breadcrumb %}
+    {% include "breadcrumb.html" %}
+{% endblock breadcrumb %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-7">
+			{% include "jogos-detalhes-informacoes.html" %}
+			{% include "jogos-detalhes-participantes.html" %}
+		</div>
+		<div class="col-md-5">
+			{% include "jogos-detalhes-regras.html" %}
+		</div>
+	</div>
+{% endblock content %}

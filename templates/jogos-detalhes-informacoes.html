@@ -1,0 +1,28 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Informações</h3>
+        <div class="box-tools pull-right">
+            <a href="/jogos/editar/{{ jogo.pk }}" class="btn btn-box-tool">Editar</a>
+        </div>
+    </div>
+    <div class="box-body">
+        <table class="table">
+            <tr class="info-table-first-row">
+                <td><b>Data</b></td>
+                <td>{{ jogo.inicio.date }}</td>
+            </tr>
+            <tr>
+                <td><b>Horário</b></td>
+                <td>{{ jogo.inicio.time }}</td>
+            </tr>
+            <tr>
+                <td><b>Local</b></td>
+                <td>{{ jogo.local }}</td>
+            </tr>
+            <tr>
+                <td><b>Responsável</b></td>
+                <td>{{ jogo.responsavel }}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

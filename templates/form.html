@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Formulário</h3>
+            </div>
+            <form role="form" action="{{ action }}" method="POST">
+                {% csrf_token %}
+                <div class="box-body">
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{field.label_tag}}
+                            {% if field.field.widget.attrs.widget == 'date' %}
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    {{field}}
+                                </div>
+                            {% elif field.field.widget.attrs.widget == 'datetime'%}
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                    {{field}}
+                                </div>
+                            {% else %}
+                                {{field}}
+                            {% endif %}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                <div class="form-group">
+                                    <span class="help-block text-red">{{error}}</span>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="box-footer">
+                    <a href="{{ cancelar }}" class="btn btn-default">Cancelar</a>
+                <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

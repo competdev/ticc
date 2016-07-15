@@ -5,8 +5,14 @@
 .status-in-progress {
     color: #339933;
 }
+
+.status-in-progress:before{
+    content: 'Em progressosss';
+}
+
 .status-ended {
     color: #990000;
+    content: 'Finalizada';
 }
 
 #participantes-table input {

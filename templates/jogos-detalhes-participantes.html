@@ -1,0 +1,29 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Participantes</h3>
+        <div class="box-tools pull-right">
+            <a href="atualizar-data-table.html" class="btn btn-box-tool">Atualizar</a>
+            <a href="login.html" class="btn btn-box-tool">Participar</a>
+        </div>
+    </div>
+    <div class="box-body">
+        <table class="table" id="participantes-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Pontuação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pontuacao in jogo.pontuacao.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>pontuacao.participante.nome</a></td>
+                        <td>pontuacao.pontos</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

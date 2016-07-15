@@ -2,11 +2,24 @@
     border-top: none !important;
 }
 
+.status-waiting:before{
+    content: 'Não iniciada';
+}
+
 .status-in-progress {
     color: #339933;
 }
+
+.status-in-progress:before{
+    content: 'Em progresso';
+}
+
 .status-ended {
     color: #990000;
+}
+
+.status-ended:before {
+    content: 'Finalizada';
 }
 
 #participantes-table input {
