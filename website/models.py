@@ -50,17 +50,20 @@ class Jogo(models.Model):
 	competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name="jogos")
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
 	responsavel = models.ForeignKey(User)
-	inicio = models.DateTimeField()
-	termino = models.DateTimeField()
+	data = models.DateField()
+	inicio = models.TimeField()
+	termino = models.TimeField()
 	local = models.CharField(max_length=255)
 	participantes = models.ManyToManyField(User, related_name='jogos')
 	intercampi = models.BooleanField(default=False)
 
 	def status(self):
-		now = timezone.now()
-		if now < self.inicio:
+		now = datetime.now()
+		inicio = datetime.combine(self.data, self.inicio)
+		termino = datetime.combine(self.data, self.termino)
+		if now < inicio:
 			return 'status-waiting'
-		elif now <= self.termino:
+		elif now <= termino:
 			return 'status-in-progress'
 		else:
 			return 'status-ended'
@@ -70,5 +73,9 @@ class Jogo(models.Model):
 
 class Pontuacao(models.Model):
 	jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="pontuacao")
+	participante = models.ForeignKey(User, on_delete=models.CASCADE)
 	pontos = models.IntegerField(default=0)
-	participante = models.ForeignKey(User)
+	tempo = models.IntegerField(default=0)
+
+	def __str__(self):
+		return self.participante.get_full_name() + ' - ' + self.jogo.__str__()

@@ -4,7 +4,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Intercampi</h3>
                 <div class="box-tools pull-right">
-                    <a href="novo-intercampi.html" class="btn btn-box-tool">Novo</a>
+                    <a href="/competicoes/editar/{{ competicao.pk }}/" class="btn btn-box-tool">Editar</a>
                 </div>
             </div>
             <div class="box-body">
@@ -14,8 +14,10 @@
                         <th>Status</th>
                     </tr>
                     <tr>
-                        <td><a href="#">{{ torneio.inicio }}</a></td>
-                        <td class="status-waiting">Não iniciada</td>
+                        <td>
+                            <a href="/jogos/{{ intercampi.pk }}">{{ intercampi.data }}</a>
+                        </td>
+                        <td class="{{ intercampi.status }}"></td>
                     </tr>
                 </table>
             </div>

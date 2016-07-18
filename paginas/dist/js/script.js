@@ -17,6 +17,19 @@ function initMap() {
     });
 }
 
+$(document).ready(function(){
+    $('[widget=time]').datetimepicker(function(){
+        datepicker: false,
+        mask: true,
+        
+    });
+    $('[widget=date]').datetimepicker(function(){
+        timepicker: false,
+        mask: true,
+
+    });
+})
+
 // Animation
 // $(function(){
 //     $(".box").hide().each(function(i) {

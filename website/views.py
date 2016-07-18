@@ -39,6 +39,19 @@ def torneios_novo(request):
 
 	return render(request, 'crud.html', context)
 
+def torneios_detalhes(request, pkTorneio):
+	torneio = get_object_or_404(Torneio, pk=pkTorneio)
+	context = {
+		'torneio': torneio,
+		'breadcrumb': [
+			{'nome': 'Inicio', 'link': '/'},
+			{'nome': 'Torneios', 'link': '/torneios'},
+			{'nome': torneio},
+		]
+	}
+
+	return render(request, 'torneios-detalhes.html', context)
+
 def torneios_editar(request, pkTorneio):
 	torneio = get_object_or_404(Torneio, pk=pkTorneio)
 	if request.method == 'POST':
@@ -64,21 +77,8 @@ def torneios_editar(request, pkTorneio):
 
 	return render(request, 'crud.html', context)
 
-def torneios_detalhes(request, pk):
-	torneio = get_object_or_404(Torneio, pk=pk)
-	context = {
-		'torneio': torneio,
-		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': torneio},
-		]
-	}
-
-	return render(request, 'torneios-detalhes.html', context)
-
-def torneios_excluir(request, pk):
-	get_object_or_404(Torneio, pk=pk).delete()
+def torneios_excluir(request, pkTorneio):
+	get_object_or_404(Torneio, pk=pkTorneio).delete()
 	return redirect('/torneios')
 
 
@@ -111,11 +111,20 @@ def competicoes_novo(request, pkTorneio):
 	return render(request, 'crud.html', context)
 
 def competicoes_detalhes(request, pkCompeticao):
+	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
+	torneio = competicao.torneio
 	context = {
-		'competicao': get_object_or_404(Competicao, pk=pkCompeticao),
-		'torneio': Competicao.objects.get(pk=pkCompeticao).torneio,
-		'seletivas': Jogo.objects.filter(competicao_id=pkCompeticao, intercampi=False),
-		'intercampi': Jogo.objects.filter(competicao_id=pkCompeticao, intercampi=True),
+		'competicao': competicao,
+		'torneio': torneio,
+		'seletivas': competicao.jogos.filter(intercampi=False),
+		'intercampi': Jogo.objects.get(competicao=competicao, intercampi=True),
+		'breadcrumb': [
+			{'nome': 'Inicio', 'link': '/'},
+			{'nome': 'Torneios', 'link': '/torneios'},
+			{'nome': torneio, 'link': '/torneios/' + str(torneio.pk)},
+			{'nome': "Competições", 'link': '/torneios/' + str(torneio.pk)},
+			{'nome': competicao.categoria },
+		]
 	}
 
 	return render(request, 'competicoes-detalhes.html', context)
@@ -183,5 +192,24 @@ def jogos_editar(request, pkJogo):
 			{'nome': 'Editar'},
 		]
 	}
-
+	
 	return render(request, 'crud.html', context)
+
+def jogos_excluir(request, pkJogo):
+	jogo = get_object_or_404(Jogo, pk=pkJogo)
+	pkCompeticao = jogo.competicao.pk
+	jogo.delete()
+	return redirect('/competicoes/' + str(pkCompeticao))
+
+def jogos_participar(request, pkJogo):
+	jogo = get_object_or_404(Jogo, pk=pkJogo)
+	jogo.participantes.add(request.user)
+	Pontuacao.objects.create(jogo=jogo, participante=request.user)
+	return redirect('/jogos/' + str(pkJogo))
+
+def jogos_sair(request, pkJogo):
+	jogo = get_object_or_404(Jogo, pk=pkJogo)
+	jogo.participantes.remove(request.user)
+	pontuacao = Pontuacao.objects.get(jogo=jogo, participante=request.user)
+	pontuacao.delete()
+	return redirect('/jogos/' + str(pkJogo))
