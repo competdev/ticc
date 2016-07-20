@@ -50,9 +50,9 @@ class Jogo(models.Model):
 	competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name="jogos")
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
 	responsavel = models.ForeignKey(User)
-	data = models.DateField()
-	inicio = models.TimeField()
-	termino = models.TimeField()
+	data = models.DateField(default=date.today)
+	inicio = models.TimeField(default=timezone.now)
+	termino = models.TimeField(default=timezone.now)
 	local = models.CharField(max_length=255)
 	participantes = models.ManyToManyField(User, related_name='jogos')
 	intercampi = models.BooleanField(default=False)
@@ -67,6 +67,12 @@ class Jogo(models.Model):
 			return 'status-in-progress'
 		else:
 			return 'status-ended'
+
+	def tipo(self):
+		if self.intercampi:
+			return "Intercampi"
+		else:
+			return "Seletiva"
 
 	def __str__(self):
 		return self.campus.__str__()

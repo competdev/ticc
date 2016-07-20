@@ -89,7 +89,16 @@ def competicoes_novo(request, pkTorneio):
 			competicao = form.save(commit=False)
 			competicao.torneio = Torneio.objects.get(pk=pkTorneio)
 			competicao.save()
-			return redirect('torneios/' + str(pkTorneio))
+			jogo = Jogo()
+			jogo.competicao = competicao
+			jogo.local = competicao.torneio.sede.__str__()
+			jogo.campus = competicao.torneio.sede
+			jogo.responsavel = request.user
+			jogo.intercampi = True
+			jogo.data = competicao.torneio.inicio
+			jogo.save()
+
+			return redirect('jogos/editar/' + str(jogo.pk))
 	else:
 		form = CompeticaoForm()
 
@@ -163,8 +172,17 @@ def jogos_novo(request, pkCompeticao):
 	return render(request, 'crud.html', context)
 
 def jogos_detalhes(request, pkJogo):
+	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	context = {
-		'jogo': get_object_or_404(Jogo, pk=pkJogo),
+		'jogo': jogo,
+		'breadcrumb': [
+			{'nome': 'Inicio', 'link': '/'},
+			{'nome': 'Torneios', 'link': '/torneios'},
+			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
+			{'nome': 'Competições', 'link': '/torneios'},
+			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
+			{'nome': jogo.tipo() },
+		]
 	}
 
 	return render(request, 'jogos-detalhes.html', context)
@@ -180,7 +198,7 @@ def jogos_editar(request, pkJogo):
 		form = JogoForm(instance=jogo)
 
 	context = {
-		'titulo': "Editar Jogo",
+		'titulo': "Editar " + jogo.tipo(),
 		'action': '/jogos/editar/' + pkJogo,
 		'cancelar': '/jogos/' + pkJogo,
 		'form': form,
@@ -188,7 +206,9 @@ def jogos_editar(request, pkJogo):
 			{'nome': 'Inicio', 'link': '/'},
 			{'nome': 'Torneios', 'link': '/torneios'},
 			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
-			{'nome': 'Jogos', 'link': '/competicoes/' + str(jogo.competicao.pk)},
+			{'nome': 'Competições', 'link': '/torneios'},
+			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
+			{'nome': jogo.tipo(), 'link': '/jogos/' + str(jogo.pk) },
 			{'nome': 'Editar'},
 		]
 	}
@@ -213,3 +233,29 @@ def jogos_sair(request, pkJogo):
 	pontuacao = Pontuacao.objects.get(jogo=jogo, participante=request.user)
 	pontuacao.delete()
 	return redirect('/jogos/' + str(pkJogo))
+
+def pontuacao_atualizar(request, pkJogo):
+	jogo = get_object_or_404(Jogo, pk=pkJogo)
+
+	if request.method == 'POST':
+		for pontuacao in jogo.pontuacao.all():
+			p = request.POST.getlist(str(pontuacao.pk))
+			pontuacao.pontos = p[0]
+			pontuacao.tempo = p[1]
+			pontuacao.save()
+
+		return redirect('/jogos/' + str(pkJogo))
+
+	context = {
+		'jogo': jogo,
+		'breadcrumb': [
+			{'nome': 'Inicio', 'link': '/'},
+			{'nome': 'Torneios', 'link': '/torneios'},
+			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
+			{'nome': 'Jogos', 'link': '/competicoes/' + str(jogo.competicao.pk)},
+			{'nome': 'Atualizar'},
+		]
+	}
+
+	return render(request, 'pontuacao-atualizar.html', context)	
+

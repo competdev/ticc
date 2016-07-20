@@ -43,7 +43,7 @@ $(document).ready(function(){
 
     $('.datatables').DataTable({
         paging: false,
-        ordering: false,
+        ordering: true,
         info: false,
         language: {
             emptyTable: 'Nenhum participante encontrado',
@@ -51,7 +51,7 @@ $(document).ready(function(){
         },
         order: [
             [2, 'desc'],
-            [3, 'asc'],
+            [3, 'asc']
         ]
     });
 })

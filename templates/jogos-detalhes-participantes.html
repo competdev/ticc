@@ -2,7 +2,7 @@
     <div class="box-header with-border">
         <h3 class="box-title">Participantes</h3>
         <div class="box-tools pull-right">
-            <a href="/" class="btn btn-box-tool">Atualizar</a>
+            <a href="/pontuacao/{{ jogo.pk }}" class="btn btn-box-tool">Atualizar</a>
             {% if user in jogo.participantes.all %}
                 <a href="/jogos/sair/{{ jogo.pk }}" class="btn btn-box-tool text-red">Sair</a>
             {% else %}
@@ -24,7 +24,7 @@
                 {% for pontuacao in jogo.pontuacao.all %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ pontuacao.participante }}</td>
+                        <td>{{ pontuacao.participante.get_full_name }}</td>
                         <td>{{ pontuacao.pontos }}</td>
                         <td>{{ pontuacao.tempo }}</td>
                     </tr>

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content-title %}
+    Definir Resultado
+{% endblock content-title %}
+
+{% block breadcrumb %}
+    {% include "breadcrumb.html" %}
+{% endblock breadcrumb %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-md-6">
+		    <div class="box">
+		    	<form method="POST" action="/pontuacao/{{ jogo.pk }}">
+		    		{% csrf_token %} 
+			        <div class="box-header with-border">
+			            <h3 class="box-title">Atualizar pontuação</h3>
+			        </div>
+			        <div class="box-body">
+			            <table class="table datatables">
+			                <thead>
+			                    <tr>
+			                        <th>#</th>
+			                        <th>Nome</th>
+			                        <th>Pontuação</th>
+			                        <th>Tempo</th>
+			                    </tr>
+			                </thead>
+			                <tbody>
+			                    {% for pontuacao in jogo.pontuacao.all %}
+					                <tr>
+					                    <td>{{ forloop.counter }}</td>
+					                    <td>{{ pontuacao.participante.get_full_name }}</td>
+					                    <td>
+					                    	<input type="text" name="{{ pontuacao.pk }}" value="{{ pontuacao.pontos }}">
+					                    </td>
+					                    <td>
+					                    	<input type="text" name="{{ pontuacao.pk }}" value="{{ pontuacao.tempo }}">
+					                    </td>
+					                </tr>
+					            {% endfor %}
+			                </tbody>
+			            </table>
+			        </div>
+			        <div class="box-footer">
+			        	<a href="/jogos/{{ jogo.pk }}" class="btn btn-default">Cancelar</a>
+			            <button type="submit" class="btn btn-primary pull-right">Atualizar</button>
+			        </div>
+		    	</form>
+		    </div>
+		</div>		
+	</div>
+{% endblock content %}
+

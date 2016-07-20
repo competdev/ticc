@@ -19,4 +19,6 @@ urlpatterns = [
 	url(r'jogos/excluir/(?P<pkJogo>[0-9]+)$', views.jogos_excluir),
 	url(r'jogos/participar/(?P<pkJogo>[0-9]+)$', views.jogos_participar),
 	url(r'jogos/sair/(?P<pkJogo>[0-9]+)$', views.jogos_sair),
+
+	url(r'pontuacao/(?P<pkJogo>[0-9]+)$', views.pontuacao_atualizar),
 ]
