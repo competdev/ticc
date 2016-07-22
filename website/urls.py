@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
 	url(r'^$', views.home),
+	url(r'login$', views.login),
+	url(r'logout$', views.logout),
 	url(r'torneios$', views.torneios),
 	url(r'torneios/novo', views.torneios_novo),
 	url(r'torneios/(?P<pkTorneio>[0-9]+)$', views.torneios_detalhes),

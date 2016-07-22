@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content-title %}
+    Login
+{% endblock content-title %}
+
+{% block breadcrumb %}
+    {% include "breadcrumb.html" %}
+{% endblock breadcrumb %}
+
+{% block content %}
+	<div class="row">
+	    <div class="col-md-6 col-md-offset-3">
+	        <div class="box">
+	            <form role="form" method="POST" action="/login">
+	            	{% csrf_token %}
+					<input type="hidden" name="next" value="{{ request.GET.next |default:"/"}}" />
+	                <div class="box-body">
+	                    <div class="form-group">
+	                        <label for="matricula">Matrícula</label>
+	                        <input type="text" class="form-control" id="matricula" name="matricula" value="{{ matricula }}"  placeholder="Digite matrícula">
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="senha">Senha</label>
+	                        <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite senha">
+	                    </div>
+	                    {% if error %}
+		                    <div class="form-group">
+	                            <span class="help-block text-red">{{error}}</span>
+	                        </div>
+	                    {% endif %}
+	                </div>
+	                <div class="box-footer">
+	                    <button type="submit" class="btn btn-primary pull-right">Entrar</button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+{% endblock content %}

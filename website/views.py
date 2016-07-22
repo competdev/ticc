@@ -1,10 +1,35 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as login_user
+from django.contrib.auth import logout as logout_user
+
 from .models import *
 from .forms import *
 
 def home(request):
 	return render(request, 'home.html')
+
+def login(request):
+	context = {}
+
+	if request.method == 'POST':
+		matricula = request.POST['matricula']
+		senha = request.POST['senha']
+		user = authenticate(username=matricula, password=senha)
+		if user is not None:
+			login_user(request, user)
+			return redirect(request.POST.get('next'))
+		else:
+			context['error'] = "Matrícula ou senha inválidos."
+			context['matricula'] = request.POST['matricula']
+
+	return render(request, 'login.html', context)
+
+def logout(request):
+	logout_user(request)
+	return redirect('/')
 
 def torneios(request):
 	context = {
@@ -16,6 +41,8 @@ def torneios(request):
 	}
 	return render(request, 'torneios.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def torneios_novo(request):
 	if request.method == 'POST':
 		form = TorneioForm(request.POST)
@@ -52,6 +79,8 @@ def torneios_detalhes(request, pkTorneio):
 
 	return render(request, 'torneios-detalhes.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def torneios_editar(request, pkTorneio):
 	torneio = get_object_or_404(Torneio, pk=pkTorneio)
 	if request.method == 'POST':
@@ -77,11 +106,14 @@ def torneios_editar(request, pkTorneio):
 
 	return render(request, 'crud.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def torneios_excluir(request, pkTorneio):
 	get_object_or_404(Torneio, pk=pkTorneio).delete()
 	return redirect('/torneios')
 
-
+@permission_required('user.is_staff')
+@login_required()
 def competicoes_novo(request, pkTorneio):
 	if request.method == 'POST':
 		form = CompeticaoForm(request.POST)
@@ -138,10 +170,13 @@ def competicoes_detalhes(request, pkCompeticao):
 
 	return render(request, 'competicoes-detalhes.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def competicoes_editar(request, pkCompeticao):
 	pass
 
-
+@permission_required('user.is_staff')
+@login_required()
 def jogos_novo(request, pkCompeticao):
 	if request.method == 'POST':
 		form = JogoForm(request.POST)
@@ -187,6 +222,8 @@ def jogos_detalhes(request, pkJogo):
 
 	return render(request, 'jogos-detalhes.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def jogos_editar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	if request.method == 'POST':
@@ -215,18 +252,22 @@ def jogos_editar(request, pkJogo):
 	
 	return render(request, 'crud.html', context)
 
+@permission_required('user.is_staff')
+@login_required()
 def jogos_excluir(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	pkCompeticao = jogo.competicao.pk
 	jogo.delete()
 	return redirect('/competicoes/' + str(pkCompeticao))
 
+@login_required()
 def jogos_participar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	jogo.participantes.add(request.user)
 	Pontuacao.objects.create(jogo=jogo, participante=request.user)
 	return redirect('/jogos/' + str(pkJogo))
 
+@login_required()
 def jogos_sair(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	jogo.participantes.remove(request.user)
@@ -234,6 +275,8 @@ def jogos_sair(request, pkJogo):
 	pontuacao.delete()
 	return redirect('/jogos/' + str(pkJogo))
 
+@permission_required('user.is_staff')
+@login_required()
 def pontuacao_atualizar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 
