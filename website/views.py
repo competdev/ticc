@@ -119,22 +119,17 @@ def competicoes_novo(request, pkTorneio):
 		form = CompeticaoForm(request.POST, pkTorneio)
 		if form.is_valid():
 			competicao = form.save(commit=False)
-			torneio = Torneio.objects.get(pk=pkTorneio)
-			competicao_existente = torneio.competicoes.filter(categoria=competicao.categoria).first()
-			if competicao_existente is None:
-				competicao.torneio = torneio
-				competicao.save()
-				jogo = Jogo()
-				jogo.competicao = competicao
-				jogo.local = competicao.torneio.sede.__str__()
-				jogo.campus = competicao.torneio.sede
-				jogo.responsavel = request.user
-				jogo.intercampi = True
-				jogo.data = competicao.torneio.inicio
-				jogo.save()
-				return redirect('jogos/editar/' + str(jogo.pk))
-			return redirect('/torneios/' + pkTorneio)
-
+			competicao.torneio = Torneio.objects.get(pk=pkTorneio)
+			competicao.save()
+			jogo = Jogo()
+			jogo.competicao = competicao
+			jogo.local = competicao.torneio.sede.__str__()
+			jogo.campus = competicao.torneio.sede
+			jogo.responsavel = request.user
+			jogo.intercampi = True
+			jogo.data = competicao.torneio.inicio
+			jogo.save()
+			return redirect('jogos/editar/' + str(jogo.pk))
 
 	else:
 		form = CompeticaoForm()
