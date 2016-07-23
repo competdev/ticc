@@ -19,6 +19,9 @@ class TorneioForm(ModelForm):
         super(TorneioForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
+        self.fields['responsavel'].label = 'Responsável'
+        self.fields['inicio'].label = 'Início'
+        self.fields['termino'].label = 'Término'
 
     def clean_termino(self):
         inicio = self.cleaned_data['inicio']
@@ -49,6 +52,7 @@ class CompeticaoForm(ModelForm):
         super(CompeticaoForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
+        self.fields['responsavel'].label = 'Responsável'
 
 class JogoForm(ModelForm):
     class Meta:
@@ -74,3 +78,6 @@ class JogoForm(ModelForm):
         super(JogoForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
+        self.fields['responsavel'].label = 'Responsável'
+        self.fields['inicio'].label = 'Início'
+        self.fields['termino'].label = 'Término'

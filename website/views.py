@@ -136,7 +136,7 @@ def competicoes_novo(request, pkTorneio):
 
 	torneio = get_object_or_404(Torneio, pk=pkTorneio)
 	context = {
-		'titulo': "Nova Competicao",
+		'titulo': "Nova Competição",
 		'action': '/competicoes/novo/' + pkTorneio,
 		'cancelar': '/torneio/' + pkTorneio,
 		'form': form,
