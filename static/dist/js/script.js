@@ -24,8 +24,11 @@ function initMap() {
 // });
 
 $(document).ready(function(){
+
+    $.datetimepicker.setLocale('pt-BR');
+
     $('[widget=time]').datetimepicker({
-        datepicker:false,
+        datepicker: false,
         formatTime: 'H:i',
         mask: true,
         format: 'H:i',
@@ -33,7 +36,7 @@ $(document).ready(function(){
     });
 
     $('[widget=date]').datetimepicker({
-        timepicker:false,
+        timepicker: false,
         formatDate: 'd/m/Y',
         mask: true,
         format: 'd/m/Y',
