@@ -47,8 +47,8 @@ def torneios_novo(request):
 	if request.method == 'POST':
 		form = TorneioForm(request.POST)
 		if form.is_valid():
-			form.save()
-			return redirect('/torneios')
+			torneio = form.save()
+			return redirect('/torneios/' + str(torneio.pk))
 	else:
 		form = TorneioForm()
 
@@ -191,7 +191,7 @@ def jogos_novo(request, pkCompeticao):
 
 	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
 	context = {
-		'titulo': "Novo Seletiva",
+		'titulo': "Nova Seletiva",
 		'action': '/jogos/novo/' + pkCompeticao,
 		'cancelar': '/competicoes/' + pkCompeticao,
 		'form': form,
