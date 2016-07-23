@@ -2,6 +2,7 @@ from django import forms
 from django.db import models
 from django.forms import ModelForm
 from .models import *
+from django.core.exceptions import ObjectDoesNotExist
 
 class TorneioForm(ModelForm):
     class Meta:
@@ -25,8 +26,17 @@ class CompeticaoForm(ModelForm):
         fields = ['categoria', 'responsavel']
         widgets = {
             'categoria': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'})
         }
+
+    def clean_categoria(self):
+        try:
+            pkTorneio = self.data['pkTorneio']
+            pkCategoria = self.data['categoria']
+            competicao = Competicao.objects.get(torneio__pk=pkTorneio, categoria__pk=pkCategoria)
+            raise forms.ValidationError('Competição já existente.')
+        except ObjectDoesNotExist:
+            return Categoria.objects.get(pk=pkCategoria)
 
     def __init__(self, *args, **kwargs):
         super(CompeticaoForm, self).__init__(*args, **kwargs)

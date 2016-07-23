@@ -5,7 +5,8 @@
                 <h3 class="box-title">Formulário</h3>
             </div>
             <form role="form" action="{{ action }}" method="POST">
-                {% csrf_token %}
+               {% csrf_token %}
+               <input type="hidden" name="pkTorneio" value="{{ torneio.pk }}">
                 <div class="box-body">
                     {% for field in form %}
                         <div class="form-group">
