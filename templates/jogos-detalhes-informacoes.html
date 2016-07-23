@@ -3,7 +3,7 @@
         <h3 class="box-title">Informações</h3>
         <div class="box-tools pull-right">
             <a href="/jogos/editar/{{ jogo.pk }}" class="btn btn-box-tool">Editar</a>
-            <a href="/jogos/excluir/{{ jogo.pk }}" class="btn btn-box-tool text-red">Excluir</a>
+            <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog" onclick="showDialog('Tem certeza que deseja excluir?', '/jogos/excluir/{{ jogo.pk }}')">Excluir</a>
         </div>
     </div>
     <div class="box-body">
