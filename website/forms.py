@@ -41,10 +41,11 @@ class CompeticaoForm(ModelForm):
 
     def clean_categoria(self):
         try:
+            import pdb; pdb.set_trace()
             pkTorneio = self.data['pkTorneio']
             pkCategoria = self.data['categoria']
             competicao = Competicao.objects.get(torneio__pk=pkTorneio, categoria__pk=pkCategoria)
-            raise forms.ValidationError('Competição já existente.')
+            raise forms.ValidationError('Este torneio já possui uma competição desta categoria.')
         except ObjectDoesNotExist:
             return Categoria.objects.get(pk=pkCategoria)
 

@@ -17,11 +17,9 @@
             <div class="container">
                 <section class="content-header">
                     <h1>
-                        {% block content-title %}
-                        {% endblock content-title %}
+                        {{ titulo }}
                     </h1>
-                        {% block breadcrumb %}
-                        {% endblock breadcrumb %}
+                    {% include "breadcrumb.html" %}
                 </section>
 
                 <section class="content">

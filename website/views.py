@@ -33,6 +33,7 @@ def logout(request):
 
 def torneios(request):
 	context = {
+		'titulo': 'Torneios',
 		'torneios': Torneio.objects.all(),
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
@@ -69,6 +70,7 @@ def torneios_novo(request):
 def torneios_detalhes(request, pkTorneio):
 	torneio = get_object_or_404(Torneio, pk=pkTorneio)
 	context = {
+		'titulo': torneio,
 		'torneio': torneio,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
@@ -138,7 +140,7 @@ def competicoes_novo(request, pkTorneio):
 	context = {
 		'titulo': "Nova Competição",
 		'action': '/competicoes/novo/' + pkTorneio,
-		'cancelar': '/torneio/' + pkTorneio,
+		'cancelar': '/torneios/' + pkTorneio,
 		'form': form,
 		'torneio' : torneio,
 		'breadcrumb': [
@@ -156,6 +158,7 @@ def competicoes_detalhes(request, pkCompeticao):
 	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
 	torneio = competicao.torneio
 	context = {
+		'titulo': competicao,
 		'competicao': competicao,
 		'torneio': torneio,
 		'seletivas': competicao.jogos.filter(intercampi=False),
@@ -210,6 +213,7 @@ def jogos_novo(request, pkCompeticao):
 def jogos_detalhes(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	context = {
+		'titulo': jogo.tipo(),
 		'jogo': jogo,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
@@ -291,6 +295,7 @@ def pontuacao_atualizar(request, pkJogo):
 		return redirect('/jogos/' + str(pkJogo))
 
 	context = {
+		'titulo': 'Atualizar Pontuação',
 		'jogo': jogo,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
