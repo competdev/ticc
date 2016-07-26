@@ -10,20 +10,17 @@ $(document).ready(function(){
 
     $('[widget=time]').datetimepicker({
         datepicker: false,
-        formatTime: 'H:i',
         mask: true,
-        format: 'H:i',
-        lang: 'pt-BR'
+        format: 'H:i'
     });
 
     $('[widget=date]').datetimepicker({
         timepicker: false,
-        formatDate: 'd/m/Y',
         mask: true,
-        format: 'd/m/Y',
-        defaultDate: new Date(),
-        lang: 'pt-BR'
+        format: 'd/m/Y'
     });
+
+    rangeData();
 
     $('.datatables').DataTable({
         paging: false,
@@ -40,3 +37,35 @@ $(document).ready(function(){
     });
 })
 
+
+var rangeData = function(){
+    // "dd/mm/yyyy" to "yyyy/mm/dd"
+    var dmy2ymd = function(str){
+        return str.split('/').reverse().join('/')
+    }
+
+    $("#id_inicio").datetimepicker('destroy');
+    $("#id_termino").datetimepicker('destroy');
+
+    $(function(){
+        $("#id_inicio").datetimepicker({
+            timepicker: false,
+            format: 'd/m/Y',
+            onShow: function( ct ){
+                this.setOptions({
+                    maxDate: $("#id_termino").val() ? dmy2ymd($("#id_termino").val()) : false
+                })
+            }
+        });
+
+        $("#id_termino").datetimepicker({
+            timepicker: false,
+            format: 'd/m/Y',
+            onShow:function( ct ){
+                this.setOptions({
+                    minDate: $("#id_inicio").val() ? dmy2ymd($("#id_inicio").val()) : false
+                })
+            }
+        });
+    });
+}

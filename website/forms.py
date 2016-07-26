@@ -11,8 +11,8 @@ class TorneioForm(ModelForm):
         widgets = {
             'sede': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'inicio': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'data-provide': 'datepicker'}, format='%d/%m/%Y'),
-            'termino': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'data-provide': 'datepicker'}, format='%d/%m/%Y'),
+            'inicio': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date'}, format='%d/%m/%Y'),
+            'termino': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date'}, format='%d/%m/%Y'),
         }
 
     def __init__(self, *args, **kwargs):
