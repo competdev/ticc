@@ -29,7 +29,6 @@ $(document).ready(function(){
         'responsavel': $('table tr:nth-child(4) td:nth-child(2)').html(),
     }
 
-
     var table = $('.datatables').DataTable({
         buttons: [
             {
@@ -74,8 +73,9 @@ $(document).ready(function(){
         .appendTo(
             $('.datatables').closest('.box').find('.box-tools')
         );
-});
+    $('.buttons-print').removeClass('btn-default');
 
+});
 
 var rangeData = function(){
     // "dd/mm/yyyy" to "yyyy/mm/dd"
