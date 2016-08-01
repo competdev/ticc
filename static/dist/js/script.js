@@ -16,7 +16,6 @@ $(document).ready(function(){
 
     $('[widget=date]').datetimepicker({
         timepicker: false,
-        mask: true,
         format: 'd/m/Y'
     });
 
@@ -83,26 +82,31 @@ var rangeData = function(){
         return str.split('/').reverse().join('/')
     }
 
-    $("#id_inicio").datetimepicker('destroy');
-    $("#id_termino").datetimepicker('destroy');
+    var inicio = $("#id_inicio[widget=date]");
+    var termino = $("#id_termino[widget=date]")
+
+    $(inicio).datetimepicker('destroy');
+    $(termino).datetimepicker('destroy');
 
     $(function(){
-        $("#id_inicio").datetimepicker({
+        $(inicio).datetimepicker({
             timepicker: false,
             format: 'd/m/Y',
+            mask: false,
             onShow: function( ct ){
                 this.setOptions({
-                    maxDate: $("#id_termino").val() ? dmy2ymd($("#id_termino").val()) : false
+                    maxDate: $(termino).val() ? dmy2ymd($(termino).val()) : false
                 })
             }
         });
 
-        $("#id_termino").datetimepicker({
+        $(termino).datetimepicker({
             timepicker: false,
             format: 'd/m/Y',
+            mask: false,
             onShow:function( ct ){
                 this.setOptions({
-                    minDate: $("#id_inicio").val() ? dmy2ymd($("#id_inicio").val()) : false
+                    minDate: $(inicio).val() ? dmy2ymd($(inicio).val()) : false
                 })
             }
         });
