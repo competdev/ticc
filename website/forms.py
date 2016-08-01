@@ -41,7 +41,6 @@ class CompeticaoForm(ModelForm):
 
     def clean_categoria(self):
         try:
-            import pdb; pdb.set_trace()
             pkTorneio = self.data['pkTorneio']
             pkCategoria = self.data['categoria']
             competicao = Competicao.objects.get(torneio__pk=pkTorneio, categoria__pk=pkCategoria)
@@ -68,6 +67,19 @@ class JogoForm(ModelForm):
             'local': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input'})
         }
 
+    def clean_campus(self):
+        campus = self.cleaned_data['campus']
+        pkCompeticao = self.data['pkCompeticao']
+        if not self.instance.pk:
+            if Jogo.objects.filter(intercampi=False, competicao__pk=pkCompeticao, campus=campus):
+                raise forms.ValidationError('Este campus já possui uma seletiva')
+        else:
+            if Jogo.objects.filter(intercampi=False, competicao__pk=pkCompeticao, campus=campus).exclude(pk=self.instance.pk):
+                raise forms.ValidationError('Este campus já possui uma seletiva')
+
+        return campus
+
+        
     def clean_termino(self):
         inicio = self.data['inicio']
         termino = self.data['termino']

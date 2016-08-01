@@ -123,15 +123,7 @@ def competicoes_novo(request, pkTorneio):
 			competicao = form.save(commit=False)
 			competicao.torneio = Torneio.objects.get(pk=pkTorneio)
 			competicao.save()
-			jogo = Jogo()
-			jogo.competicao = competicao
-			jogo.local = competicao.torneio.sede.__str__()
-			jogo.campus = competicao.torneio.sede
-			jogo.responsavel = request.user
-			jogo.intercampi = True
-			jogo.data = competicao.torneio.inicio
-			jogo.save()
-			return redirect('jogos/editar/' + str(jogo.pk))
+			return redirect('/competicoes/' + str(competicao.pk))
 
 	else:
 		form = CompeticaoForm()
@@ -162,7 +154,7 @@ def competicoes_detalhes(request, pkCompeticao):
 		'competicao': competicao,
 		'torneio': torneio,
 		'seletivas': competicao.jogos.filter(intercampi=False),
-		'intercampi': Jogo.objects.get(competicao=competicao, intercampi=True),
+		'intercampi': Jogo.objects.filter(competicao=competicao, intercampi=True).first(),
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
 			{'nome': 'Torneios', 'link': '/torneios'},
@@ -186,6 +178,7 @@ def jogos_novo(request, pkCompeticao):
 		form = JogoForm(request.POST)
 		if form.is_valid():
 			jogo = form.save(commit=False)
+			jogo.intercampi = request.POST['intercampi']
 			jogo.competicao = Competicao.objects.get(pk=pkCompeticao)
 			jogo.save()
 			return redirect('/competicoes/' + pkCompeticao)
@@ -197,6 +190,7 @@ def jogos_novo(request, pkCompeticao):
 		'titulo': "Nova Seletiva",
 		'action': '/jogos/novo/' + pkCompeticao,
 		'cancelar': '/competicoes/' + pkCompeticao,
+		'competicao': competicao,
 		'form': form,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
@@ -239,10 +233,12 @@ def jogos_editar(request, pkJogo):
 	else:
 		form = JogoForm(instance=jogo)
 
+	competicao = get_object_or_404(Competicao, pk=jogo.competicao.pk)
 	context = {
 		'titulo': "Editar " + jogo.tipo(),
 		'action': '/jogos/editar/' + pkJogo,
 		'cancelar': '/jogos/' + pkJogo,
+		'competicao': competicao,
 		'form': form,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},

@@ -4,8 +4,9 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Intercampi</h3>
                 <div class="box-tools pull-right">
-                    <a href="/competicoes/editar/{{ competicao.pk }}/" class="btn btn-box-tool">Editar</a>
-                    <a href="/jogos/novo/{{ competicao.id }}?intercampi=True" class="btn btn-box-tool">Nova</a>
+                    {% if not intercampi %}
+                        <a href="/jogos/novo/{{ competicao.id }}?intercampi=True" class="btn btn-box-tool">Novo</a>
+                    {% endif %}
                 </div>
             </div>
             <div class="box-body">

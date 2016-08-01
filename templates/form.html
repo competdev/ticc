@@ -7,6 +7,7 @@
             <form role="form" action="{{ action }}" method="POST">
                {% csrf_token %}
                <input type="hidden" name="pkTorneio" value="{{ torneio.pk }}">
+               <input type="hidden" name="pkCompeticao" value="{{ competicao.pk }}">
                <input type="hidden" name="intercampi" value="{{ request.GET.intercampi }}">
                 <div class="box-body">
                     {% for field in form %}
