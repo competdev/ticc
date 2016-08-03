@@ -2,10 +2,10 @@
     <div class="col-md-6 col-md-offset-3">
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">Intercampi</h3>
+                <h3 class="box-title">Final</h3>
                 {% if not intercampi and user.is_authenticated%}
                     <div class="box-tools pull-right">
-                        <a href="/jogos/novo/{{ competicao.id }}?intercampi=True" class="btn btn-box-tool">Novo</a>
+                        <a href="/jogos/novo/{{ competicao.id }}?intercampi=True" class="btn btn-box-tool">Nova</a>
                     </div>
                 {% endif %}
             </div>

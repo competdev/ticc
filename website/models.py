@@ -73,7 +73,7 @@ class Jogo(models.Model):
 
 	def tipo(self):
 		if self.intercampi:
-			return "Intercampi"
+			return "Final"
 		else:
 			return "Seletiva"
 

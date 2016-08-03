@@ -181,7 +181,7 @@ def jogos_novo(request, pkCompeticao):
 
 	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
 	context = {
-		'titulo': 'Novo Intercampi' if request.GET.get('intercampi') else 'Nova Seletiva',
+		'titulo': 'Nova Final' if request.GET.get('intercampi') else 'Nova Seletiva',
 		'action': '/jogos/novo/' + pkCompeticao,
 		'cancelar': '/competicoes/' + pkCompeticao,
 		'competicao': competicao,
@@ -201,7 +201,7 @@ def jogos_novo(request, pkCompeticao):
 def jogos_detalhes(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
 	context = {
-		'titulo': jogo.tipo(),
+		'titulo': jogo.tipo() + ' - ' + str(jogo.competicao),
 		'jogo': jogo,
 		'breadcrumb': [
 			{'nome': 'Inicio', 'link': '/'},
