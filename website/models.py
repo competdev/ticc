@@ -48,6 +48,9 @@ class Competicao(models.Model):
 
 class Participante(models.Model):
 	nome = models.CharField(max_length=255)
+	matricula = models.CharField(max_length=12)
+	email = models.EmailField(max_length=255)
+	curso = models.CharField(max_length=255)
 
 class Jogo(models.Model):
 	competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name="jogos")
@@ -87,4 +90,4 @@ class Pontuacao(models.Model):
 	tempo = models.IntegerField(default=0)
 
 	def __str__(self):
-		return self.participante.get_full_name() + ' - ' + self.jogo.__str__()
+		return self.participante.nome + ' - ' + self.jogo.__str__()

@@ -261,7 +261,10 @@ def jogos_participar(request, pkJogo):
 		form = ParticiparForm(request.POST)
 		if form.is_valid():
 			nome = form.cleaned_data['nome']
-			participante = Participante.objects.create(nome=nome)
+			matricula = form.cleaned_data['matricula']
+			email = form.cleaned_data['email']
+			curso = form.cleaned_data['curso']
+			participante = Participante.objects.create(nome=nome, matricula=matricula, email=email, curso=curso)
 			Pontuacao.objects.create(jogo=jogo, participante=participante)
 			jogo.participantes.add(participante)
 			return redirect('/jogos/' + pkJogo)
