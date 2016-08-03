@@ -2,10 +2,11 @@
     <div class="box-header with-border">
         <h3 class="box-title">Participantes</h3>
         <div class="box-tools pull-right">
-            <a href="/pontuacao/{{ jogo.pk }}" class="btn btn-box-tool">Atualizar</a>
-            {% if user in jogo.participantes.all %}
-                <a href="/jogos/sair/{{ jogo.pk }}" class="btn btn-box-tool text-red">Sair</a>
-            {% else %}
+            {% if user.is_authenticated %}
+                <a href="/pontuacao/{{ jogo.pk }}" class="btn btn-box-tool">Atualizar</a>
+            {% endif %}
+                <!--<a href="/jogos/sair/{{ jogo.pk }}" class="btn btn-box-tool text-red">Sair</a>-->
+            {% if not jogo.intercampi and not user.is_authenticated %}
                 <a href="/jogos/participar/{{ jogo.pk }}" class="btn btn-box-tool">Participar</a>
             {% endif %}
         </div>
@@ -24,7 +25,7 @@
                 {% for pontuacao in jogo.pontuacao.all %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ pontuacao.participante.get_full_name }}</td>
+                        <td>{{ pontuacao.participante.nome }}</td>
                         <td>{{ pontuacao.pontos }}</td>
                         <td>{{ pontuacao.tempo }}</td>
                     </tr>

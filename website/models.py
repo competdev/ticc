@@ -46,6 +46,9 @@ class Competicao(models.Model):
 	def status(self):
 		pass
 
+class Participante(models.Model):
+	nome = models.CharField(max_length=255)
+
 class Jogo(models.Model):
 	competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name="jogos")
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
@@ -54,7 +57,7 @@ class Jogo(models.Model):
 	inicio = models.TimeField(default=timezone.now)
 	termino = models.TimeField(default=timezone.now)
 	local = models.CharField(max_length=255)
-	participantes = models.ManyToManyField(User, related_name='jogos')
+	participantes = models.ManyToManyField(Participante, related_name='jogos')
 	intercampi = models.BooleanField(default=False)
 
 	def status(self):
@@ -79,7 +82,7 @@ class Jogo(models.Model):
 
 class Pontuacao(models.Model):
 	jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="pontuacao")
-	participante = models.ForeignKey(User, on_delete=models.CASCADE)
+	participante = models.ForeignKey(Participante, on_delete=models.CASCADE)
 	pontos = models.IntegerField(default=0)
 	tempo = models.IntegerField(default=0)
 

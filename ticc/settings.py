@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website.apps.WebsiteConfig',
+    'captcha',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -133,3 +134,7 @@ STATICFILES_DIRS = [
 DATE_INPUT_FORMATS = ("%d/%m/%Y", )
 
 #STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+RECAPTCHA_PUBLIC_KEY = '6LfVoCYTAAAAAH3rX3laFwniK21XMcKISfo31pbM'
+RECAPTCHA_PRIVATE_KEY = '6LfVoCYTAAAAABDstANhXJFfJEZocLvgWxjitqSe'
+NOCAPTCHA = True

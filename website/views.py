@@ -15,15 +15,15 @@ def login(request):
 	context = {}
 
 	if request.method == 'POST':
-		matricula = request.POST['matricula']
+		usuario = request.POST['usuario']
 		senha = request.POST['senha']
-		user = authenticate(username=matricula, password=senha)
+		user = authenticate(username=usuario, password=senha)
 		if user is not None:
 			login_user(request, user)
 			return redirect(request.POST.get('next'))
 		else:
-			context['error'] = "Matrícula ou senha inválidos."
-			context['matricula'] = request.POST['matricula']
+			context['error'] = "Usuário ou senha inválidos."
+			context['usuario'] = request.POST['usuario']
 
 	return render(request, 'login.html', context)
 
@@ -42,7 +42,6 @@ def torneios(request):
 	}
 	return render(request, 'torneios.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def torneios_novo(request):
 	if request.method == 'POST':
@@ -81,7 +80,6 @@ def torneios_detalhes(request, pkTorneio):
 
 	return render(request, 'torneios-detalhes.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def torneios_editar(request, pkTorneio):
 	torneio = get_object_or_404(Torneio, pk=pkTorneio)
@@ -108,13 +106,11 @@ def torneios_editar(request, pkTorneio):
 
 	return render(request, 'crud.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def torneios_excluir(request, pkTorneio):
 	get_object_or_404(Torneio, pk=pkTorneio).delete()
 	return redirect('/torneios')
 
-@permission_required('user.is_staff')
 @login_required()
 def competicoes_novo(request, pkTorneio):
 	if request.method == 'POST':
@@ -166,12 +162,10 @@ def competicoes_detalhes(request, pkCompeticao):
 
 	return render(request, 'competicoes-detalhes.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def competicoes_editar(request, pkCompeticao):
 	pass
 
-@permission_required('user.is_staff')
 @login_required()
 def jogos_novo(request, pkCompeticao):
 	if request.method == 'POST':
@@ -183,11 +177,11 @@ def jogos_novo(request, pkCompeticao):
 			jogo.save()
 			return redirect('/competicoes/' + pkCompeticao)
 	else:
-		form = JogoForm()
+		form = JogoForm(initial={'data': '', 'inicio': '', 'termino': ''})
 
 	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
 	context = {
-		'titulo': "Nova Seletiva",
+		'titulo': 'Novo Intercampi' if request.GET.get('intercampi') else 'Nova Seletiva',
 		'action': '/jogos/novo/' + pkCompeticao,
 		'cancelar': '/competicoes/' + pkCompeticao,
 		'competicao': competicao,
@@ -198,7 +192,7 @@ def jogos_novo(request, pkCompeticao):
 			{'nome': competicao.torneio, 'link': '/torneios/' + str(competicao.torneio.pk)},
 			{'nome': 'Competições', 'link': '/torneios'},
 			{'nome': competicao, 'link': '/competicoes/' + str(competicao.pk)},
-			{'nome': 'Editar'},
+			{'nome': 'Novo'},
 		]
 	}
 
@@ -221,7 +215,6 @@ def jogos_detalhes(request, pkJogo):
 
 	return render(request, 'jogos-detalhes.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def jogos_editar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
@@ -253,7 +246,6 @@ def jogos_editar(request, pkJogo):
 	
 	return render(request, 'crud.html', context)
 
-@permission_required('user.is_staff')
 @login_required()
 def jogos_excluir(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
@@ -261,12 +253,39 @@ def jogos_excluir(request, pkJogo):
 	jogo.delete()
 	return redirect('/competicoes/' + str(pkCompeticao))
 
-@login_required()
 def jogos_participar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
-	jogo.participantes.add(request.user)
-	Pontuacao.objects.create(jogo=jogo, participante=request.user)
-	return redirect('/jogos/' + str(pkJogo))
+	competicao = jogo.competicao
+
+	if request.method == 'POST':
+		form = ParticiparForm(request.POST)
+		if form.is_valid():
+			nome = form.cleaned_data['nome']
+			participante = Participante.objects.create(nome=nome)
+			Pontuacao.objects.create(jogo=jogo, participante=participante)
+			jogo.participantes.add(participante)
+			return redirect('/jogos/' + pkJogo)
+	else:
+		form = ParticiparForm()
+
+	context = {
+		'titulo': "Participar " + jogo.tipo(),
+		'action': '/jogos/participar/' + pkJogo,
+		'cancelar': '/jogos/' + pkJogo,
+		'competicao': competicao,
+		'form': form,
+		'breadcrumb': [
+			{'nome': 'Inicio', 'link': '/'},
+			{'nome': 'Torneios', 'link': '/torneios'},
+			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
+			{'nome': 'Competições', 'link': '/torneios'},
+			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
+			{'nome': jogo.tipo(), 'link': '/jogos/' + str(jogo.pk) },
+			{'nome': 'Participar'},
+		]
+	}
+	
+	return render(request, 'crud.html', context)
 
 @login_required()
 def jogos_sair(request, pkJogo):
@@ -276,7 +295,6 @@ def jogos_sair(request, pkJogo):
 	pontuacao.delete()
 	return redirect('/jogos/' + str(pkJogo))
 
-@permission_required('user.is_staff')
 @login_required()
 def pontuacao_atualizar(request, pkJogo):
 	jogo = get_object_or_404(Jogo, pk=pkJogo)
@@ -303,4 +321,3 @@ def pontuacao_atualizar(request, pkJogo):
 	}
 
 	return render(request, 'pontuacao-atualizar.html', context)	
-

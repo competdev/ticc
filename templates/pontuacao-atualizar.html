@@ -23,7 +23,7 @@
 			                    {% for pontuacao in jogo.pontuacao.all %}
 					                <tr>
 					                    <td>{{ forloop.counter }}</td>
-					                    <td>{{ pontuacao.participante.get_full_name }}</td>
+					                    <td>{{ pontuacao.participante.nome }}</td>
 					                    <td>
 					                    	<input type="text" name="{{ pontuacao.pk }}" value="{{ pontuacao.pontos }}">
 					                    </td>

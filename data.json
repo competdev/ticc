@@ -89,5 +89,14 @@
 			"nome": "Robótica",
 			"regras": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit laudantium, placeat ipsam, quas ad dolorem ab incidunt alias. Neque iure earum quos soluta eos asperiores praesentium quas non voluptatum, tenetur."
 		}
-	}
+	},
+	{
+        "model": "auth.user",
+        "fields": {
+            "password": "123456",
+            "username": "sandrordias",
+            "first_name": "Sandro",
+            "last_name": "Renato Dias"
+        }
+    }
 ]

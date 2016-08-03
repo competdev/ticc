@@ -3,6 +3,7 @@ from django.db import models
 from django.forms import ModelForm
 from .models import *
 from django.core.exceptions import ObjectDoesNotExist
+from captcha.fields import ReCaptchaField
 
 class TorneioForm(ModelForm):
     class Meta:
@@ -11,8 +12,8 @@ class TorneioForm(ModelForm):
         widgets = {
             'sede': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'inicio': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date'}, format='%d/%m/%Y'),
-            'termino': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date'}, format='%d/%m/%Y'),
+            'inicio': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
+            'termino': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
         }
 
     def __init__(self, *args, **kwargs):
@@ -61,10 +62,10 @@ class JogoForm(ModelForm):
         widgets = {
             'campus': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'data': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date'}),
-            'inicio': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time'}),
-            'termino': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time'}),
-            'local': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input'})
+            'data': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
+            'inicio': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
+            'termino': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
+            'local': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'})
         }
 
     def clean_campus(self):
@@ -94,3 +95,7 @@ class JogoForm(ModelForm):
         self.fields['responsavel'].label = 'Responsável'
         self.fields['inicio'].label = 'Início'
         self.fields['termino'].label = 'Término'
+
+class ParticiparForm(forms.Form):
+    nome = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
+    captcha = ReCaptchaField()
