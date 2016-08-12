@@ -3,12 +3,12 @@
         <div class="container">
             <div class="navbar-header">
                 <a href="/" class="navbar-brand">TICC</a>
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse1 #navbar-collapse2">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                     <i class="fa fa-bars"></i>
                 </button>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse pull-left" id="navbar-collapse1">
+            <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li>
                         <a href="/">Início</a>
@@ -19,7 +19,7 @@
                 </ul>
             </div>
             <!-- Navbar Right Menu -->
-            <div class="navbar-custom-menu" id="navbar-collapse2">
+            <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
                     {% if user.is_authenticated %}
                         <li>
