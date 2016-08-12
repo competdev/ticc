@@ -31,6 +31,9 @@ def logout(request):
 	logout_user(request)
 	return redirect('/')
 
+def sobre(request):
+	return render(request,'sobre.html',{})
+
 def torneios(request):
 	context = {
 		'titulo': 'Torneios',
