@@ -1,0 +1,24 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Final</h3>
+        {% if not intercampi and user.is_authenticated%}
+            <div class="box-tools pull-right">
+                <a href="/jogos/novo/{{ competicao.id }}?intercampi=True" class="btn btn-box-tool">Nova</a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="box-body">
+        <table class="table">
+            <tr>
+                <th>Data</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>
+                    <a href="/jogos/{{ intercampi.pk }}">{{ intercampi.data }}</a>
+                </td>
+                <td class="{{ intercampi.status }}"></td>
+            </tr>
+        </table>
+    </div>
+</div>
