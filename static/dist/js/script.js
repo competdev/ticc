@@ -1,9 +1,3 @@
-// $(function(){
-//     $(".box").hide().each(function(i) {
-//         $(this).delay(i*600).fadeIn(600);
-//     });
-// });
-
 $(document).ready(function(){
 
     $.datetimepicker.setLocale('pt-BR');
@@ -21,11 +15,11 @@ $(document).ready(function(){
 
     rangeData();
 
-    var seletiva = {
-        'data': $('table tr:nth-child(1) td:nth-child(2)').html(),
-        'horario': $('table tr:nth-child(2) td:nth-child(2)').html(),
-        'local': $('table tr:nth-child(3) td:nth-child(2)').html(),
-        'responsavel': $('table tr:nth-child(4) td:nth-child(2)').html(),
+    var trial = {
+        'date': $('table tr:nth-child(1) td:nth-child(2)').html(),
+        'time': $('table tr:nth-child(2) td:nth-child(2)').html(),
+        'location': $('table tr:nth-child(3) td:nth-child(2)').html(),
+        'responsible': $('table tr:nth-child(4) td:nth-child(2)').html(),
     }
 
     var table = $('.datatables').DataTable({
@@ -37,10 +31,10 @@ $(document).ready(function(){
                 text: '<span class="glyphicon glyphicon-print">',
                 title: 'Seletiva - Participantes',
                 message: 
-                        '<p><strong>Data: </strong>'+seletiva.data+'</p> \
-                        <p><strong>Horário: </strong>'+seletiva.horario+'</p> \
-                        <p><strong>Local: </strong>'+seletiva.local+'</p> \
-                        <p><strong>Responsável: </strong>'+seletiva.responsavel+'</p>',
+                        '<p><strong>Data: </strong>'+trial.date+'</p> \
+                        <p><strong>Horário: </strong>'+trial.time+'</p> \
+                        <p><strong>Local: </strong>'+trial.location+'</p> \
+                        <p><strong>Responsável: </strong>'+trial.responsible+'</p>',
                 customize: function(win) 
                 {   
                     $(win.document.body)
@@ -89,31 +83,31 @@ var rangeData = function(){
         return str.split('/').reverse().join('/')
     }
 
-    var inicio = $("#id_inicio[widget=date]");
-    var termino = $("#id_termino[widget=date]")
+    var start = $("#id_start[widget=date]");
+    var end = $("#id_end[widget=date]")
 
-    $(inicio).datetimepicker('destroy');
-    $(termino).datetimepicker('destroy');
+    $(start).datetimepicker('destroy');
+    $(end).datetimepicker('destroy');
 
     $(function(){
-        $(inicio).datetimepicker({
+        $(start).datetimepicker({
             timepicker: false,
             format: 'd/m/Y',
             mask: false,
             onShow: function( ct ){
                 this.setOptions({
-                    maxDate: $(termino).val() ? dmy2ymd($(termino).val()) : false
+                    maxDate: $(end).val() ? dmy2ymd($(end).val()) : false
                 })
             }
         });
 
-        $(termino).datetimepicker({
+        $(end).datetimepicker({
             timepicker: false,
             format: 'd/m/Y',
             mask: false,
             onShow:function( ct ){
                 this.setOptions({
-                    minDate: $(inicio).val() ? dmy2ymd($(inicio).val()) : false
+                    minDate: $(start).val() ? dmy2ymd($(start).val()) : false
                 })
             }
         });

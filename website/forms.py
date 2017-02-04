@@ -5,100 +5,101 @@ from .models import *
 from django.core.exceptions import ObjectDoesNotExist
 from captcha.fields import ReCaptchaField
 
-class TorneioForm(ModelForm):
+class TournamentForm(ModelForm):
     class Meta:
-        model = Torneio
-        fields = ['sede', 'responsavel', 'inicio', 'termino']
+        model = Tournament
+        fields = ['location', 'responsible', 'start', 'end']
         widgets = {
-            'sede': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'inicio': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
-            'termino': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
+            'location': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'start': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
+            'end': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
         }
 
     def __init__(self, *args, **kwargs):
-        super(TorneioForm, self).__init__(*args, **kwargs)
+        super(TournamentForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
-        self.fields['responsavel'].label = 'Responsável'
-        self.fields['inicio'].label = 'Início'
-        self.fields['termino'].label = 'Término'
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['location'].label = 'Sede'
+        self.fields['responsible'].label = 'Responsável'
+        self.fields['start'].label = 'Início'
+        self.fields['end'].label = 'Término'
 
-    def clean_termino(self):
-        inicio = self.cleaned_data['inicio']
-        termino = self.cleaned_data['termino']
-        if termino < inicio:
+    def clean_end(self):
+        start = self.cleaned_data['start']
+        end = self.cleaned_data['end']
+        if end < start:
             raise forms.ValidationError('A data de término não pode ser antes da data de início.')
-        return termino
+        return end
 
-class CompeticaoForm(ModelForm):
+class CompetitionForm(ModelForm):
     class Meta:
-        model = Competicao
-        fields = ['categoria', 'responsavel']
+        model = Competition
+        fields = ['category', 'responsible']
         widgets = {
-            'categoria': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'})
+            'category': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'})
         }
 
-    def clean_categoria(self):
+    def clean_category(self):
         try:
-            pkTorneio = self.data['pkTorneio']
-            pkCategoria = self.data['categoria']
-            competicao = Competicao.objects.get(torneio__pk=pkTorneio, categoria__pk=pkCategoria)
-            raise forms.ValidationError('Este torneio já possui uma competição desta categoria.')
+            tournament_id = self.data['tournament_id']
+            category_id = self.data['category']
+            competition = Competition.objects.get(tournament__id=tournament_id, category__id=category_id)
+            raise forms.ValidationError('Este torneio já possui uma competição desta category.')
         except ObjectDoesNotExist:
-            return Categoria.objects.get(pk=pkCategoria)
+            return Category.objects.get(id=category_id)
 
     def __init__(self, *args, **kwargs):
-        super(CompeticaoForm, self).__init__(*args, **kwargs)
+        super(CompetitionForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
-        self.fields['responsavel'].label = 'Responsável'
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['responsible'].label = 'Responsável'
 
-class JogoForm(ModelForm):
+class MatchForm(ModelForm):
     class Meta:
-        model = Jogo
-        fields = ['campus', 'responsavel', 'data', 'inicio', 'termino', 'local']
+        model = Match
+        fields = ['campus', 'responsible', 'date', 'start', 'end', 'location']
         widgets = {
             'campus': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'responsavel': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'data': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
-            'inicio': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
-            'termino': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
-            'local': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'})
+            'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'date': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
+            'start': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
+            'end': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'})
         }
 
     def clean_campus(self):
         campus = self.cleaned_data['campus']
-        pkCompeticao = self.data['pkCompeticao']
-        if not self.instance.pk:
-            if Jogo.objects.filter(intercampi=False, competicao__pk=pkCompeticao, campus=campus):
+        competition_id = self.data['competition_id']
+        if not self.instance.id:
+            if Match.objects.filter(intercampi=False, competition__id=competition_id, campus=campus):
                 raise forms.ValidationError('Este campus já possui uma seletiva')
         else:
-            if Jogo.objects.filter(intercampi=False, competicao__pk=pkCompeticao, campus=campus).exclude(pk=self.instance.pk):
+            if Match.objects.filter(intercampi=False, competition__id=competition_id, campus=campus).exclude(id=self.instance.id):
                 raise forms.ValidationError('Este campus já possui uma seletiva')
 
         return campus
 
         
-    def clean_termino(self):
-        inicio = self.data['inicio']
-        termino = self.data['termino']
-        if termino < inicio:
+    def clean_end(self):
+        start = self.data['start']
+        end = self.data['end']
+        if end < start:
             raise forms.ValidationError('O horário de término não pode ser antes do horário de início.')
-        return termino
+        return end
 
     def __init__(self, *args, **kwargs):
-        super(JogoForm, self).__init__(*args, **kwargs)
+        super(MatchForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsavel'].choices = [('', '---------')] + [(user.pk, user.get_full_name()) for user in users]
-        self.fields['responsavel'].label = 'Responsável'
-        self.fields['inicio'].label = 'Início'
-        self.fields['termino'].label = 'Término'
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['responsible'].label = 'Responsável'
+        self.fields['start'].label = 'Início'
+        self.fields['end'].label = 'Término'
 
-class ParticiparForm(forms.Form):
-    nome = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
-    matricula = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
+class AttendForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
+    code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
-    curso = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
+    course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
     captcha = ReCaptchaField()

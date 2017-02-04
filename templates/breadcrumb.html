@@ -2,10 +2,10 @@
     {% for item in breadcrumb %}
         {% if item.link %}
             <li>
-                <a href="{{ item.link }}">{{ item.nome }}</a>
+                <a href="{{ item.link }}">{{ item.name }}</a>
             </li>
         {% else %}
-            <li class="active">{{ item.nome }}</li>
+            <li class="active">{{ item.name }}</li>
         {% endif %}
     {% endfor %}
 </ol>

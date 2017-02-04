@@ -3,9 +3,9 @@ from .models import *
 
 
 admin.site.register(Campus)
-admin.site.register(Categoria)
-admin.site.register(Torneio)
-admin.site.register(Competicao)
-admin.site.register(Jogo)
-admin.site.register(Pontuacao)
-admin.site.register(Participante)
+admin.site.register(Category)
+admin.site.register(Tournament)
+admin.site.register(Competition)
+admin.site.register(Match)
+admin.site.register(MatchScore)
+admin.site.register(Participant)

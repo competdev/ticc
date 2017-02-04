@@ -9,12 +9,12 @@
 					<input type="hidden" name="next" value="{{ request.GET.next |default:"/"}}" />
 	                <div class="box-body">
 	                    <div class="form-group">
-	                        <label for="usuario">Usuário</label>
-	                        <input type="text" class="form-control" id="usuario" name="usuario" value="{{ usuario }}" placeholder="Digite usuário">
+	                        <label for="username">Usuário</label>
+	                        <input type="text" class="form-control" id="username" name="username" value="{{ username }}" placeholder="Digite seu usuário">
 	                    </div>
 	                    <div class="form-group">
-	                        <label for="senha">Senha</label>
-	                        <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite senha">
+	                        <label for="password">Senha</label>
+	                        <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha">
 	                    </div>
 	                    {% if error %}
 		                    <div class="form-group">

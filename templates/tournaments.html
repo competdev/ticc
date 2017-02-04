@@ -17,7 +17,7 @@
 	                            <th>Ano</th>
 	                            <th>Sede</th>
 	                        </tr>
-	                        {% if not torneios %}
+	                        {% if not tournaments %}
 	                        	<tr>
 	                        		<td>
 		                        		Nenhum torneio foi criado.
@@ -25,12 +25,12 @@
 	                        		<td></td>
 	                        	</tr>
 	                        {% endif %}
-	                        {% for torneio in torneios %}
+	                        {% for tournament in tournaments %}
 	                        	<tr>
 	                        	    <td>
-	                        	    	<a href="/torneios/{{ torneio.id }}">{{ torneio }}</a>
+	                        	    	<a href="/torneios/{{ tournament.id }}">{{ tournament }}</a>
 	                        	    </td>
-	                        	    <td>{{ torneio.sede }}</td>
+	                        	    <td>{{ tournament.location }}</td>
 	                        	</tr>	
 	                        {% endfor %}
 	                    </table>

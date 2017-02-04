@@ -5,11 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>TICC CEFET-MG</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    {% include "css.html" %}
+    
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/static/dist/css/style.css">
+    <link rel="stylesheet" href="/static/plugins/datetimepicker/jquery.datetimepicker.css">
+    <link rel="stylesheet" href="/static/plugins/datatables/dataTables.bootstrap.css">
     {% block css %}
     {% endblock css %}
 </head>
-
 <body class="hold-transition skin-black layout-top-nav">
     <div class="wrapper">
         {% include "header.html" %}
@@ -17,7 +24,7 @@
             <div class="container">
                 <section class="content-header">
                     <h1>
-                        {{ titulo }}
+                        {{ title }}
                     </h1>
                     {% include "breadcrumb.html" %}
                 </section>
@@ -33,7 +40,20 @@
 
     {% include "dialog.html" %}
 
-    {% include "js.html" %}
+    <script src="/static/plugins/jQuery/jQuery-2.2.0.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/plugins/datetimepicker/jquery.datetimepicker.full.min.js"></script>
+    <script src="/static/plugins/datatables/jquery.dataTables.js"></script>
+    <script src="/static/plugins/datatables/dataTables.bootstrap.js"></script>
+    <script src="/static/plugins/datatables/dataTables.buttons.min.js"></script>
+    <script src="/static/plugins/datatables/buttons.bootstrap.min.js"></script>
+    <script src="/static/plugins/datatables/buttons.html5.min.js"></script>
+    <script src="/static/plugins/datatables/buttons.print.min.js"></script>
+    <script src="/static/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="/static/plugins/fastclick/fastclick.js"></script>
+    <script src="/static/dist/js/script.js"></script>
+    <script src="/static/dist/js/app.js"></script>
+    <script src="/static/dist/js/dialog.js"></script>
     {% block js %}
     {% endblock js %}
 </body>

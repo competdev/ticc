@@ -15,15 +15,15 @@ def login(request):
 	context = {}
 
 	if request.method == 'POST':
-		usuario = request.POST['usuario']
-		senha = request.POST['senha']
-		user = authenticate(username=usuario, password=senha)
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(username=username, password=password)
 		if user is not None:
 			login_user(request, user)
 			return redirect(request.POST.get('next'))
 		else:
 			context['error'] = "Usuário ou senha inválidos."
-			context['usuario'] = request.POST['usuario']
+			context['username'] = username
 
 	return render(request, 'login.html', context)
 
@@ -31,299 +31,300 @@ def logout(request):
 	logout_user(request)
 	return redirect('/')
 
-def sobre(request):
-	return render(request,'sobre.html',{})
+def about(request):
+	return render(request,'about.html',{})
 
-def torneios(request):
+def tournaments(request):
 	context = {
-		'titulo': 'Torneios',
-		'torneios': Torneio.objects.all(),
+		'title': 'Torneios',
+		'tournaments': Tournament.objects.all(),
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios'},
 		]
 	}
-	return render(request, 'torneios.html', context)
+	return render(request, 'tournaments.html', context)
 
 @login_required()
-def torneios_novo(request):
+def add_tournament(request):
 	if request.method == 'POST':
-		form = TorneioForm(request.POST)
+		form = TournamentForm(request.POST)
 		if form.is_valid():
-			torneio = form.save()
-			return redirect('/torneios/' + str(torneio.pk))
+			tournament = form.save()
+			return redirect('/torneios/' + str(tournament.id))
 	else:
-		form = TorneioForm()
+		form = TournamentForm()
 
 	context = {
-		'titulo': "Novo Torneio",
+		'title': "Novo Torneio",
 		'action': '/torneios/novo',
-		'cancelar': '/torneios',
+		'cancel': '/torneios',
 		'form': form,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': 'Novo'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': 'Novo'},
 		]
 	}
 
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
-def torneios_detalhes(request, pkTorneio):
-	torneio = get_object_or_404(Torneio, pk=pkTorneio)
+def tournament_details(request, tournament_id):
+	tournament = get_object_or_404(Tournament, id=tournament_id)
 	context = {
-		'titulo': torneio,
-		'torneio': torneio,
+		'title': 'Torneio',
+		'tournament': tournament,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': torneio},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': 'Torneio'},
 		]
 	}
 
-	return render(request, 'torneios-detalhes.html', context)
+	return render(request, 'tournament-details.html', context)
 
 @login_required()
-def torneios_editar(request, pkTorneio):
-	torneio = get_object_or_404(Torneio, pk=pkTorneio)
+def edit_tournament(request, tournament_id):
+	tournament = get_object_or_404(Tournament, id=tournament_id)
 	if request.method == 'POST':
-		form = TorneioForm(request.POST, instance=torneio)
+		form = TournamentForm(request.POST, instance=tournament)
 		if form.is_valid():
 			form.save()
 			return redirect('/torneios')
 	else:
-		form = TorneioForm(instance=torneio)
+		form = TournamentForm(instance=tournament)
 
 	context = {
-		'titulo': "Editar Torneio",
-		'action': '/torneios/editar/' + pkTorneio,
-		'cancelar': '/torneios/' + pkTorneio,
+		'title': "Editar Torneio",
+		'action': '/torneios/editar/' + tournament_id,
+		'cancel': '/torneios/' + tournament_id,
 		'form': form,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': torneio, 'link': '/torneios/' + pkTorneio},
-			{'nome': 'Editar'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': tournament, 'link': '/torneios/' + tournament_id},
+			{'name': 'Editar'},
 		]
 	}
 
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
 @login_required()
-def torneios_excluir(request, pkTorneio):
-	get_object_or_404(Torneio, pk=pkTorneio).delete()
+def remove_tournament(request, tournament_id):
+	get_object_or_404(Tournament, id=tournament_id).delete()
 	return redirect('/torneios')
 
 @login_required()
-def competicoes_novo(request, pkTorneio):
+def add_competition(request, tournament_id):
 	if request.method == 'POST':
-		form = CompeticaoForm(request.POST, pkTorneio)
+		form = CompetitionForm(request.POST, tournament_id)
 		if form.is_valid():
-			competicao = form.save(commit=False)
-			competicao.torneio = Torneio.objects.get(pk=pkTorneio)
-			competicao.save()
-			return redirect('/competicoes/' + str(competicao.pk))
+			competition = form.save(commit=False)
+			competition.tournament = Tournament.objects.get(id=tournament_id)
+			competition.save()
+			return redirect('/competicoes/' + str(competition.id))
 
 	else:
-		form = CompeticaoForm()
+		form = CompetitionForm()
 
-	torneio = get_object_or_404(Torneio, pk=pkTorneio)
+	tournament = get_object_or_404(Tournament, id=tournament_id)
 	context = {
-		'titulo': "Nova Competição",
-		'action': '/competicoes/novo/' + pkTorneio,
-		'cancelar': '/torneios/' + pkTorneio,
+		'title': "Nova Competição",
+		'action': '/competicoes/novo/' + tournament_id,
+		'cancel': '/torneios/' + tournament_id,
 		'form': form,
-		'torneio' : torneio,
+		'tournament' : tournament,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': torneio, 'link': '/torneios/' + pkTorneio},
-			{'nome': 'Competições', 'link': '/torneios/' + pkTorneio},
-			{'nome': 'Nova'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': tournament, 'link': '/torneios/' + tournament_id},
+			{'name': 'Competições', 'link': '/torneios/' + tournament_id},
+			{'name': 'Nova'},
 		]
 	}
 
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
-def competicoes_detalhes(request, pkCompeticao):
-	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
-	torneio = competicao.torneio
+def competition_details(request, competition_id):
+	competition = get_object_or_404(Competition, id=competition_id)
+	tournament = competition.tournament
 	context = {
-		'titulo': competicao,
-		'competicao': competicao,
-		'torneio': torneio,
-		'seletivas': competicao.jogos.filter(intercampi=False),
-		'intercampi': Jogo.objects.filter(competicao=competicao, intercampi=True).first(),
+		'title': competition,
+		'competition': competition,
+		'tournament': tournament,
+		'trials': competition.matches.filter(intercampi=False),
+		'intercampi': Match.objects.filter(competition=competition, intercampi=True).first(),
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': torneio, 'link': '/torneios/' + str(torneio.pk)},
-			{'nome': "Competições", 'link': '/torneios/' + str(torneio.pk)},
-			{'nome': competicao.categoria },
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': tournament, 'link': '/torneios/' + str(tournament.id)},
+			{'name': "Competições", 'link': '/torneios/' + str(tournament.id)},
+			{'name': competition.category },
 		]
 	}
 
-	return render(request, 'competicoes-detalhes.html', context)
+	return render(request, 'competition-details.html', context)
 
 @login_required()
-def competicoes_editar(request, pkCompeticao):
+def edit_competition(request, competition_id):
 	pass
 
 @login_required()
-def jogos_novo(request, pkCompeticao):
+def add_match(request, competition_id):
 	if request.method == 'POST':
-		form = JogoForm(request.POST)
+		form = MatchForm(request.POST)
 		if form.is_valid():
-			jogo = form.save(commit=False)
-			jogo.intercampi = request.POST['intercampi']
-			jogo.competicao = Competicao.objects.get(pk=pkCompeticao)
-			jogo.save()
-			return redirect('/competicoes/' + pkCompeticao)
+			match = form.save(commit=False)
+			match.intercampi = request.POST['intercampi']
+			match.competition = Competition.objects.get(id=competition_id)
+			match.save()
+			return redirect('/competicoes/' + competition_id)
 	else:
-		form = JogoForm(initial={'data': '', 'inicio': '', 'termino': ''})
+		form = MatchForm(initial={'data': '', 'inicio': '', 'termino': ''})
 
-	competicao = get_object_or_404(Competicao, pk=pkCompeticao)
+	competition = get_object_or_404(Competition, id=competition_id)
 	context = {
-		'titulo': 'Nova Final' if request.GET.get('intercampi') else 'Nova Seletiva',
-		'action': '/jogos/novo/' + pkCompeticao,
-		'cancelar': '/competicoes/' + pkCompeticao,
-		'competicao': competicao,
+		'title': 'Nova Final' if request.GET.get('intercampi') else 'Nova Seletiva',
+		'action': '/jogos/novo/' + competition_id,
+		'cancel': '/competicoes/' + competition_id,
+		'competition': competition,
 		'form': form,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': competicao.torneio, 'link': '/torneios/' + str(competicao.torneio.pk)},
-			{'nome': 'Competições', 'link': '/torneios'},
-			{'nome': competicao, 'link': '/competicoes/' + str(competicao.pk)},
-			{'nome': 'Novo'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': competition.tournament, 'link': '/torneios/' + str(competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': competition, 'link': '/competicoes/' + str(competition.id)},
+			{'name': 'Novo'},
 		]
 	}
 
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
-def jogos_detalhes(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
+def match_details(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
 	context = {
-		'titulo': jogo.tipo() + ' - ' + str(jogo.competicao),
-		'jogo': jogo,
+		'title': match.type() + ' - ' + str(match.competition),
+		'match': match,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
-			{'nome': 'Competições', 'link': '/torneios'},
-			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
-			{'nome': jogo.tipo() },
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': match.type() },
 		]
 	}
 
-	return render(request, 'jogos-detalhes.html', context)
+	return render(request, 'match-details.html', context)
 
 @login_required()
-def jogos_editar(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
+def edit_match(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
 	if request.method == 'POST':
-		form = JogoForm(request.POST, instance=jogo)
+		form = MatchForm(request.POST, instance=match)
 		if form.is_valid():
 			form.save()
-			return redirect('/jogos/' + pkJogo)
+			return redirect('/jogos/' + match_id)
 	else:
-		form = JogoForm(instance=jogo)
+		form = MatchForm(instance=match)
 
-	competicao = get_object_or_404(Competicao, pk=jogo.competicao.pk)
+	competition = get_object_or_404(Competition, id=match.competition.id)
 	context = {
-		'titulo': "Editar " + jogo.tipo(),
-		'action': '/jogos/editar/' + pkJogo,
-		'cancelar': '/jogos/' + pkJogo,
-		'competicao': competicao,
+		'title': "Editar " + match.type(),
+		'action': '/competicoes/editar/' + match_id,
+		'cancel': '/competicoes/' + match_id,
+		'competition': competition,
 		'form': form,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
-			{'nome': 'Competições', 'link': '/torneios'},
-			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
-			{'nome': jogo.tipo(), 'link': '/jogos/' + str(jogo.pk) },
-			{'nome': 'Editar'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': match.type(), 'link': '/competicoes/' + str(match.id) },
+			{'name': 'Editar'},
 		]
 	}
 	
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
 @login_required()
-def jogos_excluir(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
-	pkCompeticao = jogo.competicao.pk
-	jogo.delete()
-	return redirect('/competicoes/' + str(pkCompeticao))
+def remove_match(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
+	competition_id = match.competition.id
+	match.delete()
+	return redirect('/competicoes/' + str(competition_id))
 
-def jogos_participar(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
-	competicao = jogo.competicao
+def attend_to_match(request, match_id):
+	import pdb; pdb.set_trace()
+	match = get_object_or_404(Match, id=match_id)
+	competition = match.competition
 
 	if request.method == 'POST':
-		form = ParticiparForm(request.POST)
+		form = AttendForm(request.POST)
 		if form.is_valid():
-			nome = form.cleaned_data['nome']
-			matricula = form.cleaned_data['matricula']
+			name = form.cleaned_data['name']
+			code = form.cleaned_data['code']
 			email = form.cleaned_data['email']
-			curso = form.cleaned_data['curso']
-			participante = Participante.objects.create(nome=nome, matricula=matricula, email=email, curso=curso)
-			Pontuacao.objects.create(jogo=jogo, participante=participante)
-			jogo.participantes.add(participante)
-			return redirect('/jogos/' + pkJogo)
+			course = form.cleaned_data['course']
+			participant = Participant.objects.create(name=name, code=code, email=email, course=course)
+			MatchScore.objects.create(match=match, participant=participant)
+			match.participants.add(participant)
+			return redirect('/jogos/' + match_id)
 	else:
-		form = ParticiparForm()
+		form = AttendForm()
 
 	context = {
-		'titulo': "Participar " + jogo.tipo(),
-		'action': '/jogos/participar/' + pkJogo,
-		'cancelar': '/jogos/' + pkJogo,
-		'competicao': competicao,
+		'title': "Participar " + match.type(),
+		'action': '/jogos/participar/' + match_id,
+		'cancel': '/jogos/' + match_id,
+		'competition': competition,
 		'form': form,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
-			{'nome': 'Competições', 'link': '/torneios'},
-			{'nome': jogo.competicao, 'link': '/competicoes/' + str(jogo.competicao.pk)},
-			{'nome': jogo.tipo(), 'link': '/jogos/' + str(jogo.pk) },
-			{'nome': 'Participar'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': match.type(), 'link': '/jogos/' + str(match.id) },
+			{'name': 'Participar'},
 		]
 	}
 	
-	return render(request, 'crud.html', context)
+	return render(request, 'form.html', context)
 
 @login_required()
-def jogos_sair(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
-	jogo.participantes.remove(request.user)
-	pontuacao = Pontuacao.objects.get(jogo=jogo, participante=request.user)
-	pontuacao.delete()
-	return redirect('/jogos/' + str(pkJogo))
+def leave_match(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
+	match.participants.remove(request.user)
+	score = MatchScore.objects.get(match=match, participant=request.user)
+	score.delete()
+	return redirect('/jogos/' + str(match_id))
 
 @login_required()
-def pontuacao_atualizar(request, pkJogo):
-	jogo = get_object_or_404(Jogo, pk=pkJogo)
+def update_score(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
 
 	if request.method == 'POST':
-		for pontuacao in jogo.pontuacao.all():
-			p = request.POST.getlist(str(pontuacao.pk))
-			pontuacao.pontos = p[0]
-			pontuacao.tempo = p[1]
-			pontuacao.save()
+		for score in match.scores.all():
+			p = request.POST.getlist(str(score.id))
+			score.pontos = p[0]
+			score.tempo = p[1]
+			score.save()
 
-		return redirect('/jogos/' + str(pkJogo))
+		return redirect('/jogos/' + str(match_id))
 
 	context = {
-		'titulo': 'Atualizar Pontuação',
-		'jogo': jogo,
+		'title': 'Atualizar Pontuação',
+		'match': match,
 		'breadcrumb': [
-			{'nome': 'Inicio', 'link': '/'},
-			{'nome': 'Torneios', 'link': '/torneios'},
-			{'nome': jogo.competicao.torneio, 'link': '/torneios/' + str(jogo.competicao.torneio.pk)},
-			{'nome': 'Jogos', 'link': '/competicoes/' + str(jogo.competicao.pk)},
-			{'nome': 'Atualizar'},
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Jogos', 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': 'Atualizar'},
 		]
 	}
 
-	return render(request, 'pontuacao-atualizar.html', context)	
+	return render(request, 'update-score.html', context)	

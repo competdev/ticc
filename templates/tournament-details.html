@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box" id="brexit">
+            <div class="box-header with-border">
+                <h3 class="box-title">Competições</h3>
+
+                {% if user.is_authenticated %}
+                    <div class="box-tools pull-right">
+                        <a href="/competicoes/novo/{{ tournament.id }}" class="btn btn-box-tool">Adicionar</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="box-body">
+                <table class="table">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Status</th>
+                    </tr>
+
+                    {% for competition in tournament.competitions.all %}
+                        <tr>
+                            <td><a href="/competicoes/{{competition.id}}">{{ competition }}</a></td>
+                            <td class="{{ tournament.status }}"></td>
+                        </tr>    
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Informações</h3>
+                {% if user.is_authenticated %}
+                    <div class="box-tools pull-right">
+                        <a href="/torneios/editar/{{ tournament.id }}" class="btn btn-box-tool">Editar</a>
+                        <a class="btn btn-box-tool text-red" data-toggle="modal" data-target="#dialog" onclick="showDialog('Tem certeza que deseja excluir?', '/torneios/excluir/{{ tournament.id }}')">Excluir</a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="box-body">
+                <table class="table">
+                    <tr class="info-table-first-row">
+                        <td><b>Sede</b></td>
+                        <td>{{ tournament.location }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Início</b></td>
+                        <td>{{ tournament.start }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Término</b></td>
+                        <td>{{ tournament.end }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Status</b></td>
+                        <td class="{{ tournament.status }}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

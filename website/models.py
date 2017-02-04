@@ -4,90 +4,94 @@ from datetime import date, datetime
 from django.utils import timezone
 
 class Campus(models.Model):
-	cidade = models.CharField(max_length=255)
-	numero = models.CharField(max_length=2)
+	location = models.CharField(max_length=255)
+	number = models.CharField(max_length=2)
 
 	def __str__(self):
-		return 'Campus ' + self.numero + ' - ' + self.cidade
+		return 'Campus ' + self.number + ' - ' + self.location
 
-class Categoria(models.Model):
-	nome = models.CharField(max_length=255)
-	regras = models.TextField()
+class Category(models.Model):
+	name = models.CharField(max_length=255)
+	rules = models.TextField()
 
 	def __str__(self):
-		return self.nome
+		return self.name
 
-class Torneio(models.Model):
-	sede = models.ForeignKey(Campus, on_delete=models.CASCADE, default=None)
-	responsavel = models.ForeignKey(User)
-	inicio = models.DateField()
-	termino = models.DateField()
+class Tournament(models.Model):
+	location = models.ForeignKey(Campus, on_delete=models.CASCADE, default=None)
+	responsible = models.ForeignKey(User)
+	start = models.DateField()
+	end = models.DateField()
 
 	def status(self):
 		now = date.today()
-		if now < self.inicio:
+		if now < self.start:
 			return 'status-waiting'
-		elif now <= self.termino:
+		elif now <= self.end:
 			return 'status-in-progress'
 		else:
 			return 'status-ended'
 
 	def __str__(self):
-		return str(self.inicio.year)
+		return str(self.start.year)
 
-class Competicao(models.Model):
-	torneio = models.ForeignKey(Torneio, on_delete=models.CASCADE, related_name="competicoes")
-	categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
-	responsavel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+class Competition(models.Model):
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="competitions")
+	category = models.ForeignKey(Category, on_delete=models.CASCADE)
+	responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
-		return self.categoria.nome
+		return self.category.name
 
 	def status(self):
 		pass
 
-class Participante(models.Model):
-	nome = models.CharField(max_length=255)
-	matricula = models.CharField(max_length=12)
+class Participant(models.Model):
+	name = models.CharField(max_length=255)
+	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
-	curso = models.CharField(max_length=255)
+	course = models.CharField(max_length=255)
 
-class Jogo(models.Model):
-	competicao = models.ForeignKey(Competicao, on_delete=models.CASCADE, related_name="jogos")
+	def __str__(self):
+		return self.name + ' - ' + self.course
+
+
+class Match(models.Model):
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches')
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
-	responsavel = models.ForeignKey(User)
-	data = models.DateField(default=date.today)
-	inicio = models.TimeField(default=timezone.now)
-	termino = models.TimeField(default=timezone.now)
-	local = models.CharField(max_length=255)
-	participantes = models.ManyToManyField(Participante, related_name='jogos')
+	responsible = models.ForeignKey(User)
+	date = models.DateField(default=date.today)
+	start = models.TimeField(default=timezone.now)
+	end = models.TimeField(default=timezone.now)
+	location = models.CharField(max_length=255)
+	participants = models.ManyToManyField(Participant, related_name='participants')
 	intercampi = models.BooleanField(default=False)
 
 	def status(self):
 		now = datetime.now()
-		inicio = datetime.combine(self.data, self.inicio)
-		termino = datetime.combine(self.data, self.termino)
-		if now < inicio:
+		start = datetime.combine(self.date, self.start)
+		end = datetime.combine(self.date, self.end)
+		if now < start:
 			return 'status-waiting'
-		elif now <= termino:
+		elif now <= end:
 			return 'status-in-progress'
 		else:
 			return 'status-ended'
 
-	def tipo(self):
+	def type(self):
 		if self.intercampi:
 			return "Final"
 		else:
 			return "Seletiva"
 
 	def __str__(self):
-		return self.campus.__str__()
+		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
-class Pontuacao(models.Model):
-	jogo = models.ForeignKey(Jogo, on_delete=models.CASCADE, related_name="pontuacao")
-	participante = models.ForeignKey(Participante, on_delete=models.CASCADE)
-	pontos = models.IntegerField(default=0)
-	tempo = models.IntegerField(default=0)
+class MatchScore(models.Model):
+	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
+	participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+	score = models.IntegerField(default=0)
+	time = models.IntegerField(default=0)
 
 	def __str__(self):
-		return self.participante.nome + ' - ' + self.jogo.__str__()
+		return self.participant.name + ' - ' + self.match.__str__()

@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
         <div class="box">
@@ -6,8 +9,8 @@
             </div>
             <form role="form" action="{{ action }}" method="POST">
                {% csrf_token %}
-               <input type="hidden" name="pkTorneio" value="{{ torneio.pk }}">
-               <input type="hidden" name="pkCompeticao" value="{{ competicao.pk }}">
+               <input type="hidden" name="tournament_id" value="{{ tournament.id }}">
+               <input type="hidden" name="competition_id" value="{{ competition.id }}">
                <input type="hidden" name="intercampi" value="{{ request.GET.intercampi }}">
                 <div class="box-body">
                     {% for field in form %}
@@ -41,10 +44,11 @@
                     {% endfor %}
                 </div>
                 <div class="box-footer">
-                    <a href="{{ cancelar }}" class="btn btn-default">Cancelar</a>
+                    <a href="{{ cancel }}" class="btn btn-default">Cancelar</a>
                 <button type="submit" class="btn btn-primary pull-right">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+{% endblock content %}
