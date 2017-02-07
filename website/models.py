@@ -87,11 +87,23 @@ class Match(models.Model):
 	def __str__(self):
 		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
+	def match_without_result(request):
+		matchs = Match.objects.all().filter(responsible=request.user)
+		MATCHS = []
+		for match in matchs:
+			matchScore = MatchScore.objects.all().filter(match=match)
+			if not matchScore:
+				MATCHS.append(match)
+		return MATCHS
+
 class MatchScore(models.Model):
+	class Meta:
+		permissions = (('add_result', 'Pode adicionar resultado'),)
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
-	participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
-	score = models.IntegerField(default=0)
-	time = models.IntegerField(default=0)
+	first_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
+	second_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
+	third_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
+	responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
-		return self.participant.name + ' - ' + self.match.__str__()
+		return self.first_place.__str__() + ' - ' + self.match.__str__()

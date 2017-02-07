@@ -327,4 +327,99 @@ def update_score(request, match_id):
 		]
 	}
 
-	return render(request, 'update-score.html', context)	
+	return render(request, 'update-score.html', context)
+
+def judges(request):
+	context = {
+		'title': 'Resultados',
+		'results': MatchScore.objects.all(),
+		'USER': request.user.username,
+		'matchs': Match.objects.all().filter(responsible=request.user),
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Resultados'},
+		]
+	}
+	return render(request, 'judges-choices.html', context)
+
+@login_required
+def list_matchs(request, user_name):
+	users = User.objects.all().filter(username=user_name)
+	if not users or request.user.username!=user_name:
+		return redirect('/resultados')
+	MATCHS = Match.match_without_result(request)
+	print(str(MATCHS) + '\n\n\n')
+	context = {
+		'title': 'Partidas a serem concluídas - '+ user_name,
+		'USER': request.user.username,
+		'USER_MORE': user_name,
+		'matchs': MATCHS,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': 'Competições', 'link': '/competicoes'},
+			{'name': 'Jogo', 'link': '/jogos'},
+			{'name': 'Resultados', 'link': '/resultados'},
+		]
+	}
+
+	return render(request, 'matchs.html', context)
+
+@login_required
+def match_score(request, user_name, match_id):
+	users = User.objects.all().filter(username=user_name)
+	if not users:
+		return redirect('/resultados')
+
+	match = get_object_or_404(Match, id=match_id)
+	matchScore = MatchScore.objects.all().filter(match=match).first()
+	context = {
+		'title': 'Resultado ' + match.type() + ' - ' + str(match.competition),
+		'MatchScore': matchScore,
+		'USER': request.user.username,
+		'USER_MOR': match.responsible.username,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': match.type() },
+			{'name': 'Resultados', 'link': '/resultados/'},
+			{'name': match.responsible.username, 'link': '/resultados/' + match.responsible.username},
+		]
+	}
+	return render(request, 'match-score-details.html', context)
+
+@login_required
+def add_matchScore(request, user_name, match_id):
+	if request.method == 'POST':
+		form = MatchScoreForm(request.POST)
+		if form.is_valid():
+			matchScore.match = get_object_or_404(Match, id=match_id)
+			matchScore = form.save()
+			return redirect('/resultados/' + str(match_id))
+	else:
+		form = MatchScoreForm()
+
+	match = get_object_or_404(Match, id=match_id)
+	form.fields['match'].initial = str(match)
+	form.fields['responsible'].initial = match.responsible.username
+	context = {
+		'title': 'Resultado: ' + str(match),
+		'action': '/resultados/' + request.user.username + '/' + match_id,
+		'cancel': '/resultados/' + request.user.username,
+		'form': form,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Torneios', 'link': '/torneios'},
+			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+			{'name': 'Competições', 'link': '/torneios'},
+			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+			{'name': match.type() },
+			{'name': 'Resultados', 'link': '/resultados/'},
+			{'name': match.responsible.username, 'link': '/resultados/' + match.responsible.username},
+		]
+	}
+	
+	return render(request, 'form.html', context)
