@@ -45,6 +45,16 @@ def tournaments(request):
 	}
 	return render(request, 'tournaments.html', context)
 
+def rankings(request):
+	context = {
+		'title': 'Rankings e Estatísticas',
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Rankings'},
+		]
+	}
+	return render(request, 'rankings.html', context)
+
 @login_required()
 def add_tournament(request):
 	if request.method == 'POST':

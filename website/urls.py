@@ -11,6 +11,7 @@ urlpatterns = [
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
 	url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
 	url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
+	url(r'rankings', views.rankings),
 
 	url(r'competicoes/novo/(?P<tournament_id>[0-9]+)$', views.add_competition),
 	url(r'competicoes/(?P<competition_id>[0-9]+)$', views.competition_details),
