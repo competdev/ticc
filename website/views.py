@@ -246,7 +246,7 @@ def edit_match(request, match_id):
 			{'name': 'Editar'},
 		]
 	}
-	
+
 	return render(request, 'form.html', context)
 
 @login_required()
@@ -291,7 +291,7 @@ def attend_to_match(request, match_id):
 			{'name': 'Participar'},
 		]
 	}
-	
+
 	return render(request, 'form.html', context)
 
 @login_required()
@@ -327,4 +327,4 @@ def update_score(request, match_id):
 		]
 	}
 
-	return render(request, 'update-score.html', context)	
+	return render(request, 'update-score.html', context)
