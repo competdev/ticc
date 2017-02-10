@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+staticroot
+.DS_Store
+db.sqlite3

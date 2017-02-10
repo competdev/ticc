@@ -55,7 +55,6 @@ class Participant(models.Model):
 	def __str__(self):
 		return self.name + ' - ' + self.course
 
-
 class Match(models.Model):
 	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches')
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
@@ -66,6 +65,9 @@ class Match(models.Model):
 	location = models.CharField(max_length=255)
 	participants = models.ManyToManyField(Participant, related_name='participants')
 	intercampi = models.BooleanField(default=False)
+	first_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='first_place', null=True, blank=True)
+	complete = models.BooleanField(default=False) 
+	#Numero de MatchScores = Numero de Participantes -> True
 
 	def status(self):
 		now = datetime.now()
@@ -87,23 +89,28 @@ class Match(models.Model):
 	def __str__(self):
 		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
-	def match_without_result(request):
+	def matchs_ready_to_publish_result(request):
+		matchs = Match.objects.all().filter(responsible=request.user)
+		MATCHS = []
+		for match in matchs:
+			if match.complete and not match.first_place:
+				MATCHS.append(match)
+		return MATCHS
+
+	def match_not_ready(request):
 		matchs = Match.objects.all().filter(responsible=request.user)
 		MATCHS = []
 		for match in matchs:
 			matchScore = MatchScore.objects.all().filter(match=match)
-			if not matchScore:
+			if not match.complete:
 				MATCHS.append(match)
 		return MATCHS
 
 class MatchScore(models.Model):
-	class Meta:
-		permissions = (('add_result', 'Pode adicionar resultado'),)
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
-	first_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
-	second_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
-	third_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='+', null=True)
-	responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+	participant = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True)
+	score = models.IntegerField(default=0)
+	time = models.IntegerField(default=0, blank=True)
 
 	def __str__(self):
-		return self.first_place.__str__() + ' - ' + self.match.__str__()
+		return self.participant.name + ' - ' + self.match.__str__()

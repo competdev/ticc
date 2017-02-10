@@ -4,7 +4,7 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 		    <div class="box">
-		    	<form method="POST" action="/pontuacao/{{ jogo.pk }}">
+		    	<form method="POST" action="/pontuacao/{{ match.pk }}">
 		    		{% csrf_token %} 
 			        <div class="box-header with-border">
 			            <h3 class="box-title">Atualizar pontuação</h3>
@@ -20,7 +20,7 @@
 			                    </tr>
 			                </thead>
 			                <tbody>
-			                    {% for pontuacao in jogo.pontuacao.all %}
+			                    {% for pontuacao in match.pontuacao.all %}
 					                <tr>
 					                    <td>{{ forloop.counter }}</td>
 					                    <td>{{ pontuacao.participante.nome }}</td>
@@ -36,7 +36,7 @@
 			            </table>
 			        </div>
 			        <div class="box-footer">
-			        	<a href="/jogos/{{ jogo.pk }}" class="btn btn-default">Cancelar</a>
+			        	<a href="/jogos/{{ match.pk }}" class="btn btn-default">Cancelar</a>
 			            <button type="submit" class="btn btn-primary pull-right">Atualizar</button>
 			        </div>
 		    	</form>

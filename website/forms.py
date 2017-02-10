@@ -107,27 +107,14 @@ class AttendForm(forms.Form):
 class MatchScoreForm(ModelForm):
     class Meta:
         model = MatchScore
-        fields = ['match', 'responsible','first_place', 'second_place', 'third_place', ]
+        fields = ['score', 'time']
         widgets = {
-            'match': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'readonly': True}),
-            'responsible': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'readonly': True}),
-            'first_place': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'second_place': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'third_place': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'score': forms.NumberInput(attrs={'class':'form-control','widget': 'input', 'autocomplete':'off', 'min_value': 0}),
+            'time':  forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'min_value': 0}, format='%H:%M')
         }
 
-        def clean_first_place(self):
-            first_place = self.data['first_place']
-            second_place = self.data['second_place']
-            third_place = self.data['third_place']
-            if first_place==second_place or first_place==third_place or second_place==third_place:
-                raise forms.ValidationError('O mesmo participante não pode ocupar mais de uma posição.')
-            return end
-
-        def __init__(self, *args, **kwargs):
-            super(MatchScoreForm, self).__init__(*args, **kwargs)
-            self.fields['first_place'].label= '1º lugar'
-            self.fields['second_place'].label= '2º lugar'
-            self.fields['third_place'].label= '3º lugar'
-            self.fields['match'].label= 'Jogo'
-            self.fields['responsible'].label= 'Responsável'
+    def __init__(self, *args, **kwargs):
+        super(MatchScoreForm, self).__init__(*args, **kwargs)
+        self.fields['score'].label='Pontuação'
+        self.fields['time'].label='Tempo'
+        self.fields['time'].editable=False

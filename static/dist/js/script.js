@@ -54,7 +54,7 @@ $(document).ready(function(){
         info: false,
         autoWidth: false,
         language: {
-            emptyTable: 'Nenhum participante encontrado',
+            emptyTable: 'Nenhum objeto encontrado',
             search: 'Buscar'
         },
         order: [

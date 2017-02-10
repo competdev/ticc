@@ -329,31 +329,36 @@ def update_score(request, match_id):
 
 	return render(request, 'update-score.html', context)
 
-def judges(request):
+def list_results(request):
+	not_matchs = {}
+	matchs = Match.objects.all()
+	if not request.user.is_anonymous():
+		not_matchs = Match.match_not_ready(request)
 	context = {
 		'title': 'Resultados',
-		'results': MatchScore.objects.all(),
 		'USER': request.user.username,
-		'matchs': Match.objects.all().filter(responsible=request.user),
+		'matchs': matchs,
+		'not_matchs': not_matchs,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Resultados'},
 		]
 	}
-	return render(request, 'judges-choices.html', context)
+	return render(request, 'list-results.html', context)
 
 @login_required
-def list_matchs(request, user_name):
+def list_incomplete_or_not_plubished_results(request, user_name):
 	users = User.objects.all().filter(username=user_name)
 	if not users or request.user.username!=user_name:
 		return redirect('/resultados')
-	MATCHS = Match.match_without_result(request)
-	print(str(MATCHS) + '\n\n\n')
+	MATCHS = Match.matchs_ready_to_publish_result(request)
+	MATCH  = Match.match_not_ready(request)
 	context = {
-		'title': 'Partidas a serem concluídas - '+ user_name,
+		'title': 'Partidas sem resultado - '+ user_name,
 		'USER': request.user.username,
 		'USER_MORE': user_name,
 		'matchs': MATCHS,
+		'matchs_not_ready': MATCH,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Torneios', 'link': '/torneios'},
@@ -363,19 +368,20 @@ def list_matchs(request, user_name):
 		]
 	}
 
-	return render(request, 'matchs.html', context)
+	return render(request, 'list-incomplete-results.html', context)
 
-@login_required
 def match_score(request, user_name, match_id):
-	users = User.objects.all().filter(username=user_name)
-	if not users:
-		return redirect('/resultados')
-
 	match = get_object_or_404(Match, id=match_id)
-	matchScore = MatchScore.objects.all().filter(match=match).first()
+	matchScore = MatchScore.objects.all().filter(match=match)
+	if not matchScore.count() == match.participants.count() or not match.first_place:
+		if request.user.is_anonymous():
+			return redirect('/resultados')
+
+	matchScore = matchScore.order_by('-score')
 	context = {
 		'title': 'Resultado ' + match.type() + ' - ' + str(match.competition),
-		'MatchScore': matchScore,
+		'matchScores': matchScore,
+		'match':match,
 		'USER': request.user.username,
 		'USER_MOR': match.responsible.username,
 		'breadcrumb': [
@@ -385,41 +391,24 @@ def match_score(request, user_name, match_id):
 			{'name': 'Competições', 'link': '/torneios'},
 			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
 			{'name': match.type() },
-			{'name': 'Resultados', 'link': '/resultados/'},
+			{'name': 'Resultados', 'link': '/resultados'},
 			{'name': match.responsible.username, 'link': '/resultados/' + match.responsible.username},
 		]
 	}
 	return render(request, 'match-score-details.html', context)
 
 @login_required
-def add_matchScore(request, user_name, match_id):
-	if request.method == 'POST':
-		form = MatchScoreForm(request.POST)
-		if form.is_valid():
-			matchScore.match = get_object_or_404(Match, id=match_id)
-			matchScore = form.save()
-			return redirect('/resultados/' + str(match_id))
-	else:
-		form = MatchScoreForm()
-
+def publish_result(request, user_name, match_id):
 	match = get_object_or_404(Match, id=match_id)
-	form.fields['match'].initial = str(match)
-	form.fields['responsible'].initial = match.responsible.username
-	context = {
-		'title': 'Resultado: ' + str(match),
-		'action': '/resultados/' + request.user.username + '/' + match_id,
-		'cancel': '/resultados/' + request.user.username,
-		'form': form,
-		'breadcrumb': [
-			{'name': 'Início', 'link': '/'},
-			{'name': 'Torneios', 'link': '/torneios'},
-			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
-			{'name': 'Competições', 'link': '/torneios'},
-			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
-			{'name': match.type() },
-			{'name': 'Resultados', 'link': '/resultados/'},
-			{'name': match.responsible.username, 'link': '/resultados/' + match.responsible.username},
-		]
-	}
-	
-	return render(request, 'form.html', context)
+						# Pega todos os MatchScore da partida, ordena de maneira 
+						# decrescente e pega o primeiro (Maior pontuação)
+	match.first_place = MatchScore.objects.all().filter(match=match).order_by('-score').first().participant
+	match.save()
+	return redirect('/resultados/'+ user_name + '/' +match_id)
+
+#FALTA Analisar se Numero de MatchScores = Numero de Participantes
+#Para complete=True
+def add_score(request, user_name, match_id):
+	match = get_object_or_404(Match, id=match_id)
+	match.complete = True
+	return redirect('/resultados')

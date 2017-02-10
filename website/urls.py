@@ -7,7 +7,7 @@ urlpatterns = [
 	url(r'logout$', views.logout),
 	url(r'sobre$',views.about),
 	url(r'torneios$', views.tournaments),
-	url(r'resultados$', views.judges),
+	url(r'resultados/$', views.list_results),
 
 	url(r'torneios/novo', views.add_tournament),
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
@@ -27,7 +27,7 @@ urlpatterns = [
 
 	url(r'pontuacao/(?P<match_id>[0-9]+)$', views.update_score),
 
-	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)$', views.list_matchs),
-	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)$', views.match_score),
-	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/novo/(?P<match_id>[0-9]+)$', views.add_matchScore),
+	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/$', views.list_incomplete_or_not_plubished_results),
+	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.match_score),
+	url(r'resultados/publica/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.publish_result),
 ]
