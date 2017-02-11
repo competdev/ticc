@@ -51,7 +51,8 @@ def rankings(request):
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Rankings'},
-		]
+		],
+		"teste": 21
 	}
 	return render(request, 'rankings.html', context)
 
