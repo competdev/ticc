@@ -47,14 +47,25 @@ class Competition(models.Model):
 		pass
 
 class Participant(models.Model):
+	#participant now have an user only for leader (when leader attr is True).
+	user = models.ForeignKey(User, null=True)
 	name = models.CharField(max_length=255)
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
+	leader = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name + ' - ' + self.course
 
+class Team(models.Model):
+	name = models.CharField(max_length=255)
+	score = models.IntegerField(default=0)
+	category = models.ForeignKey(Category, on_delete=models.CASCADE)
+	participants = models.ManyToManyField(Participant, related_name='team_participants')
+
+	def __str__(self):
+		return self.name
 
 class Match(models.Model):
 	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches')
