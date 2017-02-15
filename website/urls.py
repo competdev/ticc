@@ -25,7 +25,8 @@ urlpatterns = [
 	url(r'jogos/participar/(?P<match_id>[0-9]+)$', views.attend_to_match),
 	url(r'jogos/sair/(?P<match_id>[0-9]+)$', views.leave_match),
 
-	url(r'pontuacao/(?P<match_id>[0-9]+)$', views.update_score),
+	url(r'pontuacao/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.list_incomplete_scores),
+	url(r'pontuacao/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/(?P<participant_id>[0-9]+)/$', views.add_matchScore),
 
 	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/$', views.list_incomplete_or_not_plubished_results),
 	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.match_score),

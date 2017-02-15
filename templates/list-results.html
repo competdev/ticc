@@ -6,9 +6,9 @@
 	            <div class="box">
 	                <div class="box-header">
 	                {% if user.is_authenticated %}
-		                {% if not_matchs and perms.website.add_result %}
+		                {%if perms.website.add_result %}
 			                    <div class="box-tools pull-right">
-			                        <a href="/resultados/{{USER}}" class="btn btn-box-tool">Novo</a>
+			                        <a href="/resultados/{{USER}}" class="btn btn-box-tool">Minhas Partidas</a>
 			                    </div>
 		                {% endif %}
 	                {% endif %}
@@ -28,11 +28,11 @@
 	                        </thead>
 	                        <tbody>
 	                            {% for match in matchs %}	                            
-		                            {%if match.first_place and match.complete%}
+		                            {%if match.first_place and is_complete %}
 		                                <tr>
 		                                    <td>{{ forloop.counter }}</td>
 		                                    <td>
-	                                    		<a href="resultados/{{match.responsible.username}}/{{match.id}}">{{ match }}</a>
+	                                    		<a href="/resultados/{{match.responsible.username}}/{{match.id}}">{{ match }}</a>
 		                                    </td>
 		                                    <td>{{ match.date }}</td>
 			                        	    <td>{{ match.competition }}</td>

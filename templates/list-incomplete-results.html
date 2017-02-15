@@ -26,7 +26,7 @@
 								</tr>
 	                        {% endif %}
 	                        {% for match in matchs %}
-	                        	<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, true, {{match.id}});">
+	                        	<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/resultados/publica/' + '{{USER}}' + '/'+'{{match.id}}');">
 	                        	    <td>{{forloop.counter}}</td>
 	                        	    <td align="left">
 	                        	    	<a href="/resultados/{{USER}}/{{match.id}}">{{match}}</a>
@@ -61,7 +61,7 @@
 	                		{%endif%}
                 			{% for match in matchs_not_ready %}
                 				<input type="hidden" id="user" value="{{USER}}">
-								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, false, {{match.id}});">
+								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{USER}}' + '/' + '{{match.id}}');">
 									<td>{{forloop.counter}}</td>
 									<td align="left">
 	                        	    	<a href="/resultados/{{USER}}/{{match.id}}">{{match}}</a>

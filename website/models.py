@@ -66,7 +66,6 @@ class Match(models.Model):
 	participants = models.ManyToManyField(Participant, related_name='participants')
 	intercampi = models.BooleanField(default=False)
 	first_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='first_place', null=True, blank=True)
-	complete = models.BooleanField(default=False) 
 	#Numero de MatchScores = Numero de Participantes -> True
 
 	def status(self):
@@ -93,7 +92,8 @@ class Match(models.Model):
 		matchs = Match.objects.all().filter(responsible=request.user)
 		MATCHS = []
 		for match in matchs:
-			if match.complete and not match.first_place:
+			matchScore = MatchScore.objects.all().filter(match=match)
+			if match.participants.count()==matchScore.count() and not match.first_place:
 				MATCHS.append(match)
 		return MATCHS
 
@@ -102,7 +102,7 @@ class Match(models.Model):
 		MATCHS = []
 		for match in matchs:
 			matchScore = MatchScore.objects.all().filter(match=match)
-			if not match.complete:
+			if match.participants.count()!=matchScore.count():
 				MATCHS.append(match)
 		return MATCHS
 
@@ -110,7 +110,7 @@ class MatchScore(models.Model):
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
 	participant = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True)
 	score = models.IntegerField(default=0)
-	time = models.IntegerField(default=0, blank=True)
+	time = models.TimeField(blank=True)
 
 	def __str__(self):
 		return self.participant.name + ' - ' + self.match.__str__()

@@ -117,4 +117,9 @@ class MatchScoreForm(ModelForm):
         super(MatchScoreForm, self).__init__(*args, **kwargs)
         self.fields['score'].label='Pontuação'
         self.fields['time'].label='Tempo'
-        self.fields['time'].editable=False
+
+    def clean_score(self):
+        score = self.cleaned_data['score']
+        if score < 0:
+            raise forms.ValidationError('A pontuação não pode ser negativa')
+        return score
