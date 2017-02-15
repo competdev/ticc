@@ -46,11 +46,12 @@ class Competition(models.Model):
 	def status(self):
 		pass
 
-class Participant(models.Model):
+class Participant(models.Model): #integrar com tabela equipe
 	name = models.CharField(max_length=255)
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
+	#adicionar User (pode ser nulo)
 
 	def __str__(self):
 		return self.name + ' - ' + self.course
@@ -63,9 +64,14 @@ class Match(models.Model):
 	start = models.TimeField(default=timezone.now)
 	end = models.TimeField(default=timezone.now)
 	location = models.CharField(max_length=255)
-	participants = models.ManyToManyField(Participant, related_name='participants')
+	participants = models.ManyToManyField(Participant, related_name='participants') #mudar para equipe
 	intercampi = models.BooleanField(default=False)
 	first_place = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name='first_place', null=True, blank=True)
+<<<<<<< HEAD
+=======
+	complete = models.BooleanField(default=False) 
+	#Colocar restricao de equipes no formulario
+>>>>>>> 4edec0006344244b830f51e565a3addf3afc2129
 	#Numero de MatchScores = Numero de Participantes -> True
 
 	def status(self):
@@ -108,7 +114,7 @@ class Match(models.Model):
 
 class MatchScore(models.Model):
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
-	participant = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True)
+	participant = models.ForeignKey(Participant, on_delete=models.CASCADE, null=True) #equipe
 	score = models.IntegerField(default=0)
 	time = models.TimeField(blank=True)
 
