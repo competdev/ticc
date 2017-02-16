@@ -96,6 +96,8 @@ class MatchForm(ModelForm):
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
         self.fields['end'].label = 'Término'
+        self.fields['date'].label = 'Data'
+        self.fields['location'].label = 'Localização'
 
 class AttendForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)

@@ -8,7 +8,7 @@
                     <h3 class="box-title">Informações</h3>
                     {% if USER == USER_MOR %}
                         <div class="box-tools pull-right">
-                            <a href="/resultados/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
+                            <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
                                onclick="showDialog('Tem certeza que deseja excluir?', '/resultados/excluir/{{ match.id }}')">Excluir</a>
                         </div>
@@ -18,7 +18,7 @@
                     <table class="table">
                         <tr>
                             <td><b>Responsável</b></td>
-                            <td>{{ match.responsible.username }}</td>
+                            <td>{{ match.responsible.get_full_name }}</td>
                         </tr>
                         <tr>
                             <td><b>Torneio</b></td>
@@ -37,7 +37,7 @@
             </div>
 			<div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Participantes</h3>
+                    <h3 class="box-title">Equipes</h3>
                     <div class="box-tools pull-right">
                         {% if user.is_authenticated %}
                             <a href="/pontuacao/{{ match.id }}" class="btn btn-box-tool">Atualizar</a>
@@ -53,17 +53,15 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
-                                <th>Matrícula</th>
-                                <th>Curso</th>
+                                <th>Integrantes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for score in match.participants.all %}
+                            {% for team in match.teams.all %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ score.name }}</td>
-                                    <td>{{ score.code }}</td>
-                                    <td>{{ score.course }}</td>
+                                    <td>{{ team.name }}</td>
+                                    <td>{{ team.strparticipants }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -89,14 +87,14 @@
                     <table class = "table">
                                 <tr>
                                     <th>Colocação</th>
-                                    <th>Participante</th>
+                                    <th>Equipe</th>
                                     <th>Pontuação</th>
                                     <th>Tempo</th>
                                 </tr>
                         {% for matchScore in matchScores%}
                                 <tr>
                                     <td align="left">{{forloop.counter}}</td>
-                                    <td align="left">{{ matchScore.participant.name }} </td>
+                                    <td align="left">{{ matchScore.team }} </td>
                                     <td align="center">{{ matchScore.score }}</td>
                                     <td align="center">{{ matchScore.time }}</td>
                                 </tr>
