@@ -58,12 +58,21 @@ class Participant(models.Model):
 	def __str__(self):
 		return self.name + ' - ' + self.course
 
+#modelo chave:
+class Group(models.Model):
+	name = models.CharField(max_length=255)#the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
+	depth = models.IntegerField(default=0)#the function of depth attr is to determine how close to the final match a grouṕ is.
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.name
+
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
-	group = models.ForeignKey(Group, on_delete=SET_NULL, null=True)
+	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
 		return self.name
@@ -73,14 +82,6 @@ class Team(models.Model):
 			string+=str(participant.name) + ', '
 		return string
 
-#modelo chave:
-class Group(models.Model):
-	name = models.CharField(max_length=255)#the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
-	depth = models.IntegerField(default=0)#the function of depth attr is to determine how close to the final match a grouṕ is.
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return self.name
 
 class Match(models.Model):
 	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs')
