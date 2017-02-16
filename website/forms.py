@@ -96,6 +96,8 @@ class MatchForm(ModelForm):
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
         self.fields['end'].label = 'Término'
+        self.fields['date'].label = 'Data'
+        self.fields['location'].label = 'Localização'
 
 class AttendForm(forms.Form):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
@@ -103,3 +105,23 @@ class AttendForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
     course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
     captcha = ReCaptchaField()
+
+class MatchScoreForm(ModelForm):
+    class Meta:
+        model = MatchScore
+        fields = ['score', 'time']
+        widgets = {
+            'score': forms.NumberInput(attrs={'class':'form-control','widget': 'input', 'autocomplete':'off', 'min_value': 0}),
+            'time':  forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'min_value': 0}, format='%H:%M')
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(MatchScoreForm, self).__init__(*args, **kwargs)
+        self.fields['score'].label='Pontuação'
+        self.fields['time'].label='Tempo'
+
+    def clean_score(self):
+        score = self.cleaned_data['score']
+        if score < 0:
+            raise forms.ValidationError('A pontuação não pode ser negativa')
+        return score

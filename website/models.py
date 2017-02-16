@@ -67,6 +67,11 @@ class Team(models.Model):
 
 	def __str__(self):
 		return self.name
+	def strparticipants(self):
+		string = ''
+		for participant in self.participants.all():
+			string+=str(participant.name) + ', '
+		return string
 
 #modelo chave:
 class Group(models.Model):
@@ -78,15 +83,16 @@ class Group(models.Model):
 		return self.name
 
 class Match(models.Model):
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches')
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs')
 	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
 	responsible = models.ForeignKey(User)
 	date = models.DateField(default=date.today)
 	start = models.TimeField(default=timezone.now)
 	end = models.TimeField(default=timezone.now)
 	location = models.CharField(max_length=255)
-	participants = models.ManyToManyField(Participant, related_name='participants')
+	teams = models.ManyToManyField(Team, related_name='teams')
 	intercampi = models.BooleanField(default=False)
+	first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
 
 	def status(self):
 		now = datetime.now()
@@ -108,11 +114,38 @@ class Match(models.Model):
 	def __str__(self):
 		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
+	def matchs_ready_to_publish_result(request):
+		matchs = Match.objects.all().filter(responsible=request.user)
+		MATCHS = []
+		for match in matchs:
+			matchScore = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()==matchScore.count() and not match.first_place and matchScore.count()!=0:
+				MATCHS.append(match)
+		return MATCHS
+
+	def match_not_ready(request):
+		matchs = Match.objects.all().filter(responsible=request.user)
+		MATCHS = []
+		for match in matchs:
+			matchScore = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()!=matchScore.count() or matchScore.count()==0:
+				MATCHS.append(match)
+		return MATCHS
+
+	def match_already_published(request):
+		matchs = Match.objects.all().filter(responsible=request.user)
+		MATCHS = []
+		for match in matchs:
+			matchScore = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()==matchScore.count() and matchScore.count()!=0 and match.first_place:
+				MATCHS.append(match)
+		return MATCHS
+
 class MatchScore(models.Model):
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
-	participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+	team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
 	score = models.IntegerField(default=0)
-	time = models.IntegerField(default=0)
+	time = models.TimeField(default='00:00')
 
 	def __str__(self):
-		return self.participant.name + ' - ' + self.match.__str__()
+		return self.team.__str__() + ' - ' + self.match.__str__()

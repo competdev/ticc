@@ -1,0 +1,76 @@
+{%extends "base.html"%}
+
+{%block content %}
+	<div class="row" style="margin-top: 30px">
+		<div class="col-md-6">
+			<div class="box">
+				<div class="box-header with-border">
+                	<h3 style="color:green" class="box-title">Equipes com Pontuação</h3>
+					<div class="box-tools pull-right">
+						<a href="/pontuacao/{{USER}}/{{match.id}}" class="btn btn-box-tool">Atualiza</a>
+					</div>
+				</div>
+				<div class="box-body">
+					<table class="table">
+						<tr>
+							<th><b>Equipe</b></th>
+							<th><b>Integrantes</b></th>
+							<th><b>Pontuação</b></th>
+							<th><b>Tempo</b></th>
+						</tr>
+						{% if not matchScores%}
+						<tr>
+							<td>
+								<div>Nenhuma equipe com pontuação cadastrada</div>								
+							</td>
+						</tr>
+						{%endif%}
+						{%for matchScore in matchScores%}
+							<tr onmouseover="Select(this)" onmouseout="Diselect(this)" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{USER}}'+'/'+'{{matchScore.id}}', '/pontuacao/exclui/'+'{{USER}}'+'/'+'{{matchScore.id}}')">
+								<td>{{matchScore.team}}</td>
+								<td>{{matchScore.team.strparticipants}}</td>
+								<td align="center">{{matchScore.score}}</td>
+								<td align="center">{{matchScore.time}}</td>
+							</tr>
+						{%endfor%}
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="box">
+				<div class="box-header with-border">
+                	<h3 style="color:red" class="box-title">Equipes sem Pontuação</h3>
+					<div class="box-tools pull-right">
+						<a href="/pontuacao/{{USER}}/{{match.id}}" class="btn btn-box-tool">Atualiza</a>
+					</div>
+				</div>
+				<div class="box-body">
+					<table class="table">
+							<tr>
+								<th><b>Equipe</b></th>
+								<th><b>Integrantes</b></th>
+								<th><b>Pontuação</b></th>
+								<th><b>Tempo</b></th>
+							</tr>
+							{%if not teams_without_matchScore%}
+							<tr>
+								<td>
+									<div>Não há equipes a serem pontuadas</div>									
+								</td>
+							</tr>
+							{%endif%}
+							{%for team in teams_without_matchScore%}
+								<tr onmouseover="Select(this);" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{USER}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
+									<td>{{team}}</td>
+									<td>{{team.strparticipants}}</td>
+									<td align="center">--</td>
+									<td align="center">-- _ --</td>
+								</tr>
+							{%endfor%}				
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+{%endblock content %}

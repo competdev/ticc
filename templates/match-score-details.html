@@ -2,35 +2,35 @@
 
 {% block content %}
 	<div class="row">
-		<div class="col-md-7">
+		<div class="col-md-6">
 			<div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Informações</h3>
-                    {% if user.is_authenticated %}
+                    {% if USER == USER_MOR %}
                         <div class="box-tools pull-right">
                             <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
-                               onclick="showDialog('Tem certeza que deseja excluir?', '/jogos/excluir/{{ match.id }}')">Excluir</a>
+                               onclick="showDialog('Tem certeza que deseja excluir?', '/resultados/excluir/{{ match.id }}')">Excluir</a>
                         </div>
                     {% endif %}
                 </div>
                 <div class="box-body">
                     <table class="table">
-                        <tr class="info-table-first-row">
-                            <td><b>Data</b></td>
-                            <td>{{ match.date }}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Horário</b></td>
-                            <td>{{ match.start |time:"H:i" }} ~ {{ match.end |time:"H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Local</b></td>
-                            <td>{{ match.location }}</td>
-                        </tr>
                         <tr>
                             <td><b>Responsável</b></td>
                             <td>{{ match.responsible.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Torneio</b></td>
+                            <td>{{ match.competition.tournament }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Competição</b></td>
+                            <td>{{ match.competition }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Data</b></td>
+                            <td>{{ match.date }}</td>
                         </tr>
                     </table>
                 </div>
@@ -57,7 +57,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for team in MatchScore.match.teams.all %}
+                            {% for team in match.teams.all %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ team.name }}</td>
@@ -69,13 +69,37 @@
                 </div>
             </div>
 		</div>
-		<div class="col-md-5">
+		<div class="col-md-6">
 			<div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Regras</h3>
                 </div>
                 <div class="box-body">
                     {{ match.competition.category.rules|linebreaks }}
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Classificação</h3>
+                </div>
+
+                <div class="box-body">
+                    <table class = "table">
+                                <tr>
+                                    <th>Colocação</th>
+                                    <th>Equipe</th>
+                                    <th>Pontuação</th>
+                                    <th>Tempo</th>
+                                </tr>
+                        {% for matchScore in matchScores%}
+                                <tr>
+                                    <td align="left">{{forloop.counter}}</td>
+                                    <td align="left">{{ matchScore.team }} </td>
+                                    <td align="center">{{ matchScore.score }}</td>
+                                    <td align="center">{{ matchScore.time }}</td>
+                                </tr>
+                        {%endfor%}
+                    </table>
                 </div>
             </div>
 		</div>

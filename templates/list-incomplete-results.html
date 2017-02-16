@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+	    <div class="row">
+	        <div class="col-md-6">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:green;">Partidas terminadas</h3>
+	                </div>
+	                <div class="box-body">
+	                    <table class="table">
+	                        <tr>
+	                        	<th>#</th>
+	                            <th>Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                        </tr>
+	                        {% if not matchs%}
+								<tr>
+									<td>
+										<div>Não há nenhuma partida a ser concluída</div>
+									</td>
+								</tr>
+	                        {% endif %}
+	                        {% for match in matchs %}
+	                        	<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/resultados/publica/' + '{{USER}}' + '/'+'{{match.id}}');">
+	                        	    <td>{{forloop.counter}}</td>
+	                        	    <td align="left">
+	                        	    	<a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a>
+	                        	    </td>
+	                        	    <td align="left">{{ match.competition }}</td>
+	                        	    <td align="center">{{ match.competition.tournament }}</td>
+	                        	    <td align="center">{{ match.date }}</td>
+	                        	</tr>	
+	                        {% endfor %}
+	                    </table>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="col-md-6">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:red;">Partidas em Andamento</h3>
+	                </div>
+	                <div class="box-body">
+	                	<table class="table">
+	                		<tr>
+	                			<th>#</th>
+	                			<th>Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                		</tr>
+	                		{% if not matchs_not_ready %}
+	                			<tr>
+	                				<td>
+	                					<div>Não há nenhuma partida incompleta</div>
+	                				</td>
+	                			</tr>
+	                		{%endif%}
+                			{% for match in matchs_not_ready %}
+                				<input type="hidden" id="user" value="{{USER}}">
+								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{USER}}' + '/' + '{{match.id}}');">
+									<td>{{forloop.counter}}</td>
+									<td align="left">
+	                        	    	<a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a>
+	                        	    </td>
+									<td align="left">{{ match.competition }}</td>
+	                        	    <td align="center">{{ match.competition.tournament }}</td>
+	                        	    <td align="center">{{ match.date }}</td>
+								</tr>
+                			{% endfor %}
+	                	</table>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="row">
+	        <div class="col-md-12">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:blue;">Partidas já publicadas</h3>
+	                </div>
+	                <div class="box-body">
+	                	<table class="table">
+	                		<tr>
+	                			<th>#</th>
+	                			<th >Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                		</tr>
+	                		{% if not match_already_published %}
+	                			<tr>
+	                				<td>
+	                					<div>Não há nenhuma partida publicada</div>
+	                				</td>
+	                			</tr>
+	                		{%endif%}
+                			{% for match in match_already_published %}
+                				<input type="hidden" id="user" value="{{USER}}">
+								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{USER}}' + '/' + '{{match.id}}');">
+									<td>{{forloop.counter}}</td>
+									<td align="left"><a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a></td>
+									<td align="left">{{ match.competition }}</td>
+	                        	    <td align="center">{{ match.competition.tournament }}</td>
+	                        	    <td align="center">{{ match.date }}</td>
+								</tr>
+                			{% endfor %}
+	                	</table>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+{% endblock content %}
