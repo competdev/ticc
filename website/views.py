@@ -38,6 +38,7 @@ def logout(request):
 def signup(request):
 	if request.method == 'POST':
 		form = NewParticipantForm(request.POST)
+		print(request.POST)
 		if form.is_valid():
 				user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data[
 					'email'], password=form.cleaned_data['password'])
@@ -54,9 +55,9 @@ def signup(request):
 				except:
 					user.delete()
 					messages.error(request, 'Não foi possível cadastrar o participante.')
-					return render(request, 'signup.html', {'form': form}, status=400)
+					return render(request, 'signup.html', {'form': form})
 
-		return render(request, 'home.html', {'form': form}, status=400)
+		return render(request, 'signup.html', {'form': form}, status=400)
 	return render(request, 'signup.html', {'form': NewParticipantForm()})
 
 

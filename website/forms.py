@@ -141,6 +141,7 @@ class NewParticipantForm(forms.Form):
         label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     repassword = forms.CharField(
         label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
     def clean_username(self):
         data = self.cleaned_data['username']
         if User.objects.filter(username=data).exists():
@@ -153,12 +154,13 @@ class NewParticipantForm(forms.Form):
             raise ValidationError('E-mail já cadastrado.')
         return data
 
-    # def clean_password(self):
-    #     data1 = self.cleaned_data['password']
-    #     data2 = self.cleaned_data['repassword']
-    #     if data1!=data2
-    #         raise ValidationError('E-mail já cadastrado.')
-    #     return data
+
+    def clean_password(self):
+        data1 = self.cleaned_data['password']
+        data2 = self.data['repassword']
+        if data1!=data2:
+            raise ValidationError("A senha e sua confirmação são diferentes")
+        return data1
 
 
 
