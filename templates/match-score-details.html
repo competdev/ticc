@@ -6,13 +6,15 @@
 			<div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Informações</h3>
-                    {% if user == USER_MOR %}
                         <div class="box-tools pull-right">
+                        {%if perms.website.change_match %}
                             <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
+                        {%endif%}
+                        {%if perms.website.delete_match%}
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
                                onclick="showDialog('Tem certeza que deseja excluir?', '/resultados/excluir/{{ match.id }}')">Excluir</a>
+                        {%endif%}
                         </div>
-                    {% endif %}
                 </div>
                 <div class="box-body">
                     <table class="table">
@@ -80,6 +82,11 @@
             </div>
             <div class="box">
                 <div class="box-header with-border">
+                    <div class="box-tools pull-right">
+                        {% if perms.website.change_matchscore %}
+                            <a href="/pontuacao/{{ match.responsible.id }}/{{ match.id }}" class="btn btn-box-tool">Editar</a>
+                        {% endif %}
+                    </div>
                     <h3 class="box-title">Classificação</h3>
                 </div>
 

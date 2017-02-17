@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
@@ -8,7 +8,8 @@ from .models import *
 from .forms import *
 
 def home(request):
-	print(str(request.user.user_permissions))
+	permissoes = Permission.objects.all()
+	print(str(request.user.has_perm('website.add_matchscore')))
 	return render(request, 'home.html')
 
 def login(request):
@@ -360,6 +361,7 @@ def list_results(request):
 	return render(request, 'list-results.html', context)
 
 @login_required
+@permission_required('website.add_matchscore', raise_exception=True)
 def list_incomplete_or_not_plubished_results(request, user_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
@@ -421,6 +423,7 @@ def publish_result(request, user_id, match_id):
 	return redirect('/resultados/'+str(user_id))
 
 @login_required
+@permission_required('website.add_matchscore', raise_exception=True)
 def list_incomplete_scores(request, user_id, match_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
@@ -451,6 +454,7 @@ def list_incomplete_scores(request, user_id, match_id):
 	return render(request, 'matchscore-add.html', context)
 
 @login_required
+@permission_required('website.add_matchscore', raise_exception=True)
 def add_matchScore(request, user_id, match_id, team_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
@@ -493,6 +497,7 @@ def add_matchScore(request, user_id, match_id, team_id):
 	return render(request, 'form.html', context)
 
 @login_required
+@permission_required('website.change_matchscore', raise_exception=True)
 def edit_matchScore(request, user_id, matchScore_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
@@ -526,6 +531,7 @@ def edit_matchScore(request, user_id, matchScore_id):
 	return render(request, 'form.html', context)
 
 @login_required
+@permission_required('website.delete_matchscore', raise_exception=True)
 def remove_matchScore(request, user_id,matchScore_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user!=user:
