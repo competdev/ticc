@@ -25,10 +25,12 @@ urlpatterns = [
 	url(r'jogos/participar/(?P<match_id>[0-9]+)$', views.attend_to_match),
 	url(r'jogos/sair/(?P<match_id>[0-9]+)$', views.leave_match),
 
-	url(r'pontuacao/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.list_incomplete_scores),
-	url(r'pontuacao/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/(?P<participant_id>[0-9]+)/$', views.add_matchScore),
+	url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.list_incomplete_scores),
+	url(r'pontuacao/editar/(?P<user_id>[0-9]+)/(?P<matchScore_id>[0-9]+)/$', views.edit_matchScore),
+	url(r'pontuacao/exclui/(?P<user_id>[0-9]+)/(?P<matchScore_id>[0-9]+)/$', views.remove_matchScore),
+	url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/(?P<team_id>[0-9]+)/$', views.add_matchScore),
 
-	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/$', views.list_incomplete_or_not_plubished_results),
-	url(r'resultados/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.match_score),
-	url(r'resultados/publica/(?P<user_name>[a-zA-Z0-9_]*)/(?P<match_id>[0-9]+)/$', views.publish_result),
+	url(r'resultados/(?P<user_id>[0-9]+)/$', views.list_incomplete_or_not_plubished_results),
+	url(r'resultados/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.match_score),
+	url(r'resultados/publica/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.publish_result),
 ]

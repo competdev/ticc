@@ -37,7 +37,7 @@
             </div>
 			<div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Participantes</h3>
+                    <h3 class="box-title">Equipes</h3>
                     <div class="box-tools pull-right">
                         {% if user.is_authenticated %}
                             <a href="/pontuacao/{{ match.id }}" class="btn btn-box-tool">Atualizar</a>
@@ -53,17 +53,15 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
-                                <th>Matrícula</th>
-                                <th>Curso</th>
+                                <th>Integrantes</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for score in MatchScore.match.participants.all %}
+                            {% for team in MatchScore.match.teams.all %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ score.name }}</td>
-                                    <td>{{ score.code }}</td>
-                                    <td>{{ score.course }}</td>
+                                    <td>{{ team.name }}</td>
+                                    <td>{{ team.strparticipants }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 	    <div class="row">
 	        <div class="col-md-18 col-md-offset-0">
 	            <div class="box">
@@ -8,7 +9,7 @@
 	                {% if user.is_authenticated %}
 		                {%if perms.website.add_result %}
 			                    <div class="box-tools pull-right">
-			                        <a href="/resultados/{{USER}}" class="btn btn-box-tool">Minhas Partidas</a>
+			                        <a href="/resultados/{{user.id}}" class="btn btn-box-tool">Minhas Partidas</a>
 			                    </div>
 		                {% endif %}
 	                {% endif %}
@@ -19,8 +20,10 @@
 	                            <tr>
 	                                <th>Numero</th>
 	                                <th>Partida</th>
+	                                <th>Tipo</th>
 		                            <th>Data</th>
 		                            <th>Competição</th>
+		                            <th>Campus</th>
 		                            <th>Torneio</th>
 		                            <th>Ganhador</th>
 		                            <th>Responsável</th>
@@ -32,13 +35,15 @@
 		                                <tr>
 		                                    <td>{{ forloop.counter }}</td>
 		                                    <td>
-	                                    		<a href="/resultados/{{match.responsible.username}}/{{match.id}}">{{ match }}</a>
+	                                    		<a href="/resultados/{{match.responsible.id}}/{{match.id}}" title='Detalhes'>{{ match }}</a>
 		                                    </td>
+		                                    <td>{{match.type}} </td>
 		                                    <td>{{ match.date }}</td>
 			                        	    <td>{{ match.competition }}</td>
+			                        	    <td>{{ match.campus }}</td>
 			                        	    <td>{{ match.competition.tournament }}</td>
 			                        	    <td>{{ match.first_place }}</td>
-			                        	    <td>{{ match.responsible.username }}</td>
+			                        	    <td>{{ match.responsible.get_full_name }}</td>
 		                                </tr>
 									{%endif%}
 								{%endfor%}
