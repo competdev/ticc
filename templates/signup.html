@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header">Cadastro de Participante</h2>
+        </div>
+        <div class="col-md-7">
+            <form action="signup" method="post">
+                {% csrf_token %}
+                {{form}}
+                <!--{% for field in form %}
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
+                    <h4><strong>{{ field.label }}</strong></h4>
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    {{ field }}
+                </div>
+                {% endfor %}-->
+                <button class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

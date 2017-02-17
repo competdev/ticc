@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
+from website.forms import NewParticipantForm
+from django.contrib import messages
 
 from .models import *
 from .forms import *
@@ -31,6 +34,31 @@ def login(request):
 def logout(request):
 	logout_user(request)
 	return redirect('/')
+
+def signup(request):
+	if request.method == 'POST':
+		form = NewParticipantForm(request.POST)
+		if form.is_valid():
+				user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data[
+					'email'], password=form.cleaned_data['password'])
+				try:
+					participant = Participant()
+					participant.user = user
+					participant.name = form.cleaned_data['name']
+					participant.code = form.cleaned_data['code']
+					participant.course = form.cleaned_data['course']
+					participant.email = form.cleaned_data['email']
+					user.save()
+					participant.save()
+					messages.success(request, 'Participante cadastrado com sucesso.')
+				except:
+					user.delete()
+					messages.error(request, 'Não foi possível cadastrar o participante.')
+					return render(request, 'signup.html', {'form': form}, status=400)
+
+		return render(request, 'home.html', {'form': form}, status=400)
+	return render(request, 'signup.html', {'form': NewParticipantForm()})
+
 
 def about(request):
 	return render(request,'about.html',{})

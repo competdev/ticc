@@ -8,6 +8,7 @@ urlpatterns = [
 	url(r'sobre$',views.about),
 	url(r'torneios$', views.tournaments),
 	url(r'resultados/$', views.list_results),
+	url(r'signup$', views.signup),
 
 	url(r'torneios/novo', views.add_tournament),
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
