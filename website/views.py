@@ -369,6 +369,11 @@ def list_incomplete_or_not_plubished_results(request, user_id):
 	MATC   = Match.match_already_published(request)
 	context = {
 		'title': 'Partidas - '+ request.user.get_full_name(),
+<<<<<<< HEAD
+=======
+		'USER': request.user.username,
+		'USER_MORE': user_name,
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		'matchs': MATCHS,
 		'matchs_not_ready': MATCH,
 		'match_already_published': MATC,
@@ -383,8 +388,12 @@ def list_incomplete_or_not_plubished_results(request, user_id):
 
 def match_score(request, user_id, match_id):
 	match = get_object_or_404(Match, id=match_id)
+<<<<<<< HEAD
 	user = User.objects.all().filter(id=user_id).first()
 	if user.username!=match.responsible.username:
+=======
+	if user_name!=match.responsible.username:
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		return redirect("/resultados")
 	matchScore = MatchScore.objects.all().filter(match=match)
 	if not matchScore.count() == match.teams.count() or not match.first_place:
@@ -418,7 +427,11 @@ def publish_result(request, user_id, match_id):
 	match = get_object_or_404(Match, id=match_id)
 	match.first_place = MatchScore.objects.all().filter(match=match).order_by('-score').first().team
 	match.save()
+<<<<<<< HEAD
 	return redirect('/resultados/'+str(user_id))
+=======
+	return redirect('/resultados/'+user_name)
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 
 @login_required
 def list_incomplete_scores(request, user_id, match_id):
@@ -451,9 +464,14 @@ def list_incomplete_scores(request, user_id, match_id):
 	return render(request, 'matchscore-add.html', context)
 
 @login_required
+<<<<<<< HEAD
 def add_matchScore(request, user_id, match_id, team_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
+=======
+def add_matchScore(request, user_name, match_id, team_id):
+	if request.user.username != user_name:
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		return redirect('/resultados')
 	match = get_object_or_404(Match, id=match_id)
 	team = get_object_or_404(Team, id=team_id)
@@ -476,9 +494,15 @@ def add_matchScore(request, user_id, match_id, team_id):
 		form = MatchScoreForm()
 
 	context = {
+<<<<<<< HEAD
 		'title': "Pontuação - " + team.name,
 		'action': '/pontuacao/' + str(user_id) + '/' + str(match_id) + '/' + str(team_id) + '/',
 		'cancel': '/pontuacao/' + str(user_id) + '/' + str(match_id),
+=======
+		'title': "Pontuação - " + str(match) + ' - ' + team.name,
+		'action': '/pontuacao/' + user_name + '/' + str(match_id) + '/' + str(team_id) + '/',
+		'cancel': '/pontuacao/' + user_name + '/' + str(match_id),
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		'form': form,
 		'competition' : competition,
 		'breadcrumb': [
@@ -493,9 +517,14 @@ def add_matchScore(request, user_id, match_id, team_id):
 	return render(request, 'form.html', context)
 
 @login_required
+<<<<<<< HEAD
 def edit_matchScore(request, user_id, matchScore_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
+=======
+def edit_matchScore(request, user_name, matchScore_id):
+	if request.user.username != user_name:
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		return redirect("/resultados")
 	matchScore = get_object_or_404(MatchScore, id=matchScore_id)
 
@@ -505,12 +534,17 @@ def edit_matchScore(request, user_id, matchScore_id):
 			matchScore.match.first_place=None
 			matchScore.match.save()
 			form.save()
+<<<<<<< HEAD
 			return redirect('/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id))
+=======
+			return redirect('/pontuacao/' + user_name + '/' + str(matchScore.match.id))
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 	else:
 		form = MatchScoreForm(instance=matchScore)
 
 	context = {
 		'title': "Pontuação - " + str(matchScore.match) + ' - ' + matchScore.team.name,
+<<<<<<< HEAD
 		'action': '/pontuacao/editar/' + str(user_id) + '/' + str(matchScore_id) + '/',
 		'cancel': '/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id),
 		'form': form,
@@ -520,17 +554,32 @@ def edit_matchScore(request, user_id, matchScore_id):
 			{'name': user.first_name, 'link': '/resultados/' + str(user_id)},
 			{'name': 'Pontuação - ' + str(match), 'link': '/pontuacao/' + str(user_id) + '/' + str(match_id)},
 			{'name': 'Editar'},
+=======
+		'action': '/pontuacao/editar/' + user_name + '/' + str(matchScore_id) + '/',
+		'cancel': '/pontuacao/' + user_name + '/' + str(matchScore.match.id),
+		'form': form,
+		'breadcrumb': [
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		]
 	}
 
 	return render(request, 'form.html', context)
 
 @login_required
+<<<<<<< HEAD
 def remove_matchScore(request, user_id,matchScore_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user!=user:
+=======
+def remove_matchScore(request, user_name,matchScore_id):
+	if request.user.username!=user_name:
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 		return redirect('/')
 	matchScore = get_object_or_404(MatchScore, id=matchScore_id)
 	match_id = matchScore.match.id
 	matchScore.delete()
+<<<<<<< HEAD
 	return redirect('/pontuacao/' + str(user_id) + '/' + str(match_id))
+=======
+	return redirect('/pontuacao/' + user_name + '/' + str(match_id))
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181

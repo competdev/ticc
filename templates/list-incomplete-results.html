@@ -27,7 +27,11 @@
 	                        	<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/resultados/publica/' + '{{user.id}}' + '/'+'{{match.id}}');">
 	                        	    <td>{{forloop.counter}}</td>
 	                        	    <td align="left">
+<<<<<<< HEAD
 	                        	    	<a href="/pontuacao/{{user.id}}/{{match.id}}" title='Alterar pontuações'>{{match}}</a>
+=======
+	                        	    	<a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a>
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 	                        	    </td>
 	                        	    <td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
@@ -64,7 +68,11 @@
 								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
 									<td>{{forloop.counter}}</td>
 									<td align="left">
+<<<<<<< HEAD
 	                        	    	<a href="/resultados/{{user.id}}/{{match.id}}" title='Detalhes'>{{match}}</a>
+=======
+	                        	    	<a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a>
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 	                        	    </td>
 									<td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
@@ -99,10 +107,17 @@
 	                			</tr>
 	                		{%endif%}
                 			{% for match in match_already_published %}
+<<<<<<< HEAD
                 				<input type="hidden" id="user" value="{{user.id}}">
 								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
 									<td>{{forloop.counter}}</td>
 									<td align="left"><a href="/resultados/{{user.id}}/{{match.id}}" title='Detalhes'>{{match}}</a></td>
+=======
+                				<input type="hidden" id="user" value="{{USER}}">
+								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{USER}}' + '/' + '{{match.id}}');">
+									<td>{{forloop.counter}}</td>
+									<td align="left"><a href="/resultados/{{USER}}/{{match.id}}" title='Detalhes'>{{match}}</a></td>
+>>>>>>> 8272774608999d141ef238fa774d24010f25f181
 									<td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
 	                        	    <td align="center">{{ match.date }}</td>
