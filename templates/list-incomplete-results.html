@@ -24,7 +24,7 @@
 								</tr>
 	                        {% endif %}
 	                        {% for match in matchs %}
-	                        	<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/resultados/publica/' + '{{user.id}}' + '/'+'{{match.id}}');">
+	                        	<tr onmouseover="Select(this);" title="Publica resultado" onmouseleave ="Diselect(this);" onclick="Click(this, '/resultados/publica/' + '{{user.id}}' + '/'+'{{match.id}}');">
 	                        	    <td>{{forloop.counter}}</td>
 	                        	    <td align="left">
 	                        	    	<a href="/pontuacao/{{user.id}}/{{match.id}}" title='Alterar pontuações'>{{match}}</a>
@@ -61,7 +61,7 @@
 	                		{%endif%}
                 			{% for match in matchs_not_ready %}
                 				<input type="hidden" id="user" value="{{user.id}}">
-								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
+								<tr onmouseover="Select(this);" title="Altera pontuações" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
 									<td>{{forloop.counter}}</td>
 									<td align="left">
 	                        	    	<a href="/resultados/{{user.id}}/{{match.id}}" title='Detalhes'>{{match}}</a>
@@ -100,7 +100,7 @@
 	                		{%endif%}
                 			{% for match in match_already_published %}
                 				<input type="hidden" id="user" value="{{user.id}}">
-								<tr onmouseover="Select(this);" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
+								<tr onmouseover="Select(this);" title="Altera pontuações" onmouseleave ="Diselect(this);" onclick="Click(this, '/pontuacao/' + '{{user.id}}' + '/' + '{{match.id}}');">
 									<td>{{forloop.counter}}</td>
 									<td align="left"><a href="/resultados/{{user.id}}/{{match.id}}" title='Detalhes'>{{match}}</a></td>
 									<td align="left">{{ match.competition }}</td>

@@ -518,7 +518,7 @@ def edit_matchScore(request, user_id, matchScore_id):
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Resultados', 'link': '/resultados'},
 			{'name': user.first_name, 'link': '/resultados/' + str(user_id)},
-			{'name': 'Pontuação - ' + str(match), 'link': '/pontuacao/' + str(user_id) + '/' + str(match_id)},
+			{'name': 'Pontuação - ' + str(matchScore.match), 'link': '/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id)},
 			{'name': 'Editar'},
 		]
 	}

@@ -26,7 +26,7 @@
 						</tr>
 						{%endif%}
 						{%for matchScore in matchScores%}
-							<tr onmouseover="Select(this)" onmouseout="Diselect(this)" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/exclui/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">
+							<tr onmouseover="Select(this)" title="Edita ou exclui pontuação" onmouseout="Diselect(this)" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/exclui/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">
 								<td>{{matchScore.team}}</td>
 								<td>{{matchScore.team.strparticipants}}</td>
 								<td align="center">{{matchScore.score}}</td>
@@ -61,7 +61,7 @@
 							</tr>
 							{%endif%}
 							{%for team in teams_without_matchScore%}
-								<tr onmouseover="Select(this);" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{user.id}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
+								<tr onmouseover="Select(this);" title="Nova pontuação" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{user.id}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
 									<td>{{team}}</td>
 									<td>{{team.strparticipants}}</td>
 									<td align="center">--</td>
