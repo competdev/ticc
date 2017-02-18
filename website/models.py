@@ -52,8 +52,11 @@ class Participant(models.Model):
 	name = models.CharField(max_length=255)
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
+	year = models.IntegerField(choices=((1,'1º'),(2,'2º'),(3,'3º')))
+	school = models.CharField(max_length=255)
 	course = models.CharField(max_length=255)
-	leader = models.BooleanField(default=False)
+	valid = models.BooleanField(default=False)
+
 
 	def __str__(self):
 		return self.name + ' - ' + self.course
@@ -73,6 +76,7 @@ class Team(models.Model):
 	category = models.ForeignKey(Category, on_delete=models.CASCADE)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
 	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+	mix_team = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name

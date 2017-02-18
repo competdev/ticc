@@ -4,6 +4,8 @@ from django.forms import ModelForm
 from .models import *
 from django.core.exceptions import ObjectDoesNotExist
 from captcha.fields import ReCaptchaField
+from django.contrib.auth.models import User
+
 
 class TournamentForm(ModelForm):
     class Meta:
@@ -106,6 +108,30 @@ class AttendForm(forms.Form):
     course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
     captcha = ReCaptchaField()
 
+class ParticipantUpdateForm(ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
+    code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
+    course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
+    class Meta:
+        model = Participant
+        fields = ['name', 'code','email','course']
+
+class UserUpdateForm(ModelForm):
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Username', max_length=255)
+    password = forms.CharField(required=False,label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    repassword = forms.CharField(required=False,label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    class Meta:
+        model = User
+        fields = ['username']
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        repassword = self.data['repassword']
+        if password != repassword:
+            raise ValidationError("Senha e confirmação de senha estão diferentes")
+        return password
+    
 class MatchScoreForm(ModelForm):
     class Meta:
         model = MatchScore

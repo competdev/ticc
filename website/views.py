@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
+from django.contrib.auth import get_user
 
 from .models import *
 from .forms import *
@@ -32,6 +33,9 @@ def logout(request):
 	logout_user(request)
 	return redirect('/')
 
+
+
+
 def about(request):
 	return render(request,'about.html',{})
 
@@ -45,6 +49,39 @@ def tournaments(request):
 		]
 	}
 	return render(request, 'tournaments.html', context)
+
+@login_required
+#View for update participant info:
+def update_participant_info(request):
+
+	loggedUser = get_user(request) #get who is the user logged in
+	loggedParticipant = Participant.objects.get(user=request.user) #get who is the participant logged in
+	
+	#the forms above are filled with participant data, for update purpose:
+	participantUpdateForm = ParticipantUpdateForm(request.POST or None, instance=loggedParticipant)
+	userUpdateForm = UserUpdateForm(request.POST or None, instance=loggedUser)
+	
+	#checking what info the participant wanted to change
+	if participantUpdateForm.has_changed():
+		if participantUpdateForm.is_valid():
+			participantUpdateForm.save()#saving if changed
+	if userUpdateForm.has_changed():
+		if userUpdateForm.is_valid():
+			if userUpdateForm.data.get("password"):
+				loggedUser.set_password(userUpdateForm.data.get("password"))
+			userUpdateForm.save()
+			logout_user(request)
+			return redirect('/')
+	
+	context = {
+		'participantUpdateForm' : participantUpdateForm,
+		'userUpdateForm' : userUpdateForm,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Meu Cadastro'},
+		]
+	}
+	return render(request, 'update_participant_info.html', context)
 
 @login_required()
 def add_tournament(request):
