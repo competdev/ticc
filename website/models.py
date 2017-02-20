@@ -53,7 +53,9 @@ class Participant(models.Model):
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
-	leader = models.BooleanField(default=False)
+	year = models.IntegerField(choices=((1,'1º'),(2,'2º'),(3,'3º')))
+	school = models.CharField(max_length=255)
+	valid = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name + ' - ' + self.course

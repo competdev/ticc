@@ -7,7 +7,7 @@ from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
 from website.forms import NewParticipantForm
 from django.contrib import messages
-
+from django.http import  JsonResponse
 from .models import *
 from .forms import *
 
@@ -564,3 +564,19 @@ def remove_matchScore(request, user_name,matchScore_id):
 	match_id = matchScore.match.id
 	matchScore.delete()
 	return redirect('/pontuacao/' + user_name + '/' + str(match_id))
+
+#add user do professor como parametro
+@login_required
+def validationParticipants(request,Participant_school):
+	if request.method == 'POST':
+		for participant in Participant.objects.filter(school=Participant_school):
+			p = request.POST.get(participant.user.username)
+			if p == 'on':
+				participant.valid=True
+			else:
+				participant.valid=False
+			participant.save()
+
+	list_participats=Participant.objects.filter(school=Participant_school).order_by('name')
+	print(list_participats)
+	return render(request, 'validationParticipants.html', {'list_participats': list_participats})
