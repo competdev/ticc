@@ -151,3 +151,19 @@ class MatchScoreForm(ModelForm):
         if score < 0:
             raise forms.ValidationError('A pontuação não pode ser negativa')
         return score
+
+
+class TeamForm(ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name','category','participants']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}),
+            'category': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
+            'participants': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}), 
+        }
+    def __init__(self, *args, **kwargs):
+        super(TeamForm, self).__init__(*args,**kwargs)
+        self.fields['name'].label = 'Nome'
+        self.fields['category'].label = 'Categoria'
+        self.fields['participants'].label = 'Participantes'

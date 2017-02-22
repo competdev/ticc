@@ -59,32 +59,27 @@ class Participant(models.Model):
 
 
 	def __str__(self):
-		return self.name + ' - ' + self.course
-
-#modelo chave:
-class Group(models.Model):
-	name = models.CharField(max_length=255)#the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
-	depth = models.IntegerField(default=0)#the function of depth attr is to determine how close to the final match a grouṕ is.
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return self.name
+		return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.school 
 
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
-	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
 	mix_team = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name
-	def strparticipants(self):
-		string = ''
-		for participant in self.participants.all():
-			string+=str(participant.name) + ', '
-		return string
+
+#modelo chave:
+class Group(models.Model):
+	name = models.CharField(max_length=255)#the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
+	depth = models.IntegerField(default=0)#the function of depth attr is to determine how close to the final match a grouṕ is.
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+	teams = models.ManyToManyField(Team, related_name='group_teams')
+
+	def __str__(self):
+		return self.name
 
 
 class Match(models.Model):
@@ -96,6 +91,7 @@ class Match(models.Model):
 	end = models.TimeField(default=timezone.now)
 	location = models.CharField(max_length=255)
 	teams = models.ManyToManyField(Team, related_name='teams')
+	group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True)
 	intercampi = models.BooleanField(default=False)
 	first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
 

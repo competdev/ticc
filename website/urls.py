@@ -7,6 +7,7 @@ urlpatterns = [
 	url(r'logout$', views.logout),
 	url(r'sobre$',views.about),
 	url(r'torneios$', views.tournaments),
+	url(r'equipes$',views.teams),
 	url(r'resultados/$', views.list_results),
 	url(r'meu_cadastro/$',views.update_participant_info),
 
@@ -14,6 +15,12 @@ urlpatterns = [
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
 	url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
 	url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
+
+	url(r'equipes/nova', views.add_team),
+	url(r'equipes/filtro_participantes$',views.participant_filter,name='participant_filter'),
+	# url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
+	# url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
+	# url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
 
 	url(r'competicoes/novo/(?P<tournament_id>[0-9]+)$', views.add_competition),
 	url(r'competicoes/(?P<competition_id>[0-9]+)$', views.competition_details),

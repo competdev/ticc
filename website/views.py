@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
 from django.contrib.auth import get_user
+from django.http import HttpResponse
+import random
 
 from .models import *
 from .forms import *
@@ -32,8 +34,6 @@ def login(request):
 def logout(request):
 	logout_user(request)
 	return redirect('/')
-
-
 
 
 def about(request):
@@ -82,6 +82,68 @@ def update_participant_info(request):
 		]
 	}
 	return render(request, 'update_participant_info.html', context)
+
+def teams(request):
+	context = {
+		'title': 'Equipes',
+		'teams': Team.objects.all(),
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes'},
+		]
+	}
+	return render(request, 'teams.html', context)
+
+
+@login_required()
+def add_team(request):
+	if request.method == 'POST':
+		print(request.POST)
+		form = TeamForm(request.POST)
+		if form.is_valid():
+			team = form.save()
+			return redirect('/')
+	else:
+		form = TeamForm()
+
+	context = {
+		'title': "Nova Equipe",
+		'action': '/equipes/nova',
+		'cancel': '/',
+		'form': form,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes', 'link': '/'},
+			{'name': 'Novo'},
+		]
+	}
+	return render(request,'add-team.html',context)
+
+@login_required()
+def participant_filter(request):
+	year = None
+	max_number_of_teams = 3
+	participants = []
+	if request.method == 'GET':
+		year = request.GET['year']
+	if year != 'mix':
+		participants = Participant.objects.filter(year=int(year))
+	else:
+		#generate random numbers different from each other
+		random_numbers = set()
+		while len(random_numbers) < max_number_of_teams:
+			random_idx = random.randint(0, Participant.objects.count() - 1)
+			random_numbers.add(random_idx)
+		for i in range(0,max_number_of_teams):
+			participants.append(Participant.objects.all()[random_numbers.pop()])
+	participants_info = ""
+	i = 1
+	for participant in participants:
+		participants_info += str(participant) + "," + str(participant.id)
+		if i < len(participants):
+			participants_info += "|"
+		i = i+1
+	return HttpResponse(participants_info)
 
 @login_required()
 def add_tournament(request):
