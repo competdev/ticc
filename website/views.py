@@ -9,7 +9,6 @@ from .forms import *
 
 def home(request):
 	permissoes = Permission.objects.all()
-	print(str(request.user.has_perm('website.add_matchscore')))
 	return render(request, 'home.html')
 
 def login(request):
@@ -366,11 +365,11 @@ def list_incomplete_or_not_plubished_results(request, user_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
 		return redirect('/resultados')
-	MATCHS = Match.matchs_ready_to_publish_result(request)
-	MATCH  = Match.match_not_ready(request)
-	MATC   = Match.match_already_published(request)
+	MATCHS = Match.matchs_ready_to_publish_result(Match.objects.all())
+	MATCH  = Match.match_not_ready(Match.objects.all())
+	MATC   = Match.match_already_published(Match.objects.all())
 	context = {
-		'title': 'Partidas - '+ request.user.get_full_name(),
+		'title': 'Partidas ',
 		'matchs': MATCHS,
 		'matchs_not_ready': MATCH,
 		'match_already_published': MATC,

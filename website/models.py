@@ -13,6 +13,8 @@ class Campus(models.Model):
 class Category(models.Model):
 	name = models.CharField(max_length=255)
 	rules = models.TextField()
+	need_score = models.BooleanField(default=False)
+	need_time = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name
@@ -104,8 +106,7 @@ class Match(models.Model):
 	def __str__(self):
 		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
-	def matchs_ready_to_publish_result(request):
-		matchs = Match.objects.all().filter(responsible=request.user)
+	def matchs_ready_to_publish_result(matchs):
 		MATCHS = []
 		for match in matchs:
 			matchScore = MatchScore.objects.all().filter(match=match)
@@ -113,8 +114,7 @@ class Match(models.Model):
 				MATCHS.append(match)
 		return MATCHS
 
-	def match_not_ready(request):
-		matchs = Match.objects.all().filter(responsible=request.user)
+	def match_not_ready(matchs):
 		MATCHS = []
 		for match in matchs:
 			matchScore = MatchScore.objects.all().filter(match=match)
@@ -122,8 +122,8 @@ class Match(models.Model):
 				MATCHS.append(match)
 		return MATCHS
 
-	def match_already_published(request):
-		matchs = Match.objects.all().filter(responsible=request.user)
+
+	def match_already_published(matchs):
 		MATCHS = []
 		for match in matchs:
 			matchScore = MatchScore.objects.all().filter(match=match)

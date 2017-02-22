@@ -2,8 +2,42 @@ from django import forms
 from django.db import models
 from django.forms import ModelForm
 from .models import *
+from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist
 from captcha.fields import ReCaptchaField
+import sys
+
+class CategoryForm(ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name','rules','need_score','need_time']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}),
+            'rules': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}),
+            'need_score': forms.CheckboxInput(attrs={'autocomplete': 'off', 'style': 'width: 25%;'}),
+            'need_time': forms.CheckboxInput(attrs={'autocomplete': 'off', 'style': 'width: 25%;'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CategoryForm, self).__init__(*args, **kwargs)
+        users = User.objects.all()
+        self.fields['name'].label = 'Nome'
+        self.fields['rules'].label = 'Regras'
+        self.fields['need_score'].label = 'Pontuação como critério de avaliação'
+        self.fields['need_time'].label = 'Tempo como critério de avaliação'
+
+    def clean_need_score(self):
+        try:
+            score = self.data['need_score']
+        except MultiValueDictKeyError:
+            score = False
+        try:
+            time = self.data['need_time']
+        except MultiValueDictKeyError:
+            time=False
+        if score == False and time == False:
+            raise forms.ValidationError('É preciso selecionar pelo menos um critério de avaliação para a categoria')
+        return True
 
 class TournamentForm(ModelForm):
     class Meta:
