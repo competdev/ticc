@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
+
 {% block content %}
+	
+	<script type=text/javascript>
+		// Variavel para conseguir pegar o objeto do banco e passar para o full_calendar.js e
+		// assim poder pegar todos os torneios e adicioná-los ao calendário
+		var tournamentsData = {{jsonObj|safe}};
+	</script>
+
 	<div class="row">
 		<div class="col-md-12">
 			<div class="box box-default">
@@ -18,21 +26,13 @@ competição neste ano de 2016.</p>
 			</div>
 		</div>
 	</div>
+
 	<div class="row">
-	    <div class="col-md-4">
-	        <div class="box box-default"  style="min-height: 400px;";>
-	            <div class="box-header with-border">
-	                <h3 class="box-title">Onde?</h3>
-	            </div>
-	            <div class="box-body" style="padding: 0">
-	                <div id="map">
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	    <div class="col-md-3">
+	    
+
+	    <div class="col-md-6">
 	    	<div class="row">
-	    		<div class="col-xs-12">
+	    		<div class="col-lg-6">
 	    			<div class="box box-default">
 	    			    <div class="box-header with-border">
 	    			        <h3 class="box-title">Inscrições</h3>
@@ -48,7 +48,7 @@ competição neste ano de 2016.</p>
 	    			    </div>
 	    			</div>
 	    		</div>
-	    		<div class="col-xs-12">
+	    		<div class="col-lg-6">
 	    			<div class="box box-default">
 	    			    <div class="box-header with-border">
 	    			        <h3 class="box-title">Abertura</h3>
@@ -64,25 +64,51 @@ competição neste ano de 2016.</p>
 	    			</div>
 	    		</div>
 	    	</div>
-	        
 	    </div>
-	    <div class="col-md-5">
+
+	    <div class="col-md-6">
 	        <div class="box box-default";>
 	            <div class="box-header with-border">
 	                <h3 class="box-title">Como participar</h3>
 	            </div>
-	            <div class="box-body">
+	            <div class="box-body" style="height:135px;">
 	                <p>Cada aluno deve se inscrever nas provas seletivas em sua unidade sede. A inscrição é feita na própria página da seletiva.</p>
 	                <p>Os selecionados pela comissão local da unidade comporão a equipe que disputará a final, representando a unidade.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+	        <div class="box box-default"  style="min-height: 530px;";>
+	            <div class="box-header with-border">
+	                <h3 class="box-title">Onde?</h3>
+	            </div>
+	            <div class="box-body" style="padding: 0">
+	                <div id="map">
 	                </div>
 	            </div>
 	        </div>
 	    </div>
-	</div>
+	    <!-- Colocado o calendario -->
+		<div class="col-lg-8" >
+	        <div class="box box-default";>
+	            <div class="box-body">
+              		<div id="calendar"></div>
+	            </div>
+	        </div>
+	    </div>
+        
+	   
+	</div>    
+</div>
+
 {% endblock content %}
 
 {% block js %}
 <!-- Google Maps -->
+
 <script src="/static/dist/js/map.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHiw6bxUMu-cjHlBCH4a4HSEeDIq3v4U4"></script>
+
+
 {% endblock js %}

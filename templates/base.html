@@ -14,6 +14,15 @@
     <link rel="stylesheet" href="/static/dist/css/style.css">
     <link rel="stylesheet" href="/static/plugins/datetimepicker/jquery.datetimepicker.css">
     <link rel="stylesheet" href="/static/plugins/datatables/dataTables.bootstrap.css">
+
+
+
+
+    <!-- FULL CALENDAR ( PLUGIN ) -->
+    <link rel='stylesheet' href='/static/plugins/fullcalendar/fullcalendar.css' />
+    <link href='/static/plugins/fullcalendar/fullcalendar.print.min.css' rel='stylesheet' media='print' />
+
+
     {% block css %}
     {% endblock css %}
 </head>
@@ -39,8 +48,9 @@
     </div>
 
     {% include "dialog.html" %}
-
+    <script src='/static/plugins/fullcalendar/moment.min.js'></script>
     <script src="/static/plugins/jQuery/jQuery-2.2.0.min.js"></script>
+
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/plugins/datetimepicker/jquery.datetimepicker.full.min.js"></script>
     <script src="/static/plugins/datatables/jquery.dataTables.js"></script>
@@ -54,6 +64,14 @@
     <script src="/static/dist/js/script.js"></script>
     <script src="/static/dist/js/app.js"></script>
     <script src="/static/dist/js/dialog.js"></script>
+
+    
+        <!-- full calendar -->
+    <script src='/static/plugins/fullcalendar/fullcalendar.js'></script>
+    <script src='/static/plugins/fullcalendar/locale-all.js'></script>
+    <script src='/static/dist/js/full_calendar.js'></script>
+
+
     {% block js %}
     {% endblock js %}
 </body>

@@ -4,12 +4,28 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
+from datetime import datetime
+from django.utils import formats
+
+import json
 
 from .models import *
 from .forms import *
 
+# View modificada para poder passar os elementos do torneio para serem adicionados no
+# full calendar e assim mostrar todos os torneios no calendario.
 def home(request):
-	return render(request, 'home.html')
+	jsonObj = []
+	tournaments = Tournament.objects.all()
+	for item in tournaments:
+		start = formats.date_format(item.start,"Y-m-d")
+		end =  formats.date_format(item.end,"Y-m-d")
+		location = item.location.location
+		locationNum = item.location.number
+		jsonObj.append([start, end,locationNum, location])
+	return render(request, 'home.html',{'jsonObj': json.dumps(jsonObj) })
+## ( Modificado )---------------------------------------------------------------------------------------
+
 
 def login(request):
 	context = {}
