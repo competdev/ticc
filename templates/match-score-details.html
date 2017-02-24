@@ -101,7 +101,7 @@
                         {% for matchScore in matchScores%}
                                 <tr>
                                     <td align="left">{{forloop.counter}}</td>
-                                    <td align="left">{{ matchScore.team }} </td>
+                                    <td align="left"><a href="#"title='Detalhes da publicação' data-toggle="modal" data-target="#dialog" onclick="datetime_and_judge('{{matchScore.judge.get_full_name}}','{{matchScore.date_time}}')">{{ matchScore.team }}</a></td>
                                     <td align="center">{{ matchScore.score }}</td>
                                     <td align="center">{{ matchScore.time }}</td>
                                 </tr>

@@ -15,6 +15,7 @@
 	                            <th>Competição</th>
 	                            <th>Torneio</th>
 	                            <th>Data</th>
+	                            <th>Responsável</th>
 	                        </tr>
 	                        {% if not matchs%}
 								<tr>
@@ -32,6 +33,7 @@
 	                        	    <td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
 	                        	    <td align="center">{{ match.date }}</td>
+	                        	    <td align="center">{{ match.responsible.get_full_name }}</td>
 	                        	</tr>	
 	                        {% endfor %}
 	                    </table>
@@ -51,6 +53,7 @@
 	                            <th>Competição</th>
 	                            <th>Torneio</th>
 	                            <th>Data</th>
+	                			<th>Responsável</th>
 	                		</tr>
 	                		{% if not matchs_not_ready %}
 	                			<tr>
@@ -69,6 +72,7 @@
 									<td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
 	                        	    <td align="center">{{ match.date }}</td>
+	                        	    <td align="center">{{ match.responsible.get_full_name }}</td>
 								</tr>
                 			{% endfor %}
 	                	</table>
@@ -90,6 +94,7 @@
 	                            <th>Competição</th>
 	                            <th>Torneio</th>
 	                            <th>Data</th>
+	                            <th>Responsável</th>
 	                		</tr>
 	                		{% if not match_already_published %}
 	                			<tr>
@@ -106,6 +111,7 @@
 									<td align="left">{{ match.competition }}</td>
 	                        	    <td align="center">{{ match.competition.tournament }}</td>
 	                        	    <td align="center">{{ match.date }}</td>
+	                        	    <td align="center">{{ match.responsible.get_full_name }}</td>
 								</tr>
                 			{% endfor %}
 	                	</table>

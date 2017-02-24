@@ -136,6 +136,8 @@ class MatchScore(models.Model):
 	team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
 	score = models.IntegerField(default=0)
 	time = models.TimeField(default='00:00')
+	judge = models.ForeignKey(User, null=True)
+	date_time = models.DateTimeField(null=True)
 
 	def __str__(self):
 		return self.team.__str__() + ' - ' + self.match.__str__()

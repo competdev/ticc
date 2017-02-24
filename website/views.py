@@ -467,12 +467,17 @@ def add_matchScore(request, user_id, match_id, team_id):
 		form = MatchScoreForm(request.POST)
 		if form.is_valid():
 			matchScore = form.save(commit=False)
+			
 			team.score = matchScore.score
 			team.save()
+			
 			match.first_place=None
 			match.save()
+
 			matchScore.match=match
 			matchScore.team=team
+			matchScore.judge=user
+			matchScore.date_time = datetime.now()
 			matchScore.save()
 			return redirect("/pontuacao/" + str(user_id) + '/' + str(match_id) + '/')
 	else:

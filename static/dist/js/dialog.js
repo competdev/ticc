@@ -18,3 +18,29 @@ function edit_or_delete(edit_href, del_href){
 	$('#cancel').hide();
 	$('#link').hide();
 }
+
+function datetime_and_judge(judge, date){
+	$('.modal-title')
+	.html('Detalhes da publicação:')
+	.attr({'align': 'center'});
+
+	var p = document.createElement("p");
+	var t = document.createTextNode("Publicado por: " + judge);
+	var t2 = document.createTextNode('Data: ' + date);
+	p.append(t);
+
+	var div = document.createElement("div");
+	div.append(p);
+	div.append(t2);
+
+	$('#cancel').hide();
+	$('#link').hide();
+	$('#edit').hide();
+	$('#del').hide();
+
+	$('.modal-body').append(div);	
+}
+
+function atualiza(){
+	location.reload();
+}
