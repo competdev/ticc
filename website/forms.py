@@ -159,3 +159,7 @@ class MatchScoreForm(ModelForm):
         if score < 0:
             raise forms.ValidationError('A pontuação não pode ser negativa')
         return score
+
+    def disable(self, field):
+        self.fields[field].widget.attrs['disabled'] = True
+        return

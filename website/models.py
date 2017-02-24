@@ -134,8 +134,8 @@ class Match(models.Model):
 class MatchScore(models.Model):
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
 	team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
-	score = models.IntegerField(default=0)
-	time = models.TimeField(default='00:00')
+	score = models.IntegerField(default=0, blank=True, null=True)
+	time = models.TimeField(default='00:00', blank=True, null=True)
 	judge = models.ForeignKey(User, null=True)
 	date_time = models.DateTimeField(null=True)
 

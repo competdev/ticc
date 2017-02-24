@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
@@ -8,7 +8,14 @@ from .models import *
 from .forms import *
 
 def home(request):
-	permissoes = Permission.objects.all()
+	# A parte a seguir foi feita para evitar que cada integrante tenha que criar o grupo no seu repositório remoto
+	group, create = Group.objects.get_or_create(name='Judges') # Cria grupo Judges
+	perm = []
+	perm.append(Permission.objects.get(name='Can add match score'))
+	perm.append(Permission.objects.get(name='Can delete match score'))
+	perm.append(Permission.objects.get(name='Can change match score'))
+	for p in perm:
+		group.permissions.add(p) # Adiciona permissão de "add matchscore" no group
 	return render(request, 'home.html')
 
 def login(request):
@@ -365,11 +372,18 @@ def list_incomplete_or_not_plubished_results(request, user_id):
 	user = User.objects.all().filter(id=user_id).first()
 	if request.user != user:
 		return redirect('/resultados')
-	MATCHS = Match.matchs_ready_to_publish_result(Match.objects.all())
-	MATCH  = Match.match_not_ready(Match.objects.all())
-	MATC   = Match.match_already_published(Match.objects.all())
+	if user.groups.all().filter(name='Judges'):
+		match = Match.objects.all()
+		text = "Setor de Juízes - Acesso a todas as partidas"
+	else:
+		match = Match.objects.all().filter(responsible=user)
+		text = "Partidas - " + user.get_full_name()
+
+	MATCHS = Match.matchs_ready_to_publish_result(match)
+	MATCH  = Match.match_not_ready(match)
+	MATC   = Match.match_already_published(match)
 	context = {
-		'title': 'Partidas ',
+		'title': text,
 		'matchs': MATCHS,
 		'matchs_not_ready': MATCH,
 		'match_already_published': MATC,
@@ -482,6 +496,10 @@ def add_matchScore(request, user_id, match_id, team_id):
 			return redirect("/pontuacao/" + str(user_id) + '/' + str(match_id) + '/')
 	else:
 		form = MatchScoreForm()
+		if not match.competition.category.need_time:
+			form.disable('time')
+		elif not match.competition.category.need_score:
+			form.disable('score')
 
 	context = {
 		'title': "Pontuação - " + team.name,
@@ -512,11 +530,17 @@ def edit_matchScore(request, user_id, matchScore_id):
 		form = MatchScoreForm(request.POST, instance=matchScore)
 		if form.is_valid():
 			matchScore.match.first_place=None
+			matchScore.judge=user
+			matchScore.date_time = datetime.now()
 			matchScore.match.save()
 			form.save()
 			return redirect('/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id))
 	else:
 		form = MatchScoreForm(instance=matchScore)
+		if not matchScore.match.competition.category.need_time:
+			form.disable('time')
+		elif not matchScore.match.competition.category.need_score:
+			form.disable('score')
 
 	context = {
 		'title': "Pontuação - " + str(matchScore.match) + ' - ' + matchScore.team.name,

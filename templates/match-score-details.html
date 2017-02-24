@@ -95,15 +95,23 @@
                                 <tr>
                                     <th>Colocação</th>
                                     <th>Equipe</th>
-                                    <th>Pontuação</th>
-                                    <th>Tempo</th>
+                                    {%if matchScores.first.match.competition.category.need_score%}
+                                        <th>Pontuação</th>
+                                    {%endif%}
+                                    {%if matchScores.first.match.competiton.category.need_time%}
+                                        <th>Tempo</th>
+                                    {%endif%}
                                 </tr>
                         {% for matchScore in matchScores%}
                                 <tr>
                                     <td align="left">{{forloop.counter}}</td>
                                     <td align="left"><a href="#"title='Detalhes da publicação' data-toggle="modal" data-target="#dialog" onclick="datetime_and_judge('{{matchScore.judge.get_full_name}}','{{matchScore.date_time}}')">{{ matchScore.team }}</a></td>
-                                    <td align="center">{{ matchScore.score }}</td>
-                                    <td align="center">{{ matchScore.time }}</td>
+                                    {%if matchScores.first.match.competition.category.need_score%}
+                                        <td align="center">{{ matchScore.score }}</td>
+                                    {%endif%}
+                                    {%if matchScores.first.match.competiton.category.need_time%}
+                                        <td align="center">{{ matchScore.time }}</td>
+                                    {%endif%}
                                 </tr>
                         {%endfor%}
                     </table>

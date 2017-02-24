@@ -15,8 +15,12 @@
 						<tr>
 							<th><b>Equipe</b></th>
 							<th><b>Integrantes</b></th>
-							<th><b>Pontuação</b></th>
-							<th><b>Tempo</b></th>
+							{%if matchScores.first.match.competition.category.need_score%}
+								<th><b>Pontuação</b></th>
+							{%endif%}
+							{%if matchScores.first.match.competition.category.need_time%}
+								<th><b>Tempo</b></th>
+							{%endif%}
 						</tr>
 						{% if not matchScores%}
 						<tr>
@@ -29,8 +33,12 @@
 							<tr onmouseover="Select(this)" title="Edita ou exclui pontuação" onmouseout="Diselect(this)">
 								<td><a href="#" title='Detalhes da publicação' data-toggle="modal" data-target="#dialog" onclick="datetime_and_judge('{{matchScore.judge.get_full_name}}','{{matchScore.date_time}}')">{{matchScore.team}}</a></td>
 								<td data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.team.strparticipants}}</td>
-								<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.score}}</td>
-								<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.time}}</td>
+								{%if matchScores.first.match.competition.category.need_score%}
+									<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.score}}</td>
+								{%endif%}
+								{%if matchScores.first.match.competition.category.need_time%}
+									<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.time}}</td>
+								{%endif%}
 							</tr>
 						{%endfor%}
 					</table>
@@ -50,8 +58,12 @@
 							<tr>
 								<th><b>Equipe</b></th>
 								<th><b>Integrantes</b></th>
-								<th><b>Pontuação</b></th>
-								<th><b>Tempo</b></th>
+								{%if matchScores.first.match.competition.category.need_score%}
+									<th><b>Pontuação</b></th>
+								{%endif%}
+								{%if matchScores.first.match.competition.category.need_time%}
+									<th><b>Tempo</b></th>
+								{%endif%}
 							</tr>
 							{%if not teams_without_matchScore%}
 							<tr>
@@ -64,8 +76,12 @@
 								<tr onmouseover="Select(this);" title="Nova pontuação" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{user.id}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
 									<td>{{team}}</td>
 									<td>{{team.strparticipants}}</td>
-									<td align="center">--</td>
-									<td align="center">-- _ --</td>
+									{%if matchScores.first.match.competition.category.need_score%}
+										<td align="center">--</td>
+									{%endif%}
+									{%if matchScores.first.match.competition.category.need_time%}
+										<td align="center">-- _ --</td>
+									{%endif%}
 								</tr>
 							{%endfor%}				
 					</table>
