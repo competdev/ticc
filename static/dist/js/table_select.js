@@ -14,3 +14,4 @@ function Click(tableRow, href)
         Diselect(tableRow);
         window.location.href = href;
 }
+

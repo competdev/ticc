@@ -163,5 +163,3 @@ class NewParticipantForm(forms.Form):
         return data1
 
 
-
-

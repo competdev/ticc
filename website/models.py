@@ -53,37 +53,39 @@ class Participant(models.Model):
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
-	year = models.IntegerField(choices=((1,'1º'),(2,'2º'),(3,'3º')))
+	year = models.IntegerField(choices=((1,'1º'),(2,'2º'),(3,'3º')),default=1)
 	school = models.CharField(max_length=255)
 	valid = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name + ' - ' + self.course
 
-#modelo chave:
-class Group(models.Model):
-	name = models.CharField(max_length=255)#the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
-	depth = models.IntegerField(default=0)#the function of depth attr is to determine how close to the final match a grouṕ is.
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return self.name
-
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
-	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+	mix_team = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name
+
 	def strparticipants(self):
 		string = ''
 		for participant in self.participants.all():
-			string+=str(participant.name) + ', '
+			string += str(participant.name) + ', '
 		return string
 
+
+#modelo chave:
+class Group(models.Model):
+	name = models.CharField(max_length=255)  # the name pattern (A,B,C,1,2,3,etc) of a group needs to be choose by TICC's staff.
+	depth = models.IntegerField(default=0)  # the function of depth attr is to determine how close to the final match a grouṕ is.
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+	teams = models.ManyToManyField(Team, related_name='teams_group')
+
+	def __str__(self):
+		return self.name
 
 class Match(models.Model):
 	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs')
@@ -93,7 +95,8 @@ class Match(models.Model):
 	start = models.TimeField(default=timezone.now)
 	end = models.TimeField(default=timezone.now)
 	location = models.CharField(max_length=255)
-	teams = models.ManyToManyField(Team, related_name='teams')
+	teams = models.ManyToManyField(Team, related_name='teams_match')
+	group = models.ForeignKey(Group, on_delete=models.CASCADE)
 	intercampi = models.BooleanField(default=False)
 	first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
 
