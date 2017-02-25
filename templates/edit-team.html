@@ -9,12 +9,17 @@
             </div>
             <form role="form" action="{{ action }}" method="POST">
                {% csrf_token %}
-               <input id='inputhidden' type='hidden' value='' />
                 <div class="box-body">
                     {% for field in form %}
                         <div class="form-group">
-                            {{field.label_tag}}
                             {% if field.label == 'Participantes' %}
+                                <h5><strong>Participantes atuais:</strong></h5>
+                                <ol>
+                                   {% for participant in participants %}
+                                        <li>{{participant}}</li>
+                                   {% endfor %}
+                                </ol>
+                                {{field.label_tag}}
                                 <h5><strong>(aperte ctrl para selecionar mais de uma opção)</strong></h5>
                                 <div class="box-body">
                                     <h5><strong>Ano:</strong></h5>
@@ -23,21 +28,23 @@
                                     <button id='3-year' name='3' type="button" class="btn btn-primary">3º</button>
                                     <button id='mix' name='mix' type="button" class="btn btn-primary">Mista</button>
                                 </div>
+                            {% else %}
+                                 {{field.label_tag}}
                             {% endif %}
                             {{field}}
                             {% if field.errors %}
                                 {% for error in field.errors %}
-                                    <div class="form-group">
-                                        <span class="help-block text-red">{{error}}</span>
-                                    </div>
+                                <div class="form-group">
+                                    <span class="help-block text-red">{{error}}</span>
+                                </div>
                                 {% endfor %}
-                            {% endif %}                                       
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
                 <div class="box-footer">
                     <a href="{{ cancel }}" class="btn btn-default">Cancelar</a>
-                    <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                <button type="submit" class="btn btn-primary pull-right">Salvar</button>
                 </div>
             </form>
         </div>
@@ -48,4 +55,3 @@
 {% block js %}
 <script src="/static/dist/js/add-team.js"></script>
 {% endblock %}
-

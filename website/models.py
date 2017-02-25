@@ -69,7 +69,7 @@ class Team(models.Model):
 	mix_team = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.name
+		return self.name + " id= " +str(self.id)
 
 #modelo chave:
 class Group(models.Model):

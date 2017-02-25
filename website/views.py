@@ -98,7 +98,6 @@ def teams(request):
 @login_required()
 def add_team(request):
 	if request.method == 'POST':
-		print(request.POST)
 		form = TeamForm(request.POST)
 		if form.is_valid():
 			team = form.save()
@@ -118,6 +117,39 @@ def add_team(request):
 		]
 	}
 	return render(request,'add-team.html',context)
+
+@login_required()
+def edit_team(request, equipe_id):
+	team = get_object_or_404(Team, id=equipe_id)
+	participants = Participant.objects.filter(team_participants=equipe_id)
+	if request.method == 'POST':
+		form = TeamForm(request.POST or None, instance=team)
+		if form.has_changed():
+			if not request.POST['participants']:
+				form.participants = team.participants
+				form.save()
+			else:
+				form.save()
+	else:
+		form = TeamForm(instance=team)
+
+	context = {
+		'title': "Editar Equipe",
+		'action': '/equipes/editar/' + equipe_id,
+		'cancel': '/',
+		'form': form,
+		'participants': participants,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes', 'link': '/equipes'},
+			{'name': team, 'link' : '/equipes/' + equipe_id},
+			{'name': 'Editar'},
+		]
+	}
+
+	return render(request,'edit-team.html',context)
+
+
 
 @login_required()
 def participant_filter(request):

@@ -17,7 +17,8 @@ urlpatterns = [
 	url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
 
 	url(r'equipes/nova', views.add_team),
-	url(r'equipes/filtro_participantes$',views.participant_filter,name='participant_filter'),
+	url(r'equipes/filtro_participantes$',views.participant_filter,name=' '),
+	url(r'equipes/editar/(?P<equipe_id>[0-9]+)$',views.edit_team),
 	# url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
 	# url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
 	# url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
