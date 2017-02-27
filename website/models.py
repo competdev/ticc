@@ -20,8 +20,8 @@ class Category(models.Model):
 		return self.name
 
 class Tournament(models.Model):
-	location = models.ForeignKey(Campus, on_delete=models.CASCADE, default=None)
-	responsible = models.ForeignKey(User)
+	location = models.ForeignKey(Campus, on_delete=models.CASCADE, default=None, null=True)
+	responsible = models.ForeignKey(User, null=True)
 	start = models.DateField()
 	end = models.DateField()
 
@@ -38,8 +38,8 @@ class Tournament(models.Model):
 		return str(self.start.year)
 
 class Competition(models.Model):
-	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="competitions")
-	category = models.ForeignKey(Category, on_delete=models.CASCADE)
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="competitions", null=True)
+	category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
 	responsible = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
 	def __str__(self):
@@ -63,7 +63,7 @@ class Participant(models.Model):
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
-	category = models.ForeignKey(Category, on_delete=models.CASCADE)
+	category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
 
 	def __str__(self):
@@ -75,9 +75,9 @@ class Team(models.Model):
 		return string
 
 class Match(models.Model):
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs')
-	campus = models.ForeignKey(Campus, on_delete=models.CASCADE)
-	responsible = models.ForeignKey(User)
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs', null=True)
+	campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
+	responsible = models.ForeignKey(User, null=True)
 	date = models.DateField(default=date.today)
 	start = models.TimeField(default=timezone.now)
 	end = models.TimeField(default=timezone.now)
