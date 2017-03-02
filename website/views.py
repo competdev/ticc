@@ -12,8 +12,6 @@ from .models import *
 from .forms import *
 from random import *
 import random
-import pickle
-
 def home(request):
     print(str(request.user.user_permissions))
     return render(request, 'home.html')
@@ -588,18 +586,43 @@ def validationParticipants(request,Participant_school):
 #Ever create a group
 #Paremets competition, category , depth
 def edit_group(request):
-    competition_id=1
+    tournaments_id=1
+    competitions=Competition.objects.filter(tournament=tournaments_id)
+    list_category=list(competitions.values_list('category', flat=True))
+    thiscompetition=[]
+    array_team=[]
+    list_team=[]
     depth = 0
     size_group=3
-    this_competition=Competition.objects.get(id=competition_id)
-    list_team=Team.objects.all()#filter(category='Sumo')
-    array_team=list(list_team.values_list('id', flat=True)) # array_team = A list for support in handling items
 
 
     if request.method == 'POST':
-           if request.POST['action'] == 'Gerar chaveamento': #and not Group.objects.filter(competition=this_competition):
+           indexcategory = request.POST.getlist('categorys')
+           if request.POST['action'] == 'Exibir' and  indexcategory[0]!="-":
+                   thiscompetition=Competition.objects.filter(id=list_category[int(indexcategory[0])-1])
+                   this_competition = Competition.objects.get(id=list_category[int(indexcategory[0])-1])
+                   print (type(this_competition))
+                   list_team = Team.objects.all().filter(category=this_competition.category)
+                   array_team = list(list_team.values_list('id', flat=True))  # array_team = A list for support in handling items
+
+                   # remove team that has a group
+                   for group in Group.objects.filter(competition=this_competition):
+                       for team in list_team:
+                           if (group.teams.filter(id=team.id)):
+                               array_team.remove(team.id)
+                   teamwithoutgroup = Team.objects.filter(pk__in=array_team)
+                   context = {
+                   'list_team': list_team, 'depth': depth,
+                   'teamwithoutgroup': teamwithoutgroup,
+                   'Groups': Group.objects.filter(competition=this_competition),
+                   'competitions': competitions,'category': this_competition.category.name
+                   }
+                   print (this_competition.category.name)
+                   return render(request, 'edit-group.html', context)
+
+           if request.POST['action'] == 'Gerar chaveamento' and thiscompetition: #and not Group.objects.filter(competition=this_competition):
                 i = 65
-                Group.objects.filter(competition=this_competition).delete()
+                Group.objects.filter(competition_category=thiscompetition.category.name).delete()
                 while array_team:
                    if(len(array_team)>=size_group):
                         team_choices= random.sample(list(array_team), size_group) #team_choices= Random elements of list support
@@ -609,22 +632,24 @@ def edit_group(request):
                    group = Group()
                    group.depth =  0
                    group.name = 'Chave ' + str(group.depth+1) + chr(i)
-                   group.competition = this_competition
+                   group.competition = thiscompetition
                    group.save()
                    for choice in team_choices:
                         group.teams.add(list_team.get(id=choice))
                         array_team.remove(choice)
                    i = i + 1
 
-                context = {'list_team': list_team, 'depth': depth, 'Groups': Group.objects.filter(competition=this_competition)}
+                context = {
+                    'list_team': list_team, 'depth': depth,
+                    'Groups': Group.objects.filter(competition=thiscompetition)
+                    ,'competitions':competitions
+                 #   ,'score_list':score_list
+                    }
+
                 return render(request, 'edit-group.html',context)
 
-    for group in Group.objects.filter(competition=this_competition):  # remove team that have group
-        for team in list_team:
-            if (group.teams.filter(id=team.id)):
-                array_team.remove(team.id)
-    print(array_team)
-    teamwithoutgroup = Team.objects.filter(pk__in=array_team)
 
-    context = {'list_team': list_team, 'depth': depth,'teamwithoutgroup':teamwithoutgroup, 'Groups': Group.objects.filter(competition=this_competition)}
+
+    context = {
+        'competitions':competitions,'this_competition':thiscompetition}
     return render(request, 'edit-group.html', context)
