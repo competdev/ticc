@@ -9,6 +9,9 @@ urlpatterns = [
 	url(r'torneios$', views.tournaments),
 	url(r'equipes$',views.teams),
 	url(r'resultados/$', views.list_results),
+
+	url(r'validationParticipants/(?P<Participant_school>[a-zA-Z0-9_]*)$',views.validationParticipants),
+	
 	url(r'meu_cadastro/$',views.update_participant_info),
 
 	url(r'torneios/novo', views.add_tournament),
@@ -19,13 +22,16 @@ urlpatterns = [
 	url(r'equipes/nova', views.add_team),
 	url(r'equipes/filtro_participantes$',views.participant_filter,name=' '),
 	url(r'equipes/editar/(?P<equipe_id>[0-9]+)$',views.edit_team),
-	# url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
-	# url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
-	# url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
+	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
+	url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
+	url(r'torneios/excluir/(?P<tournament_id>[0-9]+)$', views.remove_tournament),
 
 	url(r'competicoes/novo/(?P<tournament_id>[0-9]+)$', views.add_competition),
 	url(r'competicoes/(?P<competition_id>[0-9]+)$', views.competition_details),
 	url(r'competicoes/editar/(?P<competition_id>[0-9]+)$', views.edit_competition),
+
+	url(r'groups',views.edit_group),#url para testes com group
+	url(r'(?P<tournament_id>[0-9]+)/(?P<competition_id>[0-9]+)$/groups',views.edit_group),
 	
 	url(r'jogos/(?P<match_id>[0-9]+)$', views.match_details),
 	url(r'jogos/novo/(?P<competition_id>[0-9]+)$', views.add_match),

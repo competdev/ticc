@@ -41,3 +41,8 @@
 #map img {
     max-width: none;
 }
+
+.list-group{
+    style=position: absolute;
+    z-index: 999;
+}

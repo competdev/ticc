@@ -2,7 +2,7 @@ from django import forms
 from django.db import models
 from django.forms import ModelForm
 from .models import *
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist,ValidationError
 from captcha.fields import ReCaptchaField
 from django.contrib.auth.models import User
 
@@ -167,3 +167,40 @@ class TeamForm(ModelForm):
         self.fields['name'].label = 'Nome'
         self.fields['category'].label = 'Categoria'
         self.fields['participants'].label = 'Participantes'
+
+class NewParticipantForm(forms.Form):
+    username = forms.CharField(
+        label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    name = forms.CharField(label='Nome', widget=forms.TextInput(
+        attrs={'class': 'form-control'}))
+    email = forms.EmailField(
+        label='E-mail', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    code = forms.CharField(
+        label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    course = forms.CharField(
+        label='Course', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(
+        label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    repassword = forms.CharField(
+        label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    def clean_username(self):
+        data = self.cleaned_data['username']
+        if User.objects.filter(username=data).exists():
+            raise ValidationError('Usuário já cadastrado.')
+        return data
+
+    def clean_email(self):
+        data = self.cleaned_data['email']
+        if User.objects.filter(email=data).exists():
+            raise ValidationError('E-mail já cadastrado.')
+        return data
+
+
+    def clean_password(self):
+        data1 = self.cleaned_data['password']
+        data2 = self.data['repassword']
+        if data1!=data2:
+            raise ValidationError("A senha e sua confirmação são diferentes")
+        return data1
+
