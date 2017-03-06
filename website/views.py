@@ -269,7 +269,6 @@ def remove_match(request, match_id):
 	return redirect('/competicoes/' + str(competition_id))
 
 def attend_to_match(request, match_id):
-	import pdb; pdb.set_trace()
 	match = get_object_or_404(Match, id=match_id)
 	competition = match.competition
 
