@@ -22,6 +22,25 @@
     content: 'Finalizada';
 }
 
+.card{
+    border: 1px solid #DDD;
+    border-radius: 3px;
+    padding: 15px;
+    margin-bottom: 30px;
+    min-height: 200px;
+}
+
+.card > img {
+    width: 64px;
+    height: 64px;
+}
+
+.card > a > img{
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
 #participantes-table input {
     max-width: 60px;
 }
