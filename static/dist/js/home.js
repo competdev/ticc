@@ -1,4 +1,27 @@
-$(function initMap() {
+$(document).ready(function() {
+    // Inits calendar
+    var eventsJson = [];
+    events.forEach(function(event) {
+        eventsJson.push({
+            'start' : event[0], 
+            'end': event[1],
+            'title': event[2],
+            'color': event[3]
+        });
+    });
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'title',
+            center: 'pt-br',
+            right:  'today, prev, next'
+        },
+        locale: 'pt-br',
+        height: 500,
+        events: eventsJson
+    });
+
+    // Inits map
     var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: -20.172307, lng: -44.910105},
         zoom: 13

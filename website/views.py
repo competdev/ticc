@@ -4,20 +4,38 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
+from django.utils import formats
 from .models import *
 from .forms import *
+from datetime import datetime
+import json
 
 
 def home(request):
 	# A parte a seguir foi feita para evitar que cada integrante tenha que criar o grupo no seu repositório remoto
-	group, create = Group.objects.get_or_create(name='Judges') # Cria grupo Judges
+	group, create = Group.objects.get_or_create(name='Judges')
 	perm = []
 	perm.append(Permission.objects.get(name='Can add match score'))
 	perm.append(Permission.objects.get(name='Can delete match score'))
 	perm.append(Permission.objects.get(name='Can change match score'))
 	for p in perm:
-		group.permissions.add(p) # Adiciona permissão de "add matchscore" no group
-	return render(request, 'home.html')
+		group.permissions.add(p)
+
+	# Gets calendar data
+	events = []
+	for tournament in Tournament.objects.all():
+		start = formats.date_format(tournament.start, "Y-m-d")
+		end =  formats.date_format(tournament.end, "Y-m-d")
+		title = 'Torneio no Campus ' + tournament.location.number + ' (' + tournament.location.location + ')'
+		events.append([start, end, title, '#33cc33'])
+
+	for match in Match.objects.all():
+		start = formats.date_format(match.date, "Y-m-d")
+		end =  formats.date_format(match.date, "Y-m-d")
+		title = match.__str__()
+		events.append([start, end, title, '#5f5f7b'])
+
+	return render(request, 'home.html', {'events': json.dumps(events)})
 
 
 def login(request):
@@ -181,11 +199,6 @@ def competition_details(request, competition_id):
 	}
 
 	return render(request, 'competition-details.html', context)
-
-
-@login_required()
-def edit_competition(request, competition_id):
-	pass
 
 
 @login_required()
