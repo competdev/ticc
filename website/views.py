@@ -7,6 +7,7 @@ from django.contrib.auth import logout as logout_user
 from .models import *
 from .forms import *
 
+
 def home(request):
 	# A parte a seguir foi feita para evitar que cada integrante tenha que criar o grupo no seu repositório remoto
 	group, create = Group.objects.get_or_create(name='Judges') # Cria grupo Judges
@@ -18,6 +19,7 @@ def home(request):
 		group.permissions.add(p) # Adiciona permissão de "add matchscore" no group
 	return render(request, 'home.html')
 
+
 def login(request):
 	context = {}
 
@@ -25,7 +27,7 @@ def login(request):
 		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
-		if user is not None:
+		if user:
 			login_user(request, user)
 			return redirect(request.POST.get('next'))
 		else:
@@ -34,12 +36,15 @@ def login(request):
 
 	return render(request, 'login.html', context)
 
+
 def logout(request):
 	logout_user(request)
 	return redirect('/')
 
+
 def about(request):
-	return render(request,'about.html',{})
+	return render(request, 'about.html')
+
 
 def tournaments(request):
 	context = {
@@ -76,6 +81,7 @@ def add_tournament(request):
 
 	return render(request, 'form.html', context)
 
+
 def tournament_details(request, tournament_id):
 	tournament = get_object_or_404(Tournament, id=tournament_id)
 	context = {
@@ -89,6 +95,7 @@ def tournament_details(request, tournament_id):
 	}
 
 	return render(request, 'tournament-details.html', context)
+
 
 @login_required()
 def edit_tournament(request, tournament_id):
@@ -116,10 +123,12 @@ def edit_tournament(request, tournament_id):
 
 	return render(request, 'form.html', context)
 
+
 @login_required()
 def remove_tournament(request, tournament_id):
 	get_object_or_404(Tournament, id=tournament_id).delete()
 	return redirect('/torneios')
+
 
 @login_required()
 def add_competition(request, tournament_id):
@@ -152,6 +161,7 @@ def add_competition(request, tournament_id):
 
 	return render(request, 'form.html', context)
 
+
 def competition_details(request, competition_id):
 	competition = get_object_or_404(Competition, id=competition_id)
 	tournament = competition.tournament
@@ -172,9 +182,11 @@ def competition_details(request, competition_id):
 
 	return render(request, 'competition-details.html', context)
 
+
 @login_required()
 def edit_competition(request, competition_id):
 	pass
+
 
 @login_required()
 def add_match(request, competition_id):
@@ -208,22 +220,27 @@ def add_match(request, competition_id):
 
 	return render(request, 'form.html', context)
 
+
 def match_details(request, match_id):
 	match = get_object_or_404(Match, id=match_id)
+	match_scores = MatchScore.objects.filter(match=match).order_by('-score').all()
 	context = {
 		'title': match.type() + ' - ' + str(match.competition),
 		'match': match,
+		'match_scores': match_scores,
+		'responsible': match.responsible,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Torneios', 'link': '/torneios'},
 			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
 			{'name': 'Competições', 'link': '/torneios'},
 			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
-			{'name': match.type() },
+			{'name': match.type()},
 		]
 	}
 
 	return render(request, 'match-details.html', context)
+
 
 @login_required()
 def edit_match(request, match_id):
@@ -259,6 +276,7 @@ def edit_match(request, match_id):
 	
 	return render(request, 'form.html', context)
 
+
 @login_required()
 def remove_match(request, match_id):
 	match = get_object_or_404(Match, id=match_id)
@@ -267,6 +285,7 @@ def remove_match(request, match_id):
 	competition_id = match.competition.id
 	match.delete()
 	return redirect('/competicoes/' + str(competition_id))
+
 
 def attend_to_match(request, match_id):
 	match = get_object_or_404(Match, id=match_id)
@@ -305,6 +324,7 @@ def attend_to_match(request, match_id):
 	
 	return render(request, 'form.html', context)
 
+
 @login_required()
 def leave_match(request, match_id):
 	match = get_object_or_404(Match, id=match_id)
@@ -312,6 +332,7 @@ def leave_match(request, match_id):
 	score = MatchScore.objects.get(match=match, participant=request.user)
 	score.delete()
 	return redirect('/jogos/' + str(match_id))
+
 
 @login_required()
 def update_score(request, match_id):
@@ -340,24 +361,23 @@ def update_score(request, match_id):
 
 	return render(request, 'update-score.html', context)
 
+
 def list_results(request):
-	not_matchs = []
-	boolean = False
-	matchs = Match.objects.all()
-	if not request.user.is_anonymous():
-		not_matchs = Match.match_not_ready(request) + Match.matchs_ready_to_publish_result(request)
-	for match in matchs:
+	is_complete = False
+	matches = Match.objects.all()
+	
+	for match in matches:
 			matchScore = MatchScore.objects.all().filter(match=match)
-			if match.teams.count()!=matchScore.count():
-				match.first_place=None
+			if match.teams.count() != matchScore.count():
+				match.first_place = None
 				match.save()
-			elif match.teams.count()==matchScore.count() and match.first_place:
-				boolean = True
+			elif match.teams.count() == matchScore.count() and match.first_place:
+				is_complete = True
+	
 	context = {
 		'title': 'Resultados',
-		'matchs': matchs,
-		'is_complete': boolean,
-		'not_matchs': not_matchs,
+		'matches': matches,
+		'is_complete': is_complete,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Resultados'},
@@ -365,105 +385,74 @@ def list_results(request):
 	}
 	return render(request, 'list-results.html', context)
 
+
 @login_required
 @permission_required('website.add_matchscore', raise_exception=True)
-def list_incomplete_or_not_plubished_results(request, user_id):
-	user = User.objects.all().filter(id=user_id).first()
-	if request.user != user:
-		return redirect('/resultados')
-	if user.groups.all().filter(name='Judges'):
+def my_matches(request):
+	if request.user.groups.all().filter(name='Judges'):
 		match = Match.objects.all()
 		text = "Setor de Juízes - Acesso a todas as partidas"
 	else:
-		match = Match.objects.all().filter(responsible=user)
-		text = "Partidas - " + user.get_full_name()
+		match = Match.objects.all().filter(responsible=request.user)
+		text = 'Minhas partidas (' + request.user.get_full_name() + ')'
 
-	MATCHS = Match.matchs_ready_to_publish_result(match)
-	MATCH  = Match.match_not_ready(match)
-	MATC   = Match.match_already_published(match)
 	context = {
 		'title': text,
-		'matchs': MATCHS,
-		'matchs_not_ready': MATCH,
-		'match_already_published': MATC,
+		'ready_matches': Match.matches_ready_to_publish_result(match),
+		'not_ready_matches': Match.match_not_ready(match),
+		'already_published_matches': Match.match_already_published(match),
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Resultados', 'link': '/resultados'},
-			{'name': user.first_name},
+			{'name': 'Minhas partidas'},
 		]
 	}
 
-	return render(request, 'list-incomplete-results.html', context)
+	return render(request, 'my-matches.html', context)
 
-def match_score(request, user_id, match_id):
+
+@login_required
+def publish_result(request, match_id):
 	match = get_object_or_404(Match, id=match_id)
-	user = User.objects.all().filter(id=user_id).first()
-	if user.username!=match.responsible.username:
-		return redirect("/resultados")
-	matchScore = MatchScore.objects.all().filter(match=match)
-	if not matchScore.count() == match.teams.count() or not match.first_place:
-		if request.user.is_anonymous():
-			return redirect('/resultados')
+	if request.user != match.responsible:
+		return redirect('/resultados')
+	match.first_place = MatchScore.objects.filter(match=match).order_by('-score').first().team
+	match.save()
+	return redirect('/minhas-partidas')
 
-	matchScore = matchScore.order_by('-score')
+
+@login_required
+@permission_required('website.add_matchscore', raise_exception=True)
+def list_incomplete_scores(request, match_id):
+	match = get_object_or_404(Match, id=match_id)
+	if match.responsible != request.user:
+		return HttpResponseForbidden('Somente o responsável pela partida pode pontuar equipes.')
+	
+	match_scores = MatchScore.objects.filter(match=match).order_by('-score').all()
+	teams_incomplete_score = []
+	
+	for team in match.teams.all():
+		if not MatchScore.objects.filter(team=team, match=match).exists():
+			teams_incomplete_score.append(team)
+
 	context = {
-		'title': 'Resultado ' + match.type() + ' - ' + str(match.competition),
-		'matchScores': matchScore,
-		'match':match,
-		'USER_MOR': match.responsible,
+		'title': 'Definir pontuação da partida',
+		'match': match,
+		'match_scores': match_scores.order_by('-score'),
+		'teams_without_match_score': teams_incomplete_score,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Torneios', 'link': '/torneios'},
 			{'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
 			{'name': 'Competições', 'link': '/torneios'},
 			{'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
-			{'name': match.type() },
-			{'name': 'Resultados', 'link': '/resultados'},
-			{'name': match.responsible.first_name, 'link': '/resultados/' + str(match.responsible.id)},
-		]
-	}
-	return render(request, 'match-score-details.html', context)
-
-@login_required
-def publish_result(request, user_id, match_id):
-	user = User.objects.all().filter(id=user_id).first()
-	if request.user != user:
-		return redirect('/resultados')
-	match = get_object_or_404(Match, id=match_id)
-	match.first_place = MatchScore.objects.all().filter(match=match).order_by('-score').first().team
-	match.save()
-	return redirect('/resultados/'+str(user_id))
-
-@login_required
-@permission_required('website.add_matchscore', raise_exception=True)
-def list_incomplete_scores(request, user_id, match_id):
-	user = User.objects.all().filter(id=user_id).first()
-	if request.user != user:
-		return redirect('/resultados')
-	match = get_object_or_404(Match, id=match_id)
-	scores = MatchScore.objects.all().filter(match = match)
-	teams_incomplete_score = []
-	
-	for team in match.teams.all():
-		matchScores = scores.filter(team=team)
-		if not matchScores:
-			teams_incomplete_score.append(team)
-	
-	context = {
-		'title': 'Pontuação Individual',
-		'match': match,
-		'matchScores': scores.order_by('-score'),
-		'teams_without_matchScore': teams_incomplete_score,
-
-		'breadcrumb': [
-			{'name': 'Início', 'link': '/'},
-			{'name': 'Resultados', 'link': '/resultados'},
-			{'name': user.first_name, 'link': '/resultados/' + str(user_id)},
-			{'name': 'Pontuação - ' + str(match)},
+			{'name': match.type(), 'link': '/jogos/' + str(match.id)},
+			{'name': 'Definir pontuação'}
 		]
 	}
 
 	return render(request, 'matchscore-add.html', context)
+
 
 @login_required
 @permission_required('website.add_matchscore', raise_exception=True)
@@ -487,9 +476,9 @@ def add_matchScore(request, user_id, match_id, team_id):
 			match.first_place=None
 			match.save()
 
-			matchScore.match=match
-			matchScore.team=team
-			matchScore.judge=user
+			matchScore.match = match
+			matchScore.team = team
+			matchScore.judge = user
 			matchScore.date_time = datetime.now()
 			matchScore.save()
 			return redirect("/pontuacao/" + str(user_id) + '/' + str(match_id) + '/')
@@ -517,53 +506,58 @@ def add_matchScore(request, user_id, match_id, team_id):
 
 	return render(request, 'form.html', context)
 
+
 @login_required
 @permission_required('website.change_matchscore', raise_exception=True)
-def edit_matchScore(request, user_id, matchScore_id):
-	user = User.objects.all().filter(id=user_id).first()
-	if request.user != user:
-		return redirect("/resultados")
-	matchScore = get_object_or_404(MatchScore, id=matchScore_id)
-
+def edit_match_score(request, match_id, match_score_id):
+	match = get_object_or_404(Match, id=match_id)
+	match_score = get_object_or_404(MatchScore, id=match_score_id)
+	
+	if request.user != match.responsible:
+		HttpResponseForbidden()
+	
 	if request.method == 'POST':
-		form = MatchScoreForm(request.POST, instance=matchScore)
+		form = MatchScoreForm(request.POST, instance=match_score)
 		if form.is_valid():
-			matchScore.match.first_place=None
-			matchScore.judge=user
-			matchScore.date_time = datetime.now()
-			matchScore.match.save()
+			match_score.match.first_place = None
+			match_score.judge = request.user
+			match_score.date_time = datetime.now()
+			match_score.match.save()
 			form.save()
-			return redirect('/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id))
+			return redirect('/jogos/' + str(match_id) + '/pontuar')
 	else:
-		form = MatchScoreForm(instance=matchScore)
-		if not matchScore.match.competition.category.need_time:
+		form = MatchScoreForm(instance=match_score)
+		if not match_score.match.competition.category.need_time:
 			form.disable('time')
-		elif not matchScore.match.competition.category.need_score:
+		elif not match_score.match.competition.category.need_score:
 			form.disable('score')
 
 	context = {
-		'title': "Pontuação - " + str(matchScore.match) + ' - ' + matchScore.team.name,
-		'action': '/pontuacao/editar/' + str(user_id) + '/' + str(matchScore_id) + '/',
-		'cancel': '/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id),
+		'title': "Pontuação - " + str(match_score.match) + ' - ' + match_score.team.name,
+		'action': '/jogos/' + str(match_id) + '/pontuar/' + str(match_score_id) + '/',
+		'cancel': '/jogos/' + str(match_id) + '/pontuar/',
 		'form': form,
 		'breadcrumb': [
 			{'name': 'Início', 'link': '/'},
 			{'name': 'Resultados', 'link': '/resultados'},
-			{'name': user.first_name, 'link': '/resultados/' + str(user_id)},
-			{'name': 'Pontuação - ' + str(matchScore.match), 'link': '/pontuacao/' + str(user_id) + '/' + str(matchScore.match.id)},
+			{'name': request.user.first_name, 'link': '/resultados/' + str(request.user.id)},
+			{'name': 'Pontuação - ' + str(match_score.match), 'link': '/jogos/' + str(match_id) + '/pontuar'},
 			{'name': 'Editar'},
 		]
 	}
 
 	return render(request, 'form.html', context)
 
+
 @login_required
 @permission_required('website.delete_matchscore', raise_exception=True)
-def remove_matchScore(request, user_id,matchScore_id):
-	user = User.objects.all().filter(id=user_id).first()
-	if request.user!=user:
-		return redirect('/')
-	matchScore = get_object_or_404(MatchScore, id=matchScore_id)
-	match_id = matchScore.match.id
-	matchScore.delete()
-	return redirect('/pontuacao/' + str(user_id) + '/' + str(match_id))
+def remove_match_score(request, match_id, match_score_id):
+	match = get_object_or_404(Match, id=match_id)
+	match_score = get_object_or_404(MatchScore, id=match_score_id)
+	
+	if request.user != match.responsible:
+		return HttpResponseForbidden()
+	
+	match_id = match_score.match.id
+	match_score.delete()
+	return redirect('/jogos/' + str(match_id) + '/pontuar')

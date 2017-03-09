@@ -48,6 +48,7 @@ class Competition(models.Model):
 	def status(self):
 		pass
 
+
 class Participant(models.Model):
 	#participant now have an user only for leader (when leader attr is True).
 	user = models.ForeignKey(User, null=True)
@@ -60,6 +61,7 @@ class Participant(models.Model):
 	def __str__(self):
 		return self.name + ' - ' + self.course
 
+
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
@@ -68,11 +70,10 @@ class Team(models.Model):
 
 	def __str__(self):
 		return self.name
-	def strparticipants(self):
-		string = ''
-		for participant in self.participants.all():
-			string+=str(participant.name) + ', '
-		return string
+	
+	def str_participants(self):
+		return ', '.join([p.name for p in self.participants.all()])
+
 
 class Match(models.Model):
 	competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs', null=True)
@@ -106,30 +107,31 @@ class Match(models.Model):
 	def __str__(self):
 		return self.competition.category.name + ' (' + self.campus.__str__() + ')'
 
-	def matchs_ready_to_publish_result(matchs):
-		MATCHS = []
-		for match in matchs:
-			matchScore = MatchScore.objects.all().filter(match=match)
-			if match.teams.count()==matchScore.count() and not match.first_place and matchScore.count()!=0:
-				MATCHS.append(match)
-		return MATCHS
+	def matches_ready_to_publish_result(matches):
+		MATCHES = []
+		for match in matches:
+			match_score = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()==match_score.count() and not match.first_place and match_score.count()!=0:
+				MATCHES.append(match)
+		return MATCHES
 
-	def match_not_ready(matchs):
-		MATCHS = []
-		for match in matchs:
-			matchScore = MatchScore.objects.all().filter(match=match)
-			if match.teams.count()!=matchScore.count() or matchScore.count()==0:
-				MATCHS.append(match)
-		return MATCHS
+	def match_not_ready(matches):
+		MATCHES = []
+		for match in matches:
+			match_score = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()!=match_score.count() or match_score.count()==0:
+				MATCHES.append(match)
+		return MATCHES
 
 
-	def match_already_published(matchs):
-		MATCHS = []
-		for match in matchs:
-			matchScore = MatchScore.objects.all().filter(match=match)
-			if match.teams.count()==matchScore.count() and matchScore.count()!=0 and match.first_place:
-				MATCHS.append(match)
-		return MATCHS
+	def match_already_published(matches):
+		MATCHES = []
+		for match in matches:
+			match_score = MatchScore.objects.all().filter(match=match)
+			if match.teams.count()==match_score.count() and match_score.count()!=0 and match.first_place:
+				MATCHES.append(match)
+		return MATCHES
+
 
 class MatchScore(models.Model):
 	match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')

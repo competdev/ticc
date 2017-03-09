@@ -56,11 +56,7 @@ $(document).ready(function(){
         language: {
             emptyTable: 'Nenhum objeto encontrado',
             search: 'Buscar'
-        },
-        order: [
-            [2, 'desc'],
-            [3, 'asc']
-        ]
+        }
     });
 
     table.on( 'order.dt search.dt', function () {

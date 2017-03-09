@@ -1,54 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-	    <div class="row">
-	        <div class="col-md-18 col-md-offset-0">
-	            <div class="box">
-	                <div class="box-header">
-		                {%if perms.website.add_matchscore %}
-			                    <div class="box-tools pull-right">
-			                        <a href="/resultados/{{user.id}}" class="btn btn-box-tool">Todas Partidas</a>
-			                    </div>
-		                {% endif %}
-	                </div>
-	                <div class="box-body">
-	                    <table class="table datatables">
-	                        <thead>
-	                            <tr>
-	                                <th>Numero</th>
-	                                <th>Partida</th>
-	                                <th>Tipo</th>
-		                            <th>Data</th>
-		                            <th>Competição</th>
-		                            <th>Campus</th>
-		                            <th>Torneio</th>
-		                            <th>Ganhador</th>
-		                            <th>Responsável</th>
-	                            </tr>
-	                        </thead>
-	                        <tbody>
-	                            {% for match in matchs %}	                            
-		                            {%if match.first_place and is_complete %}
-		                                <tr>
-		                                    <td>{{ forloop.counter }}</td>
-		                                    <td>
-	                                    		<a href="/resultados/{{match.responsible.id}}/{{match.id}}" title='Detalhes'>{{ match }}</a>
-		                                    </td>
-		                                    <td>{{match.type}} </td>
-		                                    <td>{{ match.date }}</td>
-			                        	    <td>{{ match.competition }}</td>
-			                        	    <td>{{ match.campus }}</td>
-			                        	    <td>{{ match.competition.tournament }}</td>
-			                        	    <td>{{ match.first_place }}</td>
-			                        	    <td>{{ match.responsible.get_full_name }}</td>
-		                                </tr>
-									{%endif%}
-								{%endfor%}
-	                        </tbody>
-	                    </table>
-                	</div>  
-	            </div>
-	        </div>
-	    </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-body">
+                <table class="table datatables">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Partida</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Competição</th>
+                            <th>Campus</th>
+                            <th>Torneio</th>
+                            <th>Ganhador</th>
+                            <th>Responsável</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches %}	                            
+                            {% if match.first_place and is_complete %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="jogos/{{match.id}}" title="Detalhes da partida">{{ match }}</a></td>
+                                    <td>{{ match.type }} </td>
+                                    <td>{{ match.date }}</td>
+	                        	    <td>{{ match.competition }}</td>
+	                        	    <td>{{ match.campus }}</td>
+	                        	    <td>{{ match.competition.tournament }}</td>
+	                        	    <td>{{ match.first_place }}</td>
+	                        	    <td>{{ match.responsible.get_full_name }}</td>
+                                </tr>
+							{% endif %}
+						{% endfor %}
+                    </tbody>
+                </table>
+        	</div>  
+        </div>
+    </div>
+</div>
 {% endblock content %}

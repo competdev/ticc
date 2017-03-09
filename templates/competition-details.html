@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-
 {% block content %}
 	<div class="row">
 		<div class="col-md-7">
 		<div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">Final</h3>
-                {% if not intercampi and user.is_authenticated%}
+                {% if not intercampi and user.is_authenticated %}
                     <div class="box-tools pull-right">
                         <a href="/jogos/novo/{{ competition.id }}?intercampi=True" class="btn btn-box-tool">Nova</a>
                     </div>
                 {% endif %}
             </div>
             <div class="box-body">
+                {% if intercampi %}
                 <table class="table">
                     <tr>
                         <th>Data</th>
@@ -26,6 +26,9 @@
                         <td class="{{ intercampi.status }}"></td>
                     </tr>
                 </table>
+                {% else %}
+                Nenhuma partida ainda.
+                {% endif %}
             </div>
         </div>
 		<div class="box">
@@ -38,18 +41,22 @@
                 {% endif %}
             </div>
             <div class="box-body">
-                <table class="table">
-                    <tr>
-                        <th>Campus</th>
-                        <th>Status</th>
-                    </tr>
-                    {% for trial in trials %}
+                {% if trials|length %}
+                    <table class="table">
                         <tr>
-                            <td><a href="/jogos/{{ trial.id }}">{{ trial.campus }}</a></td>
-                            <td class="{{ trial.status }}"></td>
+                            <th>Campus</th>
+                            <th>Status</th>
                         </tr>
-                    {% endfor %}
-                </table>
+                        {% for trial in trials %}
+                            <tr>
+                                <td><a href="/jogos/{{ trial.id }}">{{ trial.campus }}</a></td>
+                                <td class="{{ trial.status }}"></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                Nenhuma partida ainda.
+                {% endif %}
             </div>
         </div>
 		</div>
@@ -59,11 +66,11 @@
                     <h3 class="box-title">Descrição</h3>
                 </div>
                 <div class="box-body">
-                   <p> Os professores criam as seletivas de suas unidades correspondentes . </p> 
-                   <p> Os alunos da unidade se cadastram nas seletivas clicando em participar. </p>
-                   <p> Após o término, o professor coloca o resultado da seletiva, atualizando a pontuação de cada participante. </p>
-                   <p> De acordo com o ranking da seletiva, o professor cadastra os melhores na final. </p>
-                   <p> O responsável pela competição atualiza os resultados da final. </p>
+                   <p>Os professores criam as seletivas de suas unidades correspondentes.</p>
+                   <p>Os alunos da unidade se cadastram nas seletivas clicando em participar. </p>
+                   <p>Após o término, o professor coloca o resultado da seletiva, atualizando a pontuação de cada participante.</p>
+                   <p>De acordo com o ranking da seletiva, o professor cadastra os melhores na final.</p>
+                   <p>O responsável pela competição atualiza os resultados da final.</p>
                 </div>
             </div>
 		</div>

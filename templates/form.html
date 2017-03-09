@@ -14,33 +14,35 @@
                <input type="hidden" name="intercampi" value="{{ request.GET.intercampi }}">
                 <div class="box-body">
                     {% for field in form %}
-                        <div class="form-group">
-                            {{field.label_tag}}
-                            {% if field.field.widget.attrs.widget == 'date' %}
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
+                        {% if field not in form.hidden_fields %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {% if field.field.widget.attrs.widget == 'date' %}
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        {{field}}
                                     </div>
-                                    {{field}}
-                                </div>
-                            {% elif field.field.widget.attrs.widget == 'time'%}
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-clock-o"></i>
+                                {% elif field.field.widget.attrs.widget == 'time'%}
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                        {{field}}
                                     </div>
-                                    {{field}}
-                                </div>
-                            {% else %}
-                                {{field}}
-                            {% endif %}
-                            {% if field.errors %}
-                                {% for error in field.errors %}
-                                <div class="form-group">
-                                    <span class="help-block text-red">{{error}}</span>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                                {% else %}
+                                    {{ field }}
+                                {% endif %}
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                    <div class="form-group">
+                                        <span class="help-block text-red">{{error}}</span>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 <div class="box-footer">

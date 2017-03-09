@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+	    <div class="row">
+	        <div class="col-md-12">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:green;">Partidas terminadas</h3>
+	                </div>
+	                <div class="box-body">
+	                	{% if ready_matches|length %}
+	                    <table class="table">
+	                        <tr>
+	                        	<th>#</th>
+	                            <th>Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                            <th>Responsável</th>
+	                        </tr>
+	                        {% for match in ready_matches %}
+	                        	<tr>
+	                        	    <td>{{ forloop.counter }}</td>
+	                        	    <td><a href="/jogos/{{match.id}}" title="Detalhes da partida">{{ match }}</a></td>
+	                        	    <td>{{ match.competition }}</td>
+	                        	    <td>{{ match.competition.tournament }}</td>
+	                        	    <td>{{ match.date }}</td>
+	                        	    <td>{{ match.responsible.get_full_name }}</td>
+	                        	</tr>	
+	                        {% endfor %}
+	                    </table>
+	                    {% else %}
+	                    Nenhuma partida terminada.
+	                    {% endif %}
+	                </div>
+	            </div>
+	        </div>
+	        <div class="col-md-12">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:red;">Partidas em andamento</h3>
+	                </div>
+	                <div class="box-body">
+	                	{% if not_ready_matches|length %}
+	                	<table class="table">
+	                		<tr>
+	                			<th>#</th>
+	                			<th>Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                			<th>Responsável</th>
+	                		</tr>
+                			{% for match in not_ready_matches %}
+                				<input type="hidden" id="user" value="{{user.id}}">
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td><a href="/jogos/{{match.id}}" title="Detalhes da partida">{{match}}</a></td>
+									<td>{{ match.competition }}</td>
+	                        	    <td>{{ match.competition.tournament }}</td>
+	                        	    <td>{{ match.date }}</td>
+	                        	    <td>{{ match.responsible.get_full_name }}</td>
+								</tr>
+                			{% endfor %}
+	                	</table>
+	                	{% else %}
+	                	Nenhuma partida em andamento.
+	                	{% endif %}
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="row">
+	        <div class="col-md-12">
+	            <div class="box">
+	            	<div class="box-header">
+	                	<h3 style="color:blue;">Partidas já publicadas</h3>
+	                </div>
+	                <div class="box-body">
+	                	{% if already_published_matches|length %}
+	                	<table class="table">
+	                		<tr>
+	                			<th>#</th>
+	                			<th >Partida</th>
+	                            <th>Competição</th>
+	                            <th>Torneio</th>
+	                            <th>Data</th>
+	                            <th>Responsável</th>
+	                		</tr>
+                			{% for match in already_published_matches %}
+                				<input type="hidden" id="user" value="{{user.id}}">
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td><a href="/jogos/{{match.id}}" title="Detalhes da partida">{{match}}</a></td>
+									<td>{{ match.competition }}</td>
+	                        	    <td>{{ match.competition.tournament }}</td>
+	                        	    <td>{{ match.date }}</td>
+	                        	    <td>{{ match.responsible.get_full_name }}</td>
+								</tr>
+                			{% endfor %}
+	                	</table>
+	                	{% else %}
+	                	Nenhuma partida já publicada.
+	                	{% endif %}
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+{% endblock content %}

@@ -53,7 +53,7 @@ class TournamentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(TournamentForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
         self.fields['location'].label = 'Sede'
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
@@ -87,8 +87,9 @@ class CompetitionForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(CompetitionForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
         self.fields['responsible'].label = 'Responsável'
+        self.fields['category'].label = 'Categoria'
 
 class MatchForm(ModelForm):
     class Meta:
@@ -126,7 +127,7 @@ class MatchForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(MatchForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
         self.fields['end'].label = 'Término'
@@ -161,5 +162,5 @@ class MatchScoreForm(ModelForm):
         return score
 
     def disable(self, field):
-        self.fields[field].widget.attrs['disabled'] = True
+        self.fields[field].widget = forms.HiddenInput()
         return

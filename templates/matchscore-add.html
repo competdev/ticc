@@ -1,90 +1,91 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-{%block content %}
-	<div class="row" style="margin-top: 30px">
-		<div class="col-md-6">
+{% block content %}
+	<div class="row">
+		<div class="col-md-8">
 			<div class="box">
 				<div class="box-header with-border">
-                	<h3 style="color:green" class="box-title">Equipes com Pontuação</h3>
-					<div class="box-tools pull-right">
-						<a href="/pontuacao/{{user.id}}/{{match.id}}" class="btn btn-box-tool">Atualiza</a>
-					</div>
+                	<h3 style="color:green" class="box-title">Equipes com pontuação</h3>
 				</div>
 				<div class="box-body">
-					<table class="table">
-						<tr>
-							<th><b>Equipe</b></th>
-							<th><b>Integrantes</b></th>
-							{%if matchScores.first.match.competition.category.need_score%}
-								<th><b>Pontuação</b></th>
-							{%endif%}
-							{%if matchScores.first.match.competition.category.need_time%}
-								<th><b>Tempo</b></th>
-							{%endif%}
-						</tr>
-						{% if not matchScores%}
-						<tr>
-							<td>
-								<div>Nenhuma equipe com pontuação cadastrada</div>								
-							</td>
-						</tr>
-						{%endif%}
-						{%for matchScore in matchScores%}
-							<tr onmouseover="Select(this)" title="Edita ou exclui pontuação" onmouseout="Diselect(this)">
-								<td><a href="#" title='Detalhes da publicação' data-toggle="modal" data-target="#dialog" onclick="datetime_and_judge('{{matchScore.judge.get_full_name}}','{{matchScore.date_time}}')">{{matchScore.team}}</a></td>
-								<td data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.team.strparticipants}}</td>
-								{%if matchScores.first.match.competition.category.need_score%}
-									<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.score}}</td>
-								{%endif%}
-								{%if matchScores.first.match.competition.category.need_time%}
-									<td align="center" data-toggle="modal" data-target="#dialog" onclick="edit_or_delete('/pontuacao/editar/'+'{{user.id}}'+'/'+'{{matchScore.id}}', '/pontuacao/excluir/'+'{{user.id}}'+'/'+'{{matchScore.id}}')">{{matchScore.time}}</td>
-								{%endif%}
+					{% if match_scores|length %}
+						<table class="table">
+							<tr>
+								<th>Equipe</th>
+								<th>Integrantes</th>
+								{% if match_scores.first.match.competition.category.need_score %}
+									<th>Pontuação</th>
+								{% endif %}
+								{% if match_scores.first.match.competition.category.need_time %}
+									<th>Tempo</th>
+								{% endif %}
+								<th></th>
+								<th></th>
 							</tr>
-						{%endfor%}
-					</table>
+							{% for match_score in match_scores %}
+								<tr>
+									<td>{{ match_score.team }}</td>
+									<td>{{ match_score.team.str_participants }}</td>
+									{% if match_scores.first.match.competition.category.need_score %}
+										<td>{{match_score.score}}</td>
+									{%endif%}
+									{% if match_scores.first.match.competition.category.need_time %}
+										<td>{{match_score.time}}</td>
+									{% endif %}
+									<td align="right">
+										<a href="/jogos/{{ match.id }}/pontuar/{{ match_score.id }}" class="btn btn-xs btn-primary">Editar pontuação</a>
+										<a href="/jogos/{{ match.id }}/remover/{{ match_score.id }}" class="btn btn-xs btn-danger">Excluir equipe</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</table>
+					{% else %}
+					Nenhuma equipe inscrita.
+					{% endif %}
 				</div>
 			</div>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-8">
 			<div class="box">
 				<div class="box-header with-border">
-                	<h3 style="color:red" class="box-title">Equipes sem Pontuação</h3>
-					<div class="box-tools pull-right">
-						<a href="/pontuacao/{{user.id}}/{{match.id}}" class="btn btn-box-tool">Atualiza</a>
-					</div>
+                	<h3 style="color:red" class="box-title">Equipes sem pontuação</h3>
 				</div>
 				<div class="box-body">
+					{% if teams_without_match_score|length %}
 					<table class="table">
 							<tr>
-								<th><b>Equipe</b></th>
-								<th><b>Integrantes</b></th>
-								{%if matchScores.first.match.competition.category.need_score%}
-									<th><b>Pontuação</b></th>
+								<th>Equipe</th>
+								<th>Integrantes</th>
+								{%if match_scores.first.match.competition.category.need_score%}
+									<th>Pontuação</th>
 								{%endif%}
-								{%if matchScores.first.match.competition.category.need_time%}
-									<th><b>Tempo</b></th>
+								{%if match_scores.first.match.competition.category.need_time%}
+									<th>Tempo</th>
 								{%endif%}
 							</tr>
-							{%if not teams_without_matchScore%}
+							{% if not teams_without_match_score %}
 							<tr>
 								<td>
 									<div>Não há equipes a serem pontuadas</div>									
 								</td>
 							</tr>
-							{%endif%}
-							{%for team in teams_without_matchScore%}
+							{% endif %}
+							{% for team in teams_without_match_score %}
 								<tr onmouseover="Select(this);" title="Nova pontuação" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{user.id}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
 									<td>{{team}}</td>
-									<td>{{team.strparticipants}}</td>
-									{%if matchScores.first.match.competition.category.need_score%}
+									<td>{{team.str_participants}}</td>
+									{% if match_scores.first.match.competition.category.need_score %}
 										<td align="center">--</td>
-									{%endif%}
-									{%if matchScores.first.match.competition.category.need_time%}
+									{% endif %}
+									{% if match_scores.first.match.competition.category.need_time %}
 										<td align="center">-- _ --</td>
-									{%endif%}
+									{% endif %}
 								</tr>
-							{%endfor%}				
+							{% endfor %}				
 					</table>
+					{% else %}
+					Nenhuma equipe inscrita.
+					{% endif %}
 				</div>
 			</div>
 		</div>
