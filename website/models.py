@@ -50,7 +50,6 @@ class Competition(models.Model):
 
 
 class Participant(models.Model):
-	#participant now have an user only for leader (when leader attr is True).
 	user = models.ForeignKey(User, null=True)
 	name = models.CharField(max_length=255)
 	code = models.CharField(max_length=12)
@@ -62,12 +61,22 @@ class Participant(models.Model):
 		return self.name + ' - ' + self.course
 
 
+class Group(models.Model):
+	name = models.CharField(max_length=255)
+	depth = models.IntegerField(default=0)
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.name
+
+
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
 	participants = models.ManyToManyField(Participant, related_name='team_participants')
-
+	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+	
 	def __str__(self):
 		return self.name
 	
