@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-18 col-md-offset-0">
+        <form role="form" action="{{ action }}" method="POST">
+            {% csrf_token %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Lista de participantes cadastrados</h3>
+                </div>
+                <div class="box-body">
+                    <table class="table datatables">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nome</th>
+                                <th>Curso</th>
+                                <th>Ano</th>
+                                <th>Validado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for participant in participants %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ participant.name }}</td>
+                                <td>{{ participant.course }}</td>
+                                <td>{{ participant.year }}º</td>
+                                <td>
+                                    <div class="checkbox">
+                                        <label><input type="checkbox" name="{{ participant.user.username }}" {% if participant.valid %} checked {% endif %}></label>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button class="btn btn-primary">Salvar Alterações</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

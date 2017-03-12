@@ -19,10 +19,11 @@
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
                     {% if user.is_authenticated %}
-                        <li><a href="#" title="">{{ user.first_name }}</a></li>
+                        <li><a href="/meu-cadastro">{{ user.username }}</a></li>
                         <li><a href="/logout">Logout</a></li>
                     {% else %}
                         <li><a href="/login">Login</a></li>
+                        <li><a href="/signup">Cadastrar</a></li>
                     {% endif %}
                      <li><a href="/sobre">Sobre</a></li>
                 </ul>   

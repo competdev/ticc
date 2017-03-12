@@ -64,3 +64,8 @@ html {
 #map img {
     max-width: none;
 }
+
+.list-group{
+    position: absolute;
+    z-index: 999;
+} 

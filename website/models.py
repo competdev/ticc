@@ -55,33 +55,36 @@ class Participant(models.Model):
 	code = models.CharField(max_length=12)
 	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
-	leader = models.BooleanField(default=False)
+	valid = models.BooleanField(default=False)
+	year = models.IntegerField(choices=((1, '1º'), (2, '2º'), (3, '3º')))
+	school = models.CharField(max_length=255)
 
 	def __str__(self):
-		return self.name + ' - ' + self.course
-
-
-class Group(models.Model):
-	name = models.CharField(max_length=255)
-	depth = models.IntegerField(default=0)
-	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return self.name
+		return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.school
 
 
 class Team(models.Model):
 	name = models.CharField(max_length=255)
 	score = models.IntegerField(default=0)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-	participants = models.ManyToManyField(Participant, related_name='team_participants')
-	group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+	participants = models.ManyToManyField(Participant, related_name='teams')
+	mix_team = models.BooleanField(default=False)
 	
 	def __str__(self):
-		return self.name
+		return self.name + ' id = ' +str(self.id)
 	
 	def str_participants(self):
 		return ', '.join([p.name for p in self.participants.all()])
+
+
+class TeamGroup(models.Model):
+	name = models.CharField(max_length=255)
+	depth = models.IntegerField(default=0)
+	competition = models.ForeignKey(Competition, on_delete=models.CASCADE)
+	teams = models.ManyToManyField(Team, related_name='groups')
+
+	def __str__(self):
+		return self.name
 
 
 class Match(models.Model):
@@ -95,6 +98,7 @@ class Match(models.Model):
 	teams = models.ManyToManyField(Team, related_name='teams')
 	intercampi = models.BooleanField(default=False)
 	first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
+	group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
 
 	def status(self):
 		now = datetime.now()

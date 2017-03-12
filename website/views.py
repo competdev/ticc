@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.utils import formats
 from .models import *
 from .forms import *
 from datetime import datetime
+from django.http import JsonResponse, HttpResponse
+import random
 import json
 
 
@@ -38,6 +42,119 @@ def home(request):
 	return render(request, 'home.html', {'events': json.dumps(events)})
 
 
+def signup(request):
+ 	if request.method == 'POST':
+ 		form = NewParticipantForm(request.POST)
+ 		if form.is_valid():
+ 				user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data[
+ 					'email'], password=form.cleaned_data['password'])
+ 				try:
+ 					participant = Participant()
+ 					participant.user = user
+ 					participant.name = form.cleaned_data['name']
+ 					participant.code = form.cleaned_data['code']
+ 					participant.course = form.cleaned_data['course']
+ 					participant.email = form.cleaned_data['email']
+ 					participant.year = form.cleaned_data['year']
+ 					user.save()
+ 					participant.save()
+ 					login(user)
+ 					messages.success(request, 'Participante cadastrado com sucesso.')
+ 					return redirect('/')
+ 				except:
+ 					user.delete()
+ 					messages.error(request, 'Não foi possível cadastrar o participante.')
+ 					return render(request, 'signup.html', {'form': form}, status=400)
+ 
+ 		return render(request, 'signup.html', {'form': form}, status=400)
+ 	return render(request, 'signup.html', {'form': NewParticipantForm()})
+ 
+@login_required
+def update_participant_info(request):
+	participant = Participant.objects.get(user=request.user)
+	participant_form = ParticipantUpdateForm(request.POST or None, instance=participant)
+	user_form = UserUpdateForm(request.POST or None, instance=request.user)
+
+	if participant_form.has_changed() and participant_form.is_valid():
+		participant_form.save()
+	
+	if user_form.has_changed() and user_form.is_valid():
+		if user_form.data.get('password'):
+			request.user.set_password(user_form.data.get('password'))
+		user_form.save()
+	
+	context = {
+		'participant_form' : participant_form,
+		'user_form' : user_form,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Meu cadastro'},
+		]
+	}
+	return render(request, 'update-participant-info.html', context)
+def teams(request):
+	context = {
+		'title': 'Equipes',
+		'teams': Team.objects.all(),
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes'},
+		]
+	}
+	return render(request, 'teams.html', context)
+
+
+@login_required()
+def add_team(request):
+	if request.method == 'POST':
+		form = TeamForm(request.POST)
+		if form.is_valid():
+			team = form.save()
+			return redirect('/')
+	else:
+		form = TeamForm()
+
+	context = {
+		'title': "Nova Equipe",
+		'action': '/equipes/nova',
+		'cancel': '/',
+		'form': form,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes', 'link': '/'},
+			{'name': 'Novo'},
+		]
+	}
+	return render(request,'add-team.html', context)
+
+
+@login_required()
+def participant_filter(request):
+	year = None
+	max_number_of_teams = 3
+	participants = []
+	if request.method == 'GET':
+		year = request.GET['year']
+	if year != 'mix':
+		participants = Participant.objects.filter(year=int(year))
+	else:
+		#generate random numbers different from each other
+		random_numbers = set()
+		while len(random_numbers) < max_number_of_teams:
+			random_idx = random.randint(0, Participant.objects.count() - 1)
+			random_numbers.add(random_idx)
+		for i in range(0,max_number_of_teams):
+			participants.append(Participant.objects.all()[random_numbers.pop()])
+	participants_info = ""
+	i = 1
+	for participant in participants:
+		participants_info += str(participant) + "," + str(participant.id)
+		if i < len(participants):
+			participants_info += "|"
+		i = i+1
+	return HttpResponse(participants_info)
+
+
 def login(request):
 	context = {}
 
@@ -64,6 +181,20 @@ def about(request):
 	return render(request, 'about.html')
 
 
+@login_required
+def validate_participants(request, participant_school):
+	if request.method == 'POST':
+		for participant in Participant.objects.filter(school=participant_school):
+			p = request.POST.get(participant.user.username)
+			if p == 'on':
+				participant.valid = True
+			else:
+				participant.valid = False
+			participant.save()
+
+	participants = Participant.objects.filter(school=participant_school).order_by('name').all()
+	return render(request, 'participants-validation.html', {'participants': participants})
+
 def tournaments(request):
 	context = {
 		'title': 'Torneios',
@@ -74,6 +205,107 @@ def tournaments(request):
 		]
 	}
 	return render(request, 'tournaments.html', context)
+
+
+def edit_group(request):
+    tournaments_id=1
+    competitions=Competition.objects.filter(tournament=tournaments_id)
+    list_category=list(competitions.values_list('category', flat=True))
+    thiscompetition=[]
+    array_team=[]
+    list_team=[]
+    depth = 0
+    size_group=3
+
+    if request.method == 'POST':
+           indexcategory = request.POST.getlist('categorys')
+           if request.POST['action'] == 'Exibir' and  indexcategory[0]!="-":
+                   thiscompetition=Competition.objects.filter(id=list_category[int(indexcategory[0])-1])
+                   this_competition = Competition.objects.get(id=list_category[int(indexcategory[0])-1])
+                   print (type(this_competition))
+                   list_team = Team.objects.all().filter(category=this_competition.category)
+                   array_team = list(list_team.values_list('id', flat=True))  # array_team = A list for support in handling items
+
+                   # remove team that has a group
+                   for group in TeamGroup.objects.filter(competition=this_competition):
+                       for team in list_team:
+                           if (group.teams.filter(id=team.id)):
+                               array_team.remove(team.id)
+                   teamwithoutgroup = Team.objects.filter(pk__in=array_team)
+                   context = {
+                   'list_team': list_team, 'depth': depth,
+                   'teamwithoutgroup': teamwithoutgroup,
+                   'TeamGroups': TeamGroup.objects.filter(competition=this_competition),
+                   'competitions': competitions,'category': this_competition.category.name
+                   }
+                   print (this_competition.category.name)
+                   return render(request, 'edit-group.html', context)
+
+           if request.POST['action'] == 'Gerar chaveamento' and thiscompetition: #and not TeamGroup.objects.filter(competition=this_competition):
+                i = 65
+                TeamGroup.objects.filter(competition_category=thiscompetition.category.name).delete()
+                while array_team:
+                   if(len(array_team)>=size_group):
+                        team_choices= random.sample(list(array_team), size_group) #team_choices= Random elements of list support
+                   else:
+                       team_choices = random.sample(list(array_team),len(array_team))
+
+                   group = TeamGroup()
+                   group.depth =  0
+                   group.name = 'Chave ' + str(group.depth+1) + chr(i)
+                   group.competition = thiscompetition
+                   group.save()
+                   for choice in team_choices:
+                        group.teams.add(list_team.get(id=choice))
+                        array_team.remove(choice)
+                   i = i + 1
+
+                context = {
+                    'list_team': list_team, 'depth': depth,
+                    'Groups': TeamGroup.objects.filter(competition=thiscompetition)
+                    ,'competitions':competitions
+                 #   ,'score_list':score_list
+                    }
+
+                return render(request, 'edit-group.html',context)
+
+
+
+    context = {
+        'competitions':competitions,'this_competition':thiscompetition}
+    return render(request, 'edit-group.html', context)
+
+
+def edit_team(request, equipe_id):
+	team = get_object_or_404(Team, id=equipe_id)
+	participants = Participant.objects.filter(team_participants=equipe_id)
+	if request.method == 'POST':
+		form = TeamForm(request.POST or None, instance=team)
+		if form.has_changed():
+			if not request.POST['participants']:
+				form.participants = team.participants
+				form.save()
+			else:
+				form.save()
+	else:
+		form = TeamForm(instance=team)
+
+	context = {
+		'title': "Editar Equipe",
+		'action': '/equipes/editar/' + equipe_id,
+		'cancel': '/',
+		'form': form,
+		'participants': participants,
+		'breadcrumb': [
+			{'name': 'Início', 'link': '/'},
+			{'name': 'Equipes', 'link': '/equipes'},
+			{'name': team, 'link' : '/equipes/' + equipe_id},
+			{'name': 'Editar'},
+		]
+	}
+
+	return render(request,'edit-team.html', context)
+
 
 def rankings(request):
 	context = {

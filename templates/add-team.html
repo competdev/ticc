@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="box">
+            <div class="box-header with-border">
+                <h3 class="box-title">Formulário</h3>
+            </div>
+            <form role="form" action="{{ action }}" method="POST">
+               {% csrf_token %}
+               <input id='inputhidden' type='hidden' value='' />
+                <div class="box-body">
+                    {% for field in form %}
+                        <div class="form-group">
+                            {{ field.label_tag}}
+                            {% if field.label == 'Participantes' %}
+                                <h5><strong>(aperte ctrl para selecionar mais de uma opção)</strong></h5>
+                                <div class="box-body">
+                                    <h5><strong>Ano:</strong></h5>
+                                    <button id='1-year' name='1' type="button" class="btn btn-primary">1º</button>
+                                    <button id='2-year' name='2' type="button" class="btn btn-primary">2º</button>
+                                    <button id='3-year' name='3' type="button" class="btn btn-primary">3º</button>
+                                    <button id='mix' name='mix' type="button" class="btn btn-primary">Mista</button>
+                                </div>
+                            {% endif %}
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="form-group">
+                                        <span class="help-block text-red">{{ error }}</span>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}                                       
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="box-footer">
+                    <a href="{{ cancel }}" class="btn btn-default">Cancelar</a>
+                    <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script src="/static/dist/js/add-team.js"></script>
+{% endblock %}

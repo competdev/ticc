@@ -7,8 +7,19 @@ urlpatterns = [
 	url(r'logout$', views.logout),
 	url(r'sobre$',views.about),
 	url(r'torneios$', views.tournaments),
-	url(r'resultados/$', views.list_results),
+	url(r'resultados$', views.list_results),
+	url(r'signup$', views.signup),
+	url(r'meu-cadastro$',views.update_participant_info),
+	url(r'validar/(?P<participant_school>[a-zA-Z0-9_]*)$',views.validate_participants),
+	
+	url(r'groups',views.edit_group),
+	url(r'(?P<tournament_id>[0-9]+)/(?P<competition_id>[0-9]+)$/groups', views.edit_group),
 
+	url(r'equipes$',views.teams),
+	url(r'equipes/nova', views.add_team),
+	url(r'equipes/filtro_participantes$',views.participant_filter,name=' '),
+	url(r'equipes/editar/(?P<equipe_id>[0-9]+)$',views.edit_team),	
+	
 	url(r'torneios/novo', views.add_tournament),
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
 	url(r'torneios/editar/(?P<tournament_id>[0-9]+)$', views.edit_tournament),
