@@ -8,11 +8,21 @@
                 <h3 class="box-title">Cadastro de usuário</h3>
             </div>
             <form role="form" action="{{ action }}" method="POST">
-               {% csrf_token %}
                 <div class="box-body">
-                    <div class="form-group">
-                        {{ form }}
-                    </div>
+                <form action="{{ action }}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
+                    <h4><strong>{{ field.label }}</strong></h4>
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <span class="help-block">{{ field.help_text }}</span>
+                    {{ field }}
+                </div>
+                {% endfor %}
                 </div>
                 <div class="box-footer">
                     <button type="submit" class="btn btn-primary pull-right">Cadastrar</button>

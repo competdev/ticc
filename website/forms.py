@@ -177,19 +177,18 @@ class NewParticipantForm(forms.Form):
         label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
     name = forms.CharField(label='Nome', widget=forms.TextInput(
         attrs={'class': 'form-control'}))
+    password = forms.CharField(
+        label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    repassword = forms.CharField(
+        label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))    
     email = forms.EmailField(
-        label='E-mail', widget=forms.TextInput(attrs={'class': 'form-control'}))
+        label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     code = forms.CharField(
         label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
     course = forms.CharField(
         label='Curso', widget=forms.TextInput(attrs={'class': 'form-control'}))
     year = forms.ChoiceField(label='Ano', widget=forms.Select(attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
-    password = forms.CharField(
-        label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    repassword = forms.CharField(
-        label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))    
 
-    
     def clean_username(self):
         data = self.cleaned_data['username']
         if User.objects.filter(username=data).exists():
