@@ -84,7 +84,7 @@ class CompetitionForm(ModelForm):
             tournament_id = self.data['tournament_id']
             category_id = self.data['category']
             competition = Competition.objects.get(tournament__id=tournament_id, category__id=category_id)
-            raise forms.ValidationError('Este torneio já possui uma competição desta category.')
+            raise forms.ValidationError('Este torneio já possui uma competição desta categoria.')
         except ObjectDoesNotExist:
             return Category.objects.get(id=category_id)
 
@@ -104,9 +104,9 @@ class MatchForm(ModelForm):
             'campus': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
-            'start': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
-            'end': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off'}, format='%H:%M'),
-            'location': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'})
+            'start': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'placeholder': '14:00'}, format='%H:%M'),
+            'end': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'placeholder': '18:00'}, format='%H:%M'),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off', 'placeholder': 'Sala 203 do prédio principal'})
         }
 
     def clean_campus(self):
@@ -172,7 +172,7 @@ class MatchScoreForm(ModelForm):
         self.fields[field].widget = forms.HiddenInput()
 
 
-class NewParticipantForm(forms.Form):
+class ParticipantForm(forms.Form):
     username = forms.CharField(
         label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
     name = forms.CharField(label='Nome', widget=forms.TextInput(
@@ -188,45 +188,25 @@ class NewParticipantForm(forms.Form):
     course = forms.CharField(
         label='Curso', widget=forms.TextInput(attrs={'class': 'form-control'}))
     year = forms.ChoiceField(label='Ano', widget=forms.Select(attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
-
-    def clean_username(self):
-        data = self.cleaned_data['username']
-        if User.objects.filter(username=data).exists():
-            raise ValidationError('Usuário já cadastrado.')
-        return data
+    old_email = forms.EmailField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    new_participant = forms.IntegerField(widget=forms.HiddenInput(), initial=1) 
 
     def clean_email(self):
         data = self.cleaned_data['email']
-        if User.objects.filter(email=data).exists():
-            raise ValidationError('E-mail já cadastrado.')
+        try:
+            if User.objects.filter(email=data).exists() and self.data['old_email'] != data:
+                raise ValidationError('E-mail já cadastrado.')
+        except KeyError:
+            raise ValidationError('Algo deu errado ao salvar seu e-mail. Por favor, tente novamente.')
         return data
 
-    def clean_password(self):
-        if self.cleaned_data['password'] != self.data['repassword']:
-            raise ValidationError('As senhas não conferem.')
-        return self.cleaned_data['password']
-
-
-class ParticipantUpdateForm(ModelForm):
-    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
-    code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
-    course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
+    def clean_username(self):
+        data = self.cleaned_data['username']
+        if User.objects.filter(username=data).exists() and self.data['new_participant'] == 1:
+            raise ValidationError('Usuário já cadastrado.')
+        return data
     
-    class Meta:
-        model = Participant
-        fields = ['name', 'code','email','course']
-
-
-class UserUpdateForm(ModelForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Username', max_length=255)
-    password = forms.CharField(required=False,label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    repassword = forms.CharField(required=False,label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    
-    class Meta:
-        model = User
-        fields = ['username']
-
     def clean_password(self):
         if self.cleaned_data['password'] != self.data['repassword']:
             raise ValidationError('As senhas não conferem.')

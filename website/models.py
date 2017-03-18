@@ -53,7 +53,6 @@ class Participant(models.Model):
 	user = models.ForeignKey(User, null=True)
 	name = models.CharField(max_length=255)
 	code = models.CharField(max_length=12)
-	email = models.EmailField(max_length=255)
 	course = models.CharField(max_length=255)
 	valid = models.BooleanField(default=False)
 	year = models.IntegerField(choices=((1, '1º'), (2, '2º'), (3, '3º')))

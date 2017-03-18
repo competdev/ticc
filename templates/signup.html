@@ -3,25 +3,29 @@
 {% block content %}
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
+        {% include "message.html" %}
         <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">Cadastro de usuário</h3>
-            </div>
             <form role="form" action="{{ action }}" method="POST">
                 <div class="box-body">
                 <form action="{{ action }}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% for field in form %}
-                <div class="form-group {% if field.errors %}has-error{% endif %}">
-                    <h4><strong>{{ field.label }}</strong></h4>
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                            <span class="help-block">{{ error }}</span>
-                        {% endfor %}
+                    {% if field == form.old_email or field == form.new_participant %}
+                        {{ field.as_hidden }}
+                    {% elif field not in form.hidden_fields %}
+                        <div class="form-group {% if field.errors %}has-error{% endif %}">
+                            <h4><strong>{{ field.label }}</strong></h4>
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span class="help-block">{{ field.help_text }}</span>
+                            {{ field }}
+                        </div>
+                    {% else %}
+                        {{ field }}
                     {% endif %}
-                    <span class="help-block">{{ field.help_text }}</span>
-                    {{ field }}
-                </div>
                 {% endfor %}
                 </div>
                 <div class="box-footer">
