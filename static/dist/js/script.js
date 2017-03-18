@@ -2,11 +2,7 @@ $(document).ready(function(){
 
     $.datetimepicker.setLocale('pt-BR');
 
-    $('[widget=time]').datetimepicker({
-        datepicker: false,
-        mask: true,
-        format: 'H:i'
-    });
+    $('[widget=time]').mask('00:00');
 
     $('[widget=date]').datetimepicker({
         timepicker: false,
