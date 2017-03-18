@@ -8,7 +8,7 @@ urlpatterns = [
 	url(r'sobre$',views.about),
 	url(r'torneios$', views.tournaments),
 	url(r'resultados$', views.list_results),
-	url(r'signup$', views.signup),
+	url(r'cadastrar$', views.signup),
 	url(r'meu-cadastro$',views.update_participant_info),
 	url(r'validar/(?P<participant_school>[a-zA-Z0-9_]*)$',views.validate_participants),
 	

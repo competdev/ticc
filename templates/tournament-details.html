@@ -1,69 +1,70 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="box" id="brexit">
-            <div class="box-header with-border">
-                <h3 class="box-title">Competições</h3>
-
-                {% if user.is_authenticated %}
-                    <div class="box-tools pull-right">
-                        <a href="/competicoes/novo/{{ tournament.id }}" class="btn btn-box-tool">Adicionar</a>
+    <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+            {% include "message.html" %}
+            <h3>Informações</h3>
+            {% if request.user.is_authenticated %}
+                <p><a class="crud-button" href="/torneios/editar/{{ tournament.id }}">EDITAR TORNEIO</a></p>
+                <p><a class="crud-button" href="#" data-toggle="modal" data-target="#dialog" onclick="showDialog('Tem certeza que deseja excluir? Todos os jogos e competições relacionados a este torneio serão excluídos!', '/torneios/excluir/{{ tournament.id }}')">EXCLUIR TORNEIO</a></p>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <div class="small-box bg-purple">
+                        <div class="inner">
+                            <p>SEDE</p>
+                            <h4 title="{{ tournament.location }}">{{ tournament.location }}</h4>
+                        </div> 
                     </div>
-                {% endif %}
-            </div>
-            <div class="box-body">
-                <table class="table">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Status</th>
-                    </tr>
-
-                    {% for competition in tournament.competitions.all %}
-                        <tr>
-                            <td><a href="/competicoes/{{competition.id}}">{{ competition }}</a></td>
-                            <td class="{{ tournament.status }}"></td>
-                        </tr>    
-                    {% endfor %}
-                </table>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="small-box bg-purple">
+                        <div class="inner">
+                            <p>STATUS</p>
+                            <h4>{{ tournament.verbose_status }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="small-box bg-purple">
+                        <div class="inner">
+                            <p>INÍCIO</p>
+                            <h4>{{ tournament.start }}</h4>
+                        </div>
+                        <!--    <div class="icon">
+                            <i class="fa fa-calendar"></i>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="small-box bg-purple">
+                        <div class="inner">
+                            <p>TÉRMINO</p>
+                            <h4>{{ tournament.end }}</h4>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">Informações</h3>
-                {% if user.is_authenticated %}
-                    <div class="box-tools pull-right">
-                        <a href="/torneios/editar/{{ tournament.id }}" class="btn btn-box-tool">Editar</a>
-                        <a class="btn btn-box-tool text-red" data-toggle="modal" data-target="#dialog" onclick="showDialog('Tem certeza que deseja excluir?', '/torneios/excluir/{{ tournament.id }}')">Excluir</a>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h3>Competições</h3>
+            {% if request.user.is_authenticated %}
+                <p><a class="crud-button" href="/competicoes/novo/{{ tournament.id }}">ADICIONAR COMPETIÇÃO</a></p>
+            {% endif %}
+            {% for competition in tournament.competitions.all %}
+                <div class="info-box">
+                    <a href="/jogos/{{ competition.id }}">
+                        <span class="info-box-icon bg-gray"><i class="fa fa-{{ competition.category.icon }}"></i></span>
+                    </a>
+                    <div class="info-box-content">
+                        <span class="info-box-number">{{ competition }}</span>
+                        <span class="info-box-text">{{ competition.matches.all|length }} partidas até o momento</span>
+                        <a class="info-box-text" href="/competicoes/{{ competition.id }}">Ver</a>
                     </div>
-                {% endif %}
-            </div>
-            <div class="box-body">
-                <table class="table">
-                    <tr class="info-table-first-row">
-                        <td><b>Sede</b></td>
-                        <td>{{ tournament.location }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Início</b></td>
-                        <td>{{ tournament.start }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Término</b></td>
-                        <td>{{ tournament.end }}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Status</b></td>
-                        <td class="{{ tournament.status }}"></td>
-                    </tr>
-                </table>
-            </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
-</div>
 {% endblock content %}

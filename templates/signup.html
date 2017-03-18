@@ -14,13 +14,15 @@
                         {{ field.as_hidden }}
                     {% elif field not in form.hidden_fields %}
                         <div class="form-group {% if field.errors %}has-error{% endif %}">
-                            <h4><strong>{{ field.label }}</strong></h4>
+                            {{ field.label_tag }}
                             {% if field.errors %}
                                 {% for error in field.errors %}
                                     <span class="help-block">{{ error }}</span>
                                 {% endfor %}
                             {% endif %}
-                            <span class="help-block">{{ field.help_text }}</span>
+                            {% if field.help_text %}
+                                <span class="help-block">{{ field.help_text }}</span>
+                            {% endif %}
                             {{ field }}
                         </div>
                     {% else %}

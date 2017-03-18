@@ -1,3 +1,4 @@
+{% if breadcrumb %}
 <ol class="breadcrumb">
     {% for item in breadcrumb %}
         {% if item.link %}
@@ -9,3 +10,4 @@
         {% endif %}
     {% endfor %}
 </ol>
+{% endif %}

@@ -110,7 +110,7 @@ class MatchForm(ModelForm):
             'campus': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'date': forms.DateInput(attrs={'class': 'form-control', 'widget': 'date', 'autocomplete': 'off'}, format='%d/%m/%Y'),
-            'start': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'placeholder': '14:00'}, format='%H:%M'),
+            'start': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'placeholder': '07:30'}, format='%H:%M'),
             'end': forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'placeholder': '18:00'}, format='%H:%M'),
             'location': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off', 'placeholder': 'Sala 203 do prédio principal'})
         }

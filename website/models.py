@@ -25,6 +25,7 @@ class Category(models.Model):
     rules = models.TextField()
     need_score = models.BooleanField(default=False)
     need_time = models.BooleanField(default=False)
+    icon = models.CharField(default='trophy', max_length=32)
 
     def __str__(self):
         return self.name
@@ -48,6 +49,16 @@ class Tournament(models.Model):
     def __str__(self):
         return str(self.start.year)
 
+    def year(self):
+        return self.start.year
+
+    def verbose_status(self):
+        if self.status() == 'status-waiting':
+            return 'Não iniciada'
+        if self.status() == 'status-in-progress':
+            return 'Em progresso'
+        return 'Finalizada'
+
 
 class Competition(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="competitions", null=True)
@@ -56,9 +67,6 @@ class Competition(models.Model):
 
     def __str__(self):
         return self.category.name
-
-    def status(self):
-        pass
 
 
 class Participant(models.Model):
@@ -103,7 +111,7 @@ class Match(models.Model):
     class Meta:
         verbose_name_plural = 'Matches'
 
-    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matchs', null=True)
+    competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches', null=True)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
     responsible = models.ForeignKey(User, null=True)
     date = models.DateField(default=date.today)
@@ -125,6 +133,13 @@ class Match(models.Model):
             return 'status-in-progress'
         else:
             return 'status-ended'
+
+    def verbose_status(self):
+        if self.status() == 'status-waiting':
+            return 'Não iniciada'
+        if self.status() == 'status-in-progress':
+            return 'Em progresso'
+        return 'Finalizada'
 
     def type(self):
         if self.intercampi:

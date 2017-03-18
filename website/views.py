@@ -33,7 +33,12 @@ def home(request):
         title = match.__str__()
         events.append([start, end, title, '#5f5f7b', '/jogos/' + str(match.id)])
 
-    return render(request, 'home.html', {'events': json.dumps(events)})
+    context = {
+        'title': 'Torneio Intercampi de Computação Competitiva (TICC)',
+        'events': json.dumps(events),
+        'tournament': Tournament.objects.filter(start__year=datetime.now().year).first()
+    }
+    return render(request, 'home.html', context)
 
 
 def signup(request):
@@ -54,7 +59,7 @@ def signup(request):
                 participant.save()
                 login_user(request, authenticate(username=form.cleaned_data[
                            'username'], password=form.cleaned_data['password']))
-                messages.success(request, request, 'Cadastro realizado com sucesso.')
+                messages.success(request, 'Cadastro realizado com sucesso.')
                 return redirect('/')
             except:
                 participant.delete()
@@ -96,7 +101,7 @@ def update_participant_info(request):
                 participant.save()
                 login_user(request, authenticate(username=form.cleaned_data[
                            'username'], password=form.cleaned_data['password']))
-                messages.success(request, request, 'Dados alterados com sucesso.')
+                messages.success(request, 'Dados alterados com sucesso.')
                 return render(request, 'signup.html', context)
             except:
                 messages.error(request, 'Não foi possível alterar seus dados.')
@@ -362,7 +367,7 @@ def add_tournament(request):
 def tournament_details(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     context = {
-        'title': 'Torneio',
+        'title': 'Torneio de ' + str(tournament.year()) + ' (' + tournament.location.__str__() + ')',
         'tournament': tournament,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
@@ -381,7 +386,8 @@ def edit_tournament(request, tournament_id):
         form = TournamentForm(request.POST, instance=tournament)
         if form.is_valid():
             form.save()
-            return redirect('/torneios')
+            messages.success(request, 'Torneio editado com sucesso.')
+            return redirect('/torneios/' + str(tournament_id))
     else:
         form = TournamentForm(instance=tournament)
 
@@ -415,6 +421,7 @@ def add_competition(request, tournament_id):
             competition = form.save(commit=False)
             competition.tournament = Tournament.objects.get(id=tournament_id)
             competition.save()
+            messages.success(request, 'Competição "' + competition.category.__str__() + '" criada com sucesso.')
             return redirect('/competicoes/' + str(competition.id))
 
     else:
@@ -443,7 +450,7 @@ def competition_details(request, competition_id):
     competition = get_object_or_404(Competition, id=competition_id)
     tournament = competition.tournament
     context = {
-        'title': competition,
+        'title': 'Partidas: ' + competition.__str__(),
         'competition': competition,
         'tournament': tournament,
         'trials': competition.matchs.filter(intercampi=False),
@@ -470,7 +477,7 @@ def add_match(request, competition_id):
             match.competition = Competition.objects.get(id=competition_id)
             match.save()
             messages.success(request, 'Partida criada com sucesso.')
-            return redirect('/competicoes/' + competition_id)
+            return redirect('/jogos/' + str(match.id))
     else:
         form = MatchForm(initial={'date': '', 'start': '', 'end': ''})
 
@@ -507,7 +514,6 @@ def match_details(request, match_id):
             {'name': 'Torneios', 'link': '/torneios'},
             {'name': match.competition.tournament, 'link': '/torneios/' +
              str(match.competition.tournament.id)},
-            {'name': 'Competições', 'link': '/torneios'},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
             {'name': match.type()},
         ]

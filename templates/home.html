@@ -1,100 +1,88 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.css" />
-<link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.print.min.css" media="print"/>
+	<link rel="stylesheet" href="/static/dist/css/home.css" />
+	<link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.css" />
+	<link rel="stylesheet" href="/static/plugins/fullcalendar/fullcalendar.print.min.css" media="print"/>
 {% endblock %}
 
 {% block content %}
 	<script type=text/javascript>
-		var events = {{events|safe}};
+		var events = {{ events|safe }};
 	</script>
 	{% include "message.html" %}
+	<h3>O que é?</h3>
+	<div class="row descriptions">
+		<div class="col-md-6">
+			<div class="box">
+				<div class="box-body">
+					<p>O Torneio Intercampi de Computação Competitiva (TICC) se propõe a ser uma competição de computação competitiva, nos moldes da Olimpíada Brasileira de Informática, Olimpíada Brasileira de Robótica e outras, envolvendo os alunos dos cursos técnico e superior das diversas unidades do CEFET-MG. Propõe-se também palestras e minicursos, a serem realizados durante o evento, para alunos do CEFET-MG e alunos do ensino médio e/ou técnico de outras instituições da cidade sede do evento. A unidade de Divinópolis foi escolhida para sediar a competição neste ano de 2016.</p>
+				</div>
+			</div>
+			<h3 class="box-title">Como participar?</h3>
+			<div class="box">
+				<div class="box-body">
+					<p>Cada aluno deve se inscrever <a href="/cadastrar">aqui</a>. Os selecionados pela comissão local da unidade comporão a equipe que disputará a final, representando a unidade.</p>
+				</div>
+			</div>
+			<div class="hidden-xs">
+				<h3>Onde?</h3>
+				<div class="box" style="min-height: 300px;">
+					<div class="box-body" style="padding: 0">
+						<div id="map">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% if tournament %}
+			<div class="col-md-6">
+				<div class="info-box">
+					<a href="/torneios/{{ tournament.id }}">
+						<span class="info-box-icon bg-blue"><i class="fa fa-trophy"></i></span>
+					</a>
+					<div class="info-box-content">
+						<span class="info-box-number">TORNEIO EM PROGRESSO - {{ tournament.year }}</span>
+						<span class="info-box-text">{{ tournament.competitions.all|length }} competições em aberto</span>
+						<a class="info-box-text" href="/torneios/{{ tournament.id }}">Ver</a>
+					</div>
+				</div>
+			</div>
+			{% if tournament.competitions.all|length %}
+				<div class="col-md-6">
+					<h3>Competições em aberto</h3>
+				</div>
+			{% endif %}
+			<div class="col-md-6">
+			{% for competition in tournament.competitions.all %}
+				<div class="info-box">
+					<a href="/competicoes/{{ competition.id }}">
+						<span class="info-box-icon bg-gray"><i class="fa fa-{{ competition.category.icon }}"></i></span>
+					</a>
+					<div class="info-box-content">
+						<span class="info-box-number">{{ competition }}</span>
+						<span class="info-box-text">{{ competition.matches.all|length }} partidas até o momento</span>
+						<a class="info-box-text" href="/competicoes/{{ competition.id }}">Ver</a>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+		{% endif %}
+	</div>
 	<div class="row">
-		<div class="col-md-12">
-			<div class="box box-default">
-			    <div class="box-header with-border">
-			        <h3 class="box-title">O que é?</h3>
-			    </div>
-			    <div class="box-body">
-			       	<p>O 1º Torneio Intercampi de Computação Competitiva se propõe a ser uma competição de computação competitiva, nos moldes da Olimpíada Brasileira de Informática, Olimpíada Brasileira de Robótica e outras, evolvendo os alunos dos cursos técnico e superior das diversas unidades do CEFET-MG. Propõe-se também palestras e minicursos, a serem realizados durante o evento, para alunos do CEFET-MG e alunos do ensino médio e/ou técnico de outras instituições da cidade sede do evento. A unidade de Divinópolis foi escolhida para sediar a competição neste ano de 2016.</p>
-			    </div>
+		<div class="col-lg-12 col-md-12">
+			<div class="box box-default";>
+				<div class="box-body">
+					<div id="calendar"></div>
+				</div>
 			</div>
 		</div>
 	</div>
-
-	<div class="row">
-	    <div class="col-md-6">
-	    	<div class="row">
-	    		<div class="col-xs-6">
-	    			<div class="box box-default">
-	    			    <div class="box-header with-border">
-	    			        <h3 class="box-title">Inscrições</h3>
-	    			    </div>
-	    			    <div class="box-body">
-	    			        <div class="event text-center">
-	    			            <div class="event-date">
-	    			            	<b></b>
-	    			                <h1>3 a 12</h1>
-	    			            </div>
-	    			            <h3>Agosto</h3>
-	    			        </div>
-	    			    </div>
-	    			</div>
-	    		</div>
-	    		<div class="col-xs-6">
-	    			<div class="box box-default">
-	    			    <div class="box-header with-border">
-	    			        <h3 class="box-title">Abertura</h3>
-	    			    </div>
-	    			    <div class="box-body">
-	    			        <div class="event text-center">
-	    			            <div class="event-date">
-	    			                <h1>19</h1>
-	    			            </div>
-	    			            <h3>Agosto</h3>
-	    			        </div>
-	    			    </div>
-	    			</div>
-	    		</div>
-	    	</div>
-	    </div>
-
-	    <div class="col-md-6">
-	        <div class="box box-default";>
-	            <div class="box-header with-border">
-	                <h3 class="box-title">Como participar</h3>
-	            </div>
-	            <div class="box-body" style="height:135px;">
-	                <p>Cada aluno deve se inscrever nas provas seletivas em sua unidade sede. A inscrição é feita na própria página da seletiva.</p>
-	                <p>Os selecionados pela comissão local da unidade comporão a equipe que disputará a final, representando a unidade.</p>
-                </div>
-            </div>
-        </div>
-		<div class="col-lg-12 col-md-12">
-	        <div class="box box-default";>
-	            <div class="box-body">
-              		<div id="calendar"></div>
-	            </div>
-	        </div>
-	    </div>
-	    <div class="col-lg-12 col-md-12">
-	        <div class="box box-default"  style="min-height: 530px;";>
-	            <div class="box-header with-border">
-	                <h3 class="box-title">Onde?</h3>
-	            </div>
-	            <div class="box-body" style="padding: 0">
-	                <div id="map">
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	</div>    
 {% endblock content %}
 
 {% block js %}
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHiw6bxUMu-cjHlBCH4a4HSEeDIq3v4U4"></script>
-<script src="/static/plugins/fullcalendar/fullcalendar.js"></script>
-<script src="/static/plugins/fullcalendar/locale-all.js"></script>
-<script src="/static/dist/js/home.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHiw6bxUMu-cjHlBCH4a4HSEeDIq3v4U4"></script>
+	<script src="/static/plugins/fullcalendar/fullcalendar.js"></script>
+	<script src="/static/plugins/fullcalendar/locale-all.js"></script>
+	<script src="/static/dist/js/home.js"></script>
 {% endblock js %}

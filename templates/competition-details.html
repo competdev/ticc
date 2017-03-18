@@ -1,79 +1,82 @@
 {% extends "base.html" %}
-
 {% block content %}
-	<div class="row">
+    <div class="row">
         <div class="col-md-7">
             {% include "message.html" %}
-    		<div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Final</h3>
-                    {% if not intercampi and user.is_authenticated %}
-                        <div class="box-tools pull-right">
-                            <a href="/jogos/novo/{{ competition.id }}?intercampi=True" class="btn btn-box-tool">Nova</a>
-                        </div>
-                    {% endif %}
+            
+            <h3>Final</h3>
+            {% if intercampi %}
+                <div class="info-box">
+                    <a href="/jogos/{{ intercampi.id }}">
+                        <span class="info-box-icon bg-{% if intercampi.status == 'status-waiting' %}blue{% elif intercampi.status == 'status-in-progress' %}green{% else %}red{% endif %}"><i class="fa fa-hourglass-{% if intercampi.status == 'status-waiting' %}start{% elif intercampi.status == 'status-in-progress' %}half{% else %}end{% endif %}"></i></span>
+                    </a>
+                    <div class="info-box-content">
+                        <span class="info-box-number">{{ intercampi.campus }}</span>
+                        <span class="info-box-text {{ intercampi.status }}"></span>
+                        <a class="info-box-text" href="/jogos/{{ intercampi.id }}">Ver</a>
+                    </div>
                 </div>
-                <div class="box-body">
-                    {% if intercampi %}
-                    <table class="table">
-                        <tr>
-                            <th>Data</th>
-                            <th>Status</th>
-                        </tr>
-                        <tr>
-                            <td>
-                                <a href="/jogos/{{ intercampi.id }}">{{ intercampi.date }}</a>
-                            </td>
-                            <td class="{{ intercampi.status }}"></td>
-                        </tr>
-                    </table>
-                    {% else %}
-                    Nenhuma partida ainda.
-                    {% endif %}
+            {% else %}
+                A final ainda não foi definida.
+            {% endif %}
+            <hr>
+            <h3>Seletivas</h3>
+            {% if request.user.is_authenticated %}
+                <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}">ADICIONAR SELETIVA</a></p>
+            {% endif %}
+            {% for trial in trials %}
+                <div class="info-box">
+                    <a href="/jogos/{{ trial.id }}">
+                        <span class="info-box-icon bg-{% if trial.status == 'status-waiting' %}blue{% elif trial.status == 'status-in-progress' %}green{% else %}red{% endif %}"><i class="fa fa-hourglass-{% if trial.status == 'status-waiting' %}start{% elif trial.status == 'status-in-progress' %}half{% else %}end{% endif %}"></i></span>
+                    </a>
+                    <div class="info-box-content">
+                        <span class="info-box-number">{{ trial.campus }}</span>
+                        <span class="info-box-text {{ trial.status }}"></span>
+                        <a class="info-box-text" href="/jogos/{{ trial.id }}">Ver</a>
+                    </div>
                 </div>
-            </div>
-    		<div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Seletivas</h3>
-                    {% if user.is_authenticated %}
-                        <div class="box-tools pull-right">
-                            <a href="/jogos/novo/{{ competition.id }}" class="btn btn-box-tool">Nova</a>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="box-body">
-                    {% if trials|length %}
-                        <table class="table">
-                            <tr>
-                                <th>Campus</th>
-                                <th>Status</th>
-                            </tr>
-                            {% for trial in trials %}
-                                <tr>
-                                    <td><a href="/jogos/{{ trial.id }}">{{ trial.campus }}</a></td>
-                                    <td class="{{ trial.status }}"></td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% else %}
-                    Nenhuma partida ainda.
-                    {% endif %}
-                </div>
-            </div>
-		</div>
-		<div class="col-md-5">
-			<div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Descrição</h3>
-                </div>
-                <div class="box-body">
-                   <p>Os professores criam as seletivas de suas unidades correspondentes.</p>
-                   <p>Os alunos da unidade se cadastram nas seletivas clicando em participar. </p>
-                   <p>Após o término, o professor coloca o resultado da seletiva, atualizando a pontuação de cada participante.</p>
-                   <p>De acordo com o ranking da seletiva, o professor cadastra os melhores na final.</p>
-                   <p>O responsável pela competição atualiza os resultados da final.</p>
-                </div>
-            </div>
-		</div>
-	</div>
+            {% endfor %}
+        </div>
+        <hr>
+        <div class="col-md-5">
+            <ul class="timeline"> 
+                <li class="time-label">
+                    <span class="bg-gray">Como funciona</span>
+                </li>
+                <li>
+                    <i class="fa fa-question bg-blue"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">Os professores criam as seletivas em suas unidades correspondentes.</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fa fa-sign-in bg-blue"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">Os alunos da unidade se cadastram nas seletivas clicando em participar.</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fa fa-pencil bg-blue"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">Após o término, o professor coloca o resultado da seletiva, atualizando a pontuação de cada participante.</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fa fa-users bg-blue"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">De acordo com o ranking da seletiva, o professor cadastra os melhores na final.</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fa fa-refresh bg-blue"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">O responsável pela competição atualiza os resultados da final.</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fa fa-trophy bg-gray"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
 {% endblock content %}

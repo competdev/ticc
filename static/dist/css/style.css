@@ -69,3 +69,17 @@ html {
     position: absolute;
     z-index: 999;
 } 
+
+p.crud-button {
+    padding-bottom: 10px;
+}
+
+.small-box .inner p {
+    font-weight: bold;
+}
+
+.small-box .inner h4 {
+    white-space: nowrap;
+    overflow:hidden !important;
+    text-overflow: ellipsis;   
+}
