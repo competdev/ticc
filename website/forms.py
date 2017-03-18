@@ -10,6 +10,7 @@ import sys
 
 
 class CategoryForm(ModelForm):
+
     class Meta:
         model = Category
         fields = ['name', 'rules', 'need_score', 'need_time']
@@ -36,13 +37,14 @@ class CategoryForm(ModelForm):
         try:
             time = self.data['need_time']
         except MultiValueDictKeyError:
-            time=False
+            time = False
         if score == False and time == False:
             raise forms.ValidationError('É preciso selecionar pelo menos um critério de avaliação para a categoria.')
         return True
 
 
 class TournamentForm(ModelForm):
+
     class Meta:
         model = Tournament
         fields = ['location', 'responsible', 'start', 'end']
@@ -56,7 +58,8 @@ class TournamentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(TournamentForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
+                                                                    for user in users if user.get_full_name()]
         self.fields['location'].label = 'Sede'
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
@@ -69,8 +72,9 @@ class TournamentForm(ModelForm):
             raise forms.ValidationError('A data de término não pode ser anterior à data de início.')
         return end
 
-      
+
 class CompetitionForm(ModelForm):
+
     class Meta:
         model = Competition
         fields = ['category', 'responsible']
@@ -91,12 +95,14 @@ class CompetitionForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(CompetitionForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
+                                                                    for user in users if user.get_full_name()]
         self.fields['responsible'].label = 'Responsável'
         self.fields['category'].label = 'Categoria'
 
 
 class MatchForm(ModelForm):
+
     class Meta:
         model = Match
         fields = ['campus', 'responsible', 'date', 'start', 'end', 'location']
@@ -121,7 +127,6 @@ class MatchForm(ModelForm):
 
         return campus
 
-        
     def clean_end(self):
         start = self.data['start']
         end = self.data['end']
@@ -132,7 +137,8 @@ class MatchForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(MatchForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
-        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name()) for user in users if user.get_full_name()]
+        self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
+                                                                    for user in users if user.get_full_name()]
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
         self.fields['end'].label = 'Término'
@@ -141,26 +147,31 @@ class MatchForm(ModelForm):
 
 
 class AttendForm(forms.Form):
-    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
-    code = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
-    course = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
+    name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Nome', max_length=255)
+    code = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Matrícula', max_length=12)
+    email = forms.EmailField(widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='E-mail', max_length=255)
+    course = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}), label='Curso', max_length=255)
     captcha = ReCaptchaField()
 
 
 class MatchScoreForm(ModelForm):
+
     class Meta:
         model = MatchScore
         fields = ['score', 'time']
         widgets = {
-            'score': forms.NumberInput(attrs={'class':'form-control','widget': 'input', 'autocomplete':'off', 'min_value': 0}),
+            'score': forms.NumberInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off', 'min_value': 0}),
             'time':  forms.TimeInput(attrs={'class': 'form-control', 'widget': 'time', 'autocomplete': 'off', 'min_value': 0}, format='%H:%M')
         }
 
     def __init__(self, *args, **kwargs):
         super(MatchScoreForm, self).__init__(*args, **kwargs)
-        self.fields['score'].label='Pontuação'
-        self.fields['time'].label='Tempo'
+        self.fields['score'].label = 'Pontuação'
+        self.fields['time'].label = 'Tempo'
 
     def clean_score(self):
         score = self.cleaned_data['score']
@@ -180,17 +191,18 @@ class ParticipantForm(forms.Form):
     password = forms.CharField(
         label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     repassword = forms.CharField(
-        label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))    
+        label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(
         label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     code = forms.CharField(
         label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
     course = forms.CharField(
         label='Curso', widget=forms.TextInput(attrs={'class': 'form-control'}))
-    year = forms.ChoiceField(label='Ano', widget=forms.Select(attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
+    year = forms.ChoiceField(label='Ano', widget=forms.Select(
+        attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
     old_email = forms.EmailField(
         widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
-    new_participant = forms.IntegerField(widget=forms.HiddenInput(), initial=1) 
+    new_participant = forms.IntegerField(widget=forms.HiddenInput(), initial=1)
 
     def clean_email(self):
         data = self.cleaned_data['email']
@@ -206,7 +218,7 @@ class ParticipantForm(forms.Form):
         if User.objects.filter(username=data).exists() and self.data['new_participant'] == 1:
             raise ValidationError('Usuário já cadastrado.')
         return data
-    
+
     def clean_password(self):
         if self.cleaned_data['password'] != self.data['repassword']:
             raise ValidationError('As senhas não conferem.')
@@ -214,17 +226,18 @@ class ParticipantForm(forms.Form):
 
 
 class TeamForm(ModelForm):
+
     class Meta:
         model = Team
         fields = ['name', 'category', 'participants']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}),
             'category': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'participants': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}), 
+            'participants': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}),
         }
-    
+
     def __init__(self, *args, **kwargs):
-        super(TeamForm, self).__init__(*args,**kwargs)
+        super(TeamForm, self).__init__(*args, **kwargs)
         self.fields['name'].label = 'Nome'
         self.fields['category'].label = 'Categoria'
-        self.fields['participants'].label = 'Participantes' 
+        self.fields['participants'].label = 'Participantes'

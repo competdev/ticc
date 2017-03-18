@@ -72,7 +72,7 @@ def update_participant_info(request):
                'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email}
     form = ParticipantForm(request.POST or None, initial=initial)
     form.fields['username'].widget = forms.HiddenInput()
-    
+
     context = {
         'form': form,
         'action': '/meu-cadastro',
