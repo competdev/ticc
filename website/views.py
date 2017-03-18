@@ -27,17 +27,11 @@ def home(request):
 
     # Gets calendar data
     events = []
-    for tournament in Tournament.objects.all():
-        start = formats.date_format(tournament.start, "Y-m-d")
-        end = formats.date_format(tournament.end, "Y-m-d")
-        title = 'Torneio no Campus ' + tournament.location.number + ' (' + tournament.location.location + ')'
-        events.append([start, end, title, '#33cc33'])
-
     for match in Match.objects.all():
         start = formats.date_format(match.date, "Y-m-d")
         end = formats.date_format(match.date, "Y-m-d")
         title = match.__str__()
-        events.append([start, end, title, '#5f5f7b'])
+        events.append([start, end, title, '#5f5f7b', '/jogos/' + str(match.id)])
 
     return render(request, 'home.html', {'events': json.dumps(events)})
 

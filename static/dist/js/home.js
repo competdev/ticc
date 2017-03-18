@@ -6,7 +6,9 @@ $(document).ready(function() {
             'start' : event[0], 
             'end': event[1],
             'title': event[2],
-            'color': event[3]
+            'backgroundColor': event[3],
+            'borderColor': event[3],
+            'url': event[4]
         });
     });
 
