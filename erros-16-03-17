@@ -1,0 +1,17 @@
+O nome dos responsáveis é resgatado pelo modelo User e não pelo Participant
+Filtrar e validar os User's responsáveis.
+Trocar a ordem de usuário no formulário de cadastro.
+Aumentar o espaço entre os campos.
+Avisar o usuário do cadastro bem sucedido.
+Se não sucedido -> volta pra página.
+Mudar erros (front-end) do formulário de cadastro.
+Não é possível cadastrar participante.
+Mensagem de cadastro de equipes bem sucedido, redirecionamento.
+Verificar a view de exibição das equipes (related name).
+Fazer uma tela de exibição de equipes.
+Tempo da MatchScore errado, DateTime?
+Todos os forms com o plugin de horário não autocompletam o campo.
+Deixar mais claro o critério de uma partida terminada.
+Dropdown para exibir -> editar, logout.
+Alterar as permissões de cada usuário.
+Ao clicar no calendário redireciona para exibição dos detalhes.

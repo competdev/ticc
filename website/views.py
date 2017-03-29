@@ -47,6 +47,7 @@ def signup(request):
         if form.is_valid():
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data[
                 'email'], form.cleaned_data['password'])
+            user.first_name = form.cleaned_data['name']
             try:
                 participant = Participant()
                 participant.user = user
@@ -453,7 +454,7 @@ def competition_details(request, competition_id):
         'title': 'Partidas: ' + competition.__str__(),
         'competition': competition,
         'tournament': tournament,
-        'trials': competition.matchs.filter(intercampi=False),
+        'trials': competition.matches.filter(intercampi=False),
         'intercampi': Match.objects.filter(competition=competition, intercampi=True).first(),
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
@@ -468,6 +469,7 @@ def competition_details(request, competition_id):
 
 
 @login_required()
+@permission_required('website.add_match', raise_exception=True)
 def add_match(request, competition_id):
     if request.method == 'POST':
         form = MatchForm(request.POST)
