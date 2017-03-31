@@ -194,8 +194,8 @@ class ParticipantForm(forms.Form):
         label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(
         label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    school = forms.CharField(
-        label='Escola', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    campus = forms.CharField(
+        label='Campus', widget=forms.Select(attrs={'class' : 'form-control select2'}))
     code = forms.CharField(
         label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
     course = forms.CharField(
