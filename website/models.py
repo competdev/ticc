@@ -76,10 +76,10 @@ class Participant(models.Model):
     course = models.CharField(max_length=255)
     valid = models.BooleanField(default=False)
     year = models.IntegerField(choices=((1, '1º'), (2, '2º'), (3, '3º')))
-    school = models.CharField(max_length=255)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.school
+        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.campus
 
 
 class Team(models.Model):
