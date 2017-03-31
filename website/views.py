@@ -328,18 +328,6 @@ def edit_team(request, equipe_id):
     return render(request, 'edit-team.html', context)
 
 
-def rankings(request):
-    context = {
-        'title': 'Rankings e Estatísticas',
-        'breadcrumb': [
-            {'name': 'Início', 'link': '/'},
-            {'name': 'Rankings'},
-        ],
-        "teste": 21
-    }
-    return render(request, 'rankings.html', context)
-
-
 @login_required()
 def add_tournament(request):
     if request.method == 'POST':
