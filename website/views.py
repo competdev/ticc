@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Permission, Group
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
@@ -16,15 +16,6 @@ import json
 
 
 def home(request):
-    # A parte a seguir foi feita para evitar que cada integrante tenha que criar o grupo no seu repositório remoto
-    group, create = Group.objects.get_or_create(name='Judges')
-    perm = []
-    perm.append(Permission.objects.get(name='Can add match score'))
-    perm.append(Permission.objects.get(name='Can delete match score'))
-    perm.append(Permission.objects.get(name='Can change match score'))
-    for p in perm:
-        group.permissions.add(p)
-
     # Gets calendar data
     events = []
     for match in Match.objects.all():
@@ -124,7 +115,8 @@ def teams(request):
     return render(request, 'teams.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_team(request):
     if request.method == 'POST':
         form = TeamForm(request.POST)
@@ -148,7 +140,7 @@ def add_team(request):
     return render(request, 'add-team.html', context)
 
 
-@login_required()
+@login_required
 def participant_filter(request):
     year = None
     max_number_of_teams = 3
@@ -202,6 +194,7 @@ def about(request):
 
 
 @login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def validate_participants(request, participant_school):
     if request.method == 'POST':
         for participant in Participant.objects.filter(school=participant_school):
@@ -227,7 +220,8 @@ def tournaments(request):
     }
     return render(request, 'tournaments.html', context)
 
-
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_group(request):
     tournaments_id = 1
     competitions = Competition.objects.filter(tournament=tournaments_id)
@@ -297,6 +291,8 @@ def edit_group(request):
     return render(request, 'edit-group.html', context)
 
 
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_team(request, equipe_id):
     team = get_object_or_404(Team, id=equipe_id)
     participants = Participant.objects.filter(team_participants=equipe_id)
@@ -340,7 +336,8 @@ def rankings(request):
     return render(request, 'rankings.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_tournament(request):
     if request.method == 'POST':
         form = TournamentForm(request.POST)
@@ -380,7 +377,8 @@ def tournament_details(request, tournament_id):
     return render(request, 'tournament-details.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_tournament(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == 'POST':
@@ -408,13 +406,15 @@ def edit_tournament(request, tournament_id):
     return render(request, 'form.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def remove_tournament(request, tournament_id):
     get_object_or_404(Tournament, id=tournament_id).delete()
     return redirect('/torneios')
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_competition(request, tournament_id):
     if request.method == 'POST':
         form = CompetitionForm(request.POST, tournament_id)
@@ -468,8 +468,8 @@ def competition_details(request, competition_id):
     return render(request, 'competition-details.html', context)
 
 
-@login_required()
-@permission_required('website.add_match', raise_exception=True)
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_match(request, competition_id):
     if request.method == 'POST':
         form = MatchForm(request.POST)
@@ -524,7 +524,8 @@ def match_details(request, match_id):
     return render(request, 'match-details.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user.username != match.responsible.username:
@@ -560,7 +561,8 @@ def edit_match(request, match_id):
     return render(request, 'form.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def remove_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user.username != match.responsible.username:
@@ -610,7 +612,7 @@ def attend_to_match(request, match_id):
     return render(request, 'form.html', context)
 
 
-@login_required()
+@login_required
 def leave_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     match.teams.remove(request.user)
@@ -619,7 +621,8 @@ def leave_match(request, match_id):
     return redirect('/jogos/' + str(match_id))
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def update_score(request, match_id):
     match = get_object_or_404(Match, id=match_id)
 
@@ -674,7 +677,7 @@ def list_results(request):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def my_matches(request):
     if request.user.groups.all().filter(name='Judges'):
         match = Match.objects.all()
@@ -699,6 +702,7 @@ def my_matches(request):
 
 
 @login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def publish_result(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user != match.responsible:
@@ -709,7 +713,7 @@ def publish_result(request, match_id):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def list_incomplete_scores(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if match.responsible != request.user:
@@ -743,7 +747,7 @@ def list_incomplete_scores(request, match_id):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_matchScore(request, user_id, match_id, team_id):
     user = User.objects.all().filter(id=user_id).first()
     if request.user != user:
@@ -796,7 +800,7 @@ def add_matchScore(request, user_id, match_id, team_id):
 
 
 @login_required
-@permission_required('website.change_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)
@@ -838,7 +842,7 @@ def edit_match_score(request, match_id, match_score_id):
 
 
 @login_required
-@permission_required('website.delete_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def remove_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)

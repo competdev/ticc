@@ -21,7 +21,7 @@
             {% endif %}
             <hr>
             <h3>Seletivas</h3>
-            {% if request.user.is_authenticated %}
+            {% if request.user.is_authenticated  and user.groups.0.name == 'admin' %}
                 <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}">ADICIONAR SELETIVA</a></p>
             {% endif %}
             {% for trial in trials %}
