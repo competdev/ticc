@@ -40,7 +40,8 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Equipes</h3>
                     <div class="box-tools pull-right">
-                        {% if perms.website.change_matchscore and request.user == responsible %}
+                        {% if request.user == match.responsible %}
+                            <a href="/jogos/{{ match.id }}/gerenciar-equipes" class="btn btn-box-tool">Gerenciar equipes</a>
                             <a href="/jogos/{{ match.id }}/pontuar" class="btn btn-box-tool">Definir pontuação</a>
                         {% endif %}
                   <!--       {% if not match.intercampi and not user.is_authenticated %}
@@ -49,21 +50,33 @@
                     </div>
                 </div>
                 <div class="box-body">
-                {% if match_scores %}
+                {% if match.teams.all|length > 0 %}
                     <table class="table datatables">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
                                 <th>Integrantes</th>
+                                {% if match.competition.category.need_time %}
+                                    <th>Tempo</th>
+                                {% endif %}
+                                {% if match.competition.category.need_score %}
+                                    <th>Pontuação</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
-                        {% for match_score in match_scores %}
+                        {% for score in match.scores.all %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ match_score.team.name }}</td>
-                                <td>{{ match_score.team.str_members }}</td>
+                                <td>{{ score.team.name }}</td>
+                                <td>{{ score.team.str_members }}</td>
+                                {% if match.competition.category.need_time %}
+                                    <td>{{ score.time }}</td>
+                                {% endif %}
+                                {% if match.competition.category.need_score %}
+                                    <td>{{ score.score }}</td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>

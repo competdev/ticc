@@ -103,6 +103,8 @@ def update_participant_info(request):
     return render(request, 'signup.html', context)
 
 
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def teams(request):
     context = {
         'title': 'Equipes',
@@ -145,7 +147,7 @@ def add_team(request):
         ]
     }
 
-    return render(request, 'edit-team.html', context)
+    return render(request, 'team-form.html', context)
 
 
 @login_required
@@ -333,7 +335,7 @@ def edit_team(request, team_id):
         ]
     }
 
-    return render(request, 'edit-team.html', context)
+    return render(request, 'team-form.html', context)
 
 
 def rankings(request):
@@ -517,12 +519,9 @@ def add_match(request, competition_id):
 
 def match_details(request, match_id):
     match = get_object_or_404(Match, id=match_id)
-    match_scores = MatchScore.objects.filter(match=match).order_by('-score').all()
     context = {
         'title': match.type() + ' - ' + str(match.competition),
         'match': match,
-        'match_scores': match_scores,
-        'responsible': match.responsible,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
@@ -565,7 +564,7 @@ def edit_match(request, match_id):
              str(match.competition.tournament.id)},
             {'name': 'Competições', 'link': '/torneios'},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
-            {'name': match.type(), 'link': '/competicoes/' + str(match.id)},
+            {'name': match.type(), 'link': '/jogos/' + str(match.id)},
             {'name': 'Editar'},
         ]
     }
@@ -585,43 +584,54 @@ def remove_match(request, match_id):
     return redirect('/competicoes/' + str(competition_id))
 
 
-def attend_to_match(request, match_id):
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def manage_teams(request, match_id):
     match = get_object_or_404(Match, id=match_id)
-    competition = match.competition
+    form = SignupTeamsForm(instance=match)
 
     if request.method == 'POST':
-        form = AttendForm(request.POST)
+        form = SignupTeamsForm(request.POST or None, instance=match)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            id = form.cleaned_data['id']
-            email = form.cleaned_data['email']
-            course = form.cleaned_data['course']
-            participant = Participant.objects.create(name=name, id=id, email=email, course=course)
-            MatchScore.objects.create(match=match, participant=participant)
-            match.participants.add(participant)
-            return redirect('/jogos/' + match_id)
+            form.save()
+            if 'teams' in request.POST:
+                to_delete = []
+
+                for team in match.teams.all():
+                    if not MatchScore.objects.filter(match=match, team=team).exists():
+                        match.scores.add(MatchScore.objects.create(match=match, team=team))
+                
+                for match_score in MatchScore.objects.filter(match=match).all():
+                    if match_score.team not in match.teams.all():
+                        to_delete.append(match_score)
+                
+                for match_score in to_delete:
+                    match_score.delete()
+
+            messages.success(request, 'Alteração realizada com sucesso.')
+            return redirect('/jogos/' + str(match.id))
+        else:
+            messages.error(request, 'Algo de errado ocorreu e não foi possível inscrever as equipes selecionadas.')
     else:
-        form = AttendForm()
+        form = SignupTeamsForm(instance=match)
+
 
     context = {
-        'title': "Participar " + match.type(),
-        'action': '/jogos/participar/' + match_id,
-        'cancel': '/jogos/' + match_id,
-        'competition': competition,
+        'title': 'Inscrever equipe',
+        'teams': [t for t in Team.objects.all() if t not in match.teams.all() and t.category == match.competition.category],
+        'match': match,
         'form': form,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
-            {'name': match.competition.tournament, 'link': '/torneios/' +
-             str(match.competition.tournament.id)},
-            {'name': 'Competições', 'link': '/torneios'},
+            {'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
             {'name': match.type(), 'link': '/jogos/' + str(match.id)},
-            {'name': 'Participar'},
+            {'name': 'Inscrever equipes'}
         ]
     }
 
-    return render(request, 'form.html', context)
+    return render(request, 'signup-teams.html', context)
 
 
 @login_required
@@ -640,12 +650,17 @@ def update_score(request, match_id):
 
     if request.method == 'POST':
         for score in match.scores.all():
-            p = request.POST.getlist(str(score.id))
-            score.pontos = p[0]
-            score.tempo = p[1]
-            score.save()
+            errors = False
+            try:
+                score.score = request.POST['score-' + str(score.id)]
+                score.time = request.POST['time-' + str(score.id)]
+                score.save()
+            except ValueError:
+                errors = True
+                messages.error(request, 'Pontuação da equipe ' + score.team.name + ' é inválida.')
 
-        messages.success(request, 'Pontuação atualizada com sucesso.')
+        if not errors:
+            messages.success(request, 'Pontuações atualizada com sucesso.')
         return redirect('/jogos/' + str(match_id))
 
     context = {

@@ -4,7 +4,7 @@
 	<div class="row">
 		<div class="col-md-6 col-md-offset-3">
 		    <div class="box">
-		    	<form method="POST" action="/pontuacao/{{ match.pk }}">
+		    	<form method="POST" action="/jogos/{{ match.id }}/pontuar">
 		    		{% csrf_token %} 
 			        <div class="box-header with-border">
 			            <h3 class="box-title">Atualizar pontuação</h3>
@@ -15,28 +15,34 @@
 			                    <tr>
 			                        <th>#</th>
 			                        <th>Nome</th>
-			                        <th>Pontuação</th>
-			                        <th>Tempo</th>
+			                        <th>Integrantes</th>
+			                        {% if match.competition.category.need_time %}
+                                    	<td>Tempo</td>
+	                                {% endif %}
+	                                {% if match.competition.category.need_score %}
+	                                    <td>Pontuação</td>
+	                                {% endif %}
 			                    </tr>
 			                </thead>
 			                <tbody>
-			                    {% for pontuacao in match.pontuacao.all %}
+			                    {% for score in match.scores.all %}
 					                <tr>
 					                    <td>{{ forloop.counter }}</td>
-					                    <td>{{ pontuacao.participante.nome }}</td>
-					                    <td>
-					                    	<input type="text" name="{{ pontuacao.pk }}" value="{{ pontuacao.pontos }}">
-					                    </td>
-					                    <td>
-					                    	<input type="text" name="{{ pontuacao.pk }}" value="{{ pontuacao.tempo }}">
-					                    </td>
+					                    <td>{{ score.team.name }}</td>
+					                    <td>{{ score.team.str_members }}</td>
+							            {% if match.competition.category.need_time %}
+		                                    <td><input type="text" name="time-{{ score.id }}" value="{{ score.time }}"></td>
+		                                {% endif %}
+		                                {% if match.competition.category.need_score %}
+		                                    <td><input type="text" name="score-{{ score.id }}" value="{{ score.score }}"></td>
+		                                {% endif %}
 					                </tr>
 					            {% endfor %}
 			                </tbody>
 			            </table>
 			        </div>
 			        <div class="box-footer">
-			        	<a href="/jogos/{{ match.pk }}" class="btn btn-default">Cancelar</a>
+			        	<a href="/jogos/{{ match.id }}" class="btn btn-default">Cancelar</a>
 			            <button type="submit" class="btn btn-primary pull-right">Atualizar</button>
 			        </div>
 		    	</form>
@@ -45,3 +51,6 @@
 	</div>
 {% endblock content %}
 
+{% block js %}
+<script src="/static/dist/js/update-score.js"></script>
+{% endblock %}

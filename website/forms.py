@@ -240,3 +240,17 @@ class TeamForm(ModelForm):
         self.fields['name'].label = 'Nome'
         self.fields['category'].label = 'Categoria'
         self.fields['members'].label = 'Participantes'
+
+
+class SignupTeamsForm(ModelForm):
+
+    class Meta:
+        model = Match
+        fields = ['teams']
+        widgets = {
+            'members': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}),
+        }
+
+        def __init__(self, *args, **kwargs):
+            super(SignupTeamsForm, self).__init__(*args, **kwargs)
+            self.fields['teams'].required = False

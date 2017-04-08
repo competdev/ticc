@@ -118,7 +118,7 @@ class Match(models.Model):
     start = models.TimeField(default=timezone.now)
     end = models.TimeField(default=timezone.now)
     location = models.CharField(max_length=255)
-    teams = models.ManyToManyField(Team, related_name='teams')
+    teams = models.ManyToManyField(Team, related_name='matches', blank=True)
     intercampi = models.BooleanField(default=False)
     first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
@@ -179,7 +179,7 @@ class MatchScore(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
     score = models.IntegerField(default=0, blank=True, null=True)
-    time = models.TimeField(default='00:00', blank=True, null=True)
+    time = models.IntegerField(default=0, blank=True, null=True)
     judge = models.ForeignKey(User, null=True)
     date_time = models.DateTimeField(null=True)
 
