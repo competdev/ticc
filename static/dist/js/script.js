@@ -17,6 +17,12 @@ $(document).ready(function(){
         'location': $('table tr:nth-child(3) td:nth-child(2)').html(),
         'responsible': $('table tr:nth-child(4) td:nth-child(2)').html(),
     }
+
+    $('input[type=checkbox]').iCheck({
+        checkboxClass: 'icheckbox_minimal',
+        radioClass: 'iradio_minimal',
+        increaseArea: '20%'
+    });
 });
 
 var rangeData = function(){

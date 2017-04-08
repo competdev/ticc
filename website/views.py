@@ -66,7 +66,7 @@ def signup(request):
 def update_participant_info(request):
     participant = Participant.objects.get(user=request.user)
     initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'id': participant.id,
-               'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email}
+               'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email, 'campus': participant.campus}
     form = ParticipantForm(request.POST or None, initial=initial)
     form.fields['username'].widget = forms.HiddenInput()
 
@@ -497,6 +497,9 @@ def add_match(request, competition_id):
     else:
         form = MatchForm(initial={'date': '', 'start': '', 'end': ''})
 
+    form.fields['first_place'].widget = forms.HiddenInput()
+    form.fields['finished'].widget = forms.HiddenInput()
+
     competition = get_object_or_404(Competition, id=competition_id)
     context = {
         'title': 'Nova Final' if request.GET.get('intercampi') else 'Nova Seletiva',
@@ -550,11 +553,14 @@ def edit_match(request, match_id):
     else:
         form = MatchForm(instance=match)
 
+    form.fields['first_place'].choices = [('', '---------')] + [(team.id, team.name + ' (' + team.str_members() + ')') 
+                                                                    for team in match.teams.all()]
     competition = get_object_or_404(Competition, id=match.competition.id)
+
     context = {
         'title': "Editar " + match.type(),
         'action': '/jogos/editar/' + match_id,
-        'cancel': '/competicoes/' + match_id,
+        'cancel': '/jogos/' + match_id,
         'competition': competition,
         'form': form,
         'breadcrumb': [
@@ -649,19 +655,18 @@ def update_score(request, match_id):
     match = get_object_or_404(Match, id=match_id)
 
     if request.method == 'POST':
+        errors = False
         for score in match.scores.all():
-            errors = False
             try:
                 score.score = request.POST['score-' + str(score.id)]
                 score.time = request.POST['time-' + str(score.id)]
                 score.save()
-            except ValueError:
+            except:
                 errors = True
-                messages.error(request, 'Pontuação da equipe ' + score.team.name + ' é inválida.')
+                messages.error(request, 'Pontuação da equipe ' + score.team.name + ' é inválida.') 
 
         if not errors:
-            messages.success(request, 'Pontuações atualizada com sucesso.')
-        return redirect('/jogos/' + str(match_id))
+            messages.success(request, 'Pontuação atualizada com sucesso.')
 
     context = {
         'title': 'Atualizar Pontuação',
@@ -671,7 +676,8 @@ def update_score(request, match_id):
             {'name': 'Torneios', 'link': '/torneios'},
             {'name': match.competition.tournament, 'link': '/torneios/' +
              str(match.competition.tournament.id)},
-            {'name': 'Jogos', 'link': '/competicoes/' + str(match.competition.id)},
+            {'name': match.competition.__str__(), 'link': '/competicoes/' + str(match.competition.id)},
+            {'name': 'Seletiva', 'link': '/jogos/' + str(match.id)},
             {'name': 'Atualizar'},
         ]
     }
@@ -706,26 +712,27 @@ def list_results(request):
 @login_required
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def my_matches(request):
-    if request.user.groups.all().filter(name='Judges'):
-        match = Match.objects.all()
-        text = "Setor de Juízes - Acesso a todas as partidas"
-    else:
-        match = Match.objects.all().filter(responsible=request.user)
-        text = 'Minhas partidas (' + request.user.get_full_name() + ')'
-
     context = {
-        'title': text,
-        'ready_matches': Match.matches_ready_to_publish_result(match),
-        'not_ready_matches': Match.match_not_ready(match),
-        'already_published_matches': Match.match_already_published(match),
+        'title': 'Minhas partidas',
+        'finished_matches': Match.objects.filter(responsible=request.user, finished=True).all(),
+        'ongoing_matches': Match.objects.filter(responsible=request.user, finished=False).all(),
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
-            {'name': 'Resultados', 'link': '/resultados'},
             {'name': 'Minhas partidas'},
         ]
     }
 
     return render(request, 'my-matches.html', context)
+
+
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def finish_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    match.finished = not match.finished
+    match.save()
+    messages.success(request, 'Operação realizada com sucesso.')
+    return redirect('/jogos/' + str(match_id))
 
 
 @login_required

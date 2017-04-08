@@ -120,7 +120,8 @@ class Match(models.Model):
     location = models.CharField(max_length=255)
     teams = models.ManyToManyField(Team, related_name='matches', blank=True)
     intercampi = models.BooleanField(default=False)
-    first_place = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='first_place', blank=True, null=True)
+    finished = models.BooleanField(default=False)
+    first_place = models.ForeignKey(Team, blank=True, null=True)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
 
     def status(self):
@@ -149,30 +150,6 @@ class Match(models.Model):
 
     def __str__(self):
         return self.competition.category.name + ' (' + self.campus.__str__() + ')'
-
-    def matches_ready_to_publish_result(matches):
-        MATCHES = []
-        for match in matches:
-            match_score = MatchScore.objects.all().filter(match=match)
-            if match.teams.count() == match_score.count() and not match.first_place and match_score.count() != 0:
-                MATCHES.append(match)
-        return MATCHES
-
-    def match_not_ready(matches):
-        MATCHES = []
-        for match in matches:
-            match_score = MatchScore.objects.all().filter(match=match)
-            if match.teams.count() != match_score.count() or match_score.count() == 0:
-                MATCHES.append(match)
-        return MATCHES
-
-    def match_already_published(matches):
-        MATCHES = []
-        for match in matches:
-            match_score = MatchScore.objects.all().filter(match=match)
-            if match.teams.count() == match_score.count() and match_score.count() != 0 and match.first_place:
-                MATCHES.append(match)
-        return MATCHES
 
 
 class MatchScore(models.Model):

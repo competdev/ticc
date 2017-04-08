@@ -9,7 +9,7 @@
                     <h3 class="box-title">Informações</h3>
                     {% if user.is_authenticated and user.groups.all.0.name == 'admin' %}
                         <div class="box-tools pull-right">
-                            <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
+                            <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar/Finalizar</a>
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
                                onclick="showDialog('Tem certeza que deseja excluir?', '/jogos/excluir/{{ match.id }}')">Excluir</a>
                         </div>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <div class="box-body">
-                {% if match.teams.all|length > 0 %}
+                {% if match.scores.all|length > 0 %}
                     <table class="table datatables">
                         <thead>
                             <tr>
