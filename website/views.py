@@ -43,7 +43,7 @@ def signup(request):
                 participant = Participant()
                 participant.user = user
                 participant.name = form.cleaned_data['name']
-                participant.code = form.cleaned_data['code']
+                participant.id = form.cleaned_data['id']
                 participant.course = form.cleaned_data['course']
                 participant.user.email = form.cleaned_data['email']
                 participant.year = form.cleaned_data['year']
@@ -65,7 +65,7 @@ def signup(request):
 @login_required
 def update_participant_info(request):
     participant = Participant.objects.get(user=request.user)
-    initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'code': participant.code,
+    initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'id': participant.id,
                'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email}
     form = ParticipantForm(request.POST or None, initial=initial)
     form.fields['username'].widget = forms.HiddenInput()
@@ -84,7 +84,7 @@ def update_participant_info(request):
         if form.is_valid():
             try:
                 participant.name = form.cleaned_data['name']
-                participant.code = form.cleaned_data['code']
+                participant.id = form.cleaned_data['id']
                 participant.course = form.cleaned_data['course']
                 participant.user.email = form.cleaned_data['email']
                 participant.year = form.cleaned_data['year']
@@ -118,26 +118,34 @@ def teams(request):
 @login_required
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_team(request):
+    participants = [p for p in Participant.objects.all()]
+    
     if request.method == 'POST':
         form = TeamForm(request.POST)
         if form.is_valid():
             team = form.save()
-            return redirect('/')
+            messages.success(request, 'Equipe criada com sucesso.')
+            return redirect('/equipes/' + str(team.id))
+        elif 'participants' in form.errors:
+            messages.error(request, 'Uma equipe precisa ter no mínimo um membro. Sua equipe não foi criada.')
     else:
         form = TeamForm()
 
     context = {
-        'title': "Nova Equipe",
+        'title': "Nova equipe",
         'action': '/equipes/nova',
-        'cancel': '/',
+        'cancel': '/equipes',
         'form': form,
+        'members': [],
+        'participants': participants,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
-            {'name': 'Equipes', 'link': '/'},
-            {'name': 'Novo'},
+            {'name': 'Equipes', 'link': '/equipes'},
+            {'name': 'Nova equipe'},
         ]
     }
-    return render(request, 'add-team.html', context)
+
+    return render(request, 'edit-team.html', context)
 
 
 @login_required
@@ -293,31 +301,35 @@ def edit_group(request):
 
 @login_required
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
-def edit_team(request, equipe_id):
-    team = get_object_or_404(Team, id=equipe_id)
-    participants = Participant.objects.filter(team_participants=equipe_id)
+def edit_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    members = [p for p in Participant.objects.all() if p in team.members.all()]
+    participants = [p for p in Participant.objects.all() if p not in members]
+    
     if request.method == 'POST':
         form = TeamForm(request.POST or None, instance=team)
-        if form.has_changed():
-            if not request.POST['participants']:
-                form.participants = team.participants
-                form.save()
-            else:
-                form.save()
+        if form.is_valid():
+            team = form.save()
+            messages.success(request, 'Equipe alterada com sucesso.')
+            members = [p for p in Participant.objects.all() if p in team.members.all()]
+            participants = [p for p in Participant.objects.all() if p not in members]
+        else:
+            messages.error(request, 'Uma equipe precisa ter no mínimo um membro. Suas alterações não foram salvas.')
     else:
         form = TeamForm(instance=team)
 
     context = {
         'title': "Editar Equipe",
-        'action': '/equipes/editar/' + equipe_id,
-        'cancel': '/',
+        'action': '/equipes/' + team_id,
+        'cancel': '/equipes',
         'form': form,
+        'members': members,
         'participants': participants,
+        'team': team,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Equipes', 'link': '/equipes'},
-            {'name': team, 'link': '/equipes/' + equipe_id},
-            {'name': 'Editar'},
+            {'name': team.name, 'link': '/equipes/' + team_id},
         ]
     }
 
@@ -542,7 +554,7 @@ def edit_match(request, match_id):
     competition = get_object_or_404(Competition, id=match.competition.id)
     context = {
         'title': "Editar " + match.type(),
-        'action': '/competicoes/editar/' + match_id,
+        'action': '/jogos/editar/' + match_id,
         'cancel': '/competicoes/' + match_id,
         'competition': competition,
         'form': form,
@@ -581,10 +593,10 @@ def attend_to_match(request, match_id):
         form = AttendForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['name']
-            code = form.cleaned_data['code']
+            id = form.cleaned_data['id']
             email = form.cleaned_data['email']
             course = form.cleaned_data['course']
-            participant = Participant.objects.create(name=name, code=code, email=email, course=course)
+            participant = Participant.objects.create(name=name, id=id, email=email, course=course)
             MatchScore.objects.create(match=match, participant=participant)
             match.participants.add(participant)
             return redirect('/jogos/' + match_id)

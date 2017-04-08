@@ -4,9 +4,8 @@ from django.forms import ModelForm
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from captcha.fields import ReCaptchaField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import *
-import sys
 
 
 class CategoryForm(ModelForm):
@@ -59,7 +58,7 @@ class TournamentForm(ModelForm):
         super(TournamentForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
-                                                                    for user in users if user.get_full_name()]
+                                                                    for user in users if user.get_full_name() and Group.objects.get(name='admin') in user.groups.all()]
         self.fields['location'].label = 'Sede'
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
@@ -96,7 +95,7 @@ class CompetitionForm(ModelForm):
         super(CompetitionForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
-                                                                    for user in users if user.get_full_name()]
+                                                                    for user in users if user.get_full_name() and Group.objects.get(name='admin') in user.groups.all()]
         self.fields['responsible'].label = 'Responsável'
         self.fields['category'].label = 'Categoria'
 
@@ -138,7 +137,7 @@ class MatchForm(ModelForm):
         super(MatchForm, self).__init__(*args, **kwargs)
         users = User.objects.all()
         self.fields['responsible'].choices = [('', '---------')] + [(user.id, user.get_full_name())
-                                                                    for user in users if user.get_full_name()]
+                                                                    for user in users if user.get_full_name() and Group.objects.get(name='admin') in user.groups.all()]
         self.fields['responsible'].label = 'Responsável'
         self.fields['start'].label = 'Início'
         self.fields['end'].label = 'Término'
@@ -187,7 +186,7 @@ class ParticipantForm(forms.Form):
     username = forms.CharField(
         label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
     name = forms.CharField(
-        label='Nome Completo', widget=forms.TextInput(attrs={'class': 'form-control'}))
+        label='Nome completo', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(
         label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     repassword = forms.CharField(
@@ -229,15 +228,15 @@ class TeamForm(ModelForm):
 
     class Meta:
         model = Team
-        fields = ['name', 'category', 'participants']
+        fields = ['name', 'category', 'members']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'widget': 'input', 'autocomplete': 'off'}),
             'category': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
-            'participants': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}),
+            'members': forms.SelectMultiple(attrs={'class': 'form-control', 'style': 'width: 100%;', 'widget': 'select'}),
         }
 
     def __init__(self, *args, **kwargs):
         super(TeamForm, self).__init__(*args, **kwargs)
         self.fields['name'].label = 'Nome'
         self.fields['category'].label = 'Categoria'
-        self.fields['participants'].label = 'Participantes'
+        self.fields['members'].label = 'Participantes'

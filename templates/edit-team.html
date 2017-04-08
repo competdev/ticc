@@ -2,7 +2,8 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-10 col-md-offset-1">
+        {% include "message.html" %}
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">Formulário</h3>
@@ -11,41 +12,93 @@
                {% csrf_token %}
                 <div class="box-body">
                     {% for field in form %}
-                        <div class="form-group">
-                            {% if field.label == 'Participantes' %}
-                                <h5><strong>Participantes atuais:</strong></h5>
-                                <ol>
-                                   {% for participant in participants %}
-                                        <li>{{participant}}</li>
-                                   {% endfor %}
-                                </ol>
-                                {{field.label_tag}}
-                                <h5><strong>(aperte ctrl para selecionar mais de uma opção)</strong></h5>
+                            {% if field == form.members %}
+                                </div>
+                            </div>
+                            <div class="box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Membros atuais da equipe{% if team %} "{{ team.name }}"{% endif %}</h3>
+                                </div>
                                 <div class="box-body">
-                                    <h5><strong>Ano:</strong></h5>
-                                    <button id='1-year' name='1' type="button" class="btn btn-primary">1º</button>
-                                    <button id='2-year' name='2' type="button" class="btn btn-primary">2º</button>
-                                    <button id='3-year' name='3' type="button" class="btn btn-primary">3º</button>
-                                    <button id='mix' name='mix' type="button" class="btn btn-primary">Mista</button>
+                                    <table class="table" id="members-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Matrícula</th>
+                                                <th>Aluno</th>
+                                                <th>Curso</th>
+                                                <th>Campus</th>
+                                                <th>Ano</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for member in members %}
+                                                <tr>
+                                                    <td>{{ member.id }}</td>
+                                                    <td>{{ member.name }}</td>
+                                                    <td>{{ member.course }}</td>
+                                                    <td>{{ member.school }}</td>
+                                                    <td>{{ member.year }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-xs btn-danger remove-btn">Remover</button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
+                            </div>
+                            <div class="box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Todos os alunos inscritos no torneio</h3>
+                                </div>
+                                <div class="box-body">
+                                    <table class="table datatables" id="participants-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Matrícula</th>
+                                                <th>Aluno</th>
+                                                <th>Curso</th>
+                                                <th>Campus</th>
+                                                <th>Ano</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for participant in participants %}
+                                                <tr>
+                                                    <td>{{ participant.id }}</td>
+                                                    <td>{{ participant.name }}</td>
+                                                    <td>{{ participant.course }}</td>
+                                                    <td>{{ participant.school }}</td>
+                                                    <td>{{ participant.year }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-xs btn-primary add-btn">Adicionar</button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {{ field }}
                             {% else %}
-                                 {{field.label_tag}}
-                            {% endif %}
-                            {{field}}
-                            {% if field.errors %}
-                                {% for error in field.errors %}
                                 <div class="form-group">
-                                    <span class="help-block text-red">{{error}}</span>
+                                    {{ field.label_tag }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="form-group">
+                                                <span class="help-block text-red">{{ error }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {{ field }}
                                 </div>
-                                {% endfor %}
                             {% endif %}
-                        </div>
                     {% endfor %}
-                </div>
-                <div class="box-footer">
-                    <a href="{{ cancel }}" class="btn btn-default">Cancelar</a>
-                <button type="submit" class="btn btn-primary pull-right">Salvar</button>
-                </div>
+                        <a href="{{ cancel }}" class="btn btn-danger">Cancelar</a>
+                        <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+                    </div>
             </form>
         </div>
     </div>

@@ -18,7 +18,7 @@ urlpatterns = [
 	url(r'equipes$',views.teams),
 	url(r'equipes/nova', views.add_team),
 	url(r'equipes/filtro_participantes$',views.participant_filter,name=' '),
-	url(r'equipes/editar/(?P<equipe_id>[0-9]+)$',views.edit_team),	
+	url(r'equipes/(?P<team_id>[0-9]+)$',views.edit_team),	
 	
 	url(r'torneios/novo', views.add_tournament),
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
@@ -38,10 +38,10 @@ urlpatterns = [
 	url(r'jogos/sair/(?P<match_id>[0-9]+)$', views.leave_match),
 
 	# url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.list_incomplete_scores),
-	url(r'jogos/(?P<match_id>[0-9]+)/pontuar$', views.list_incomplete_scores),
-	url(r'jogos/(?P<match_id>[0-9]+)/pontuar/(?P<match_score_id>[0-9]+)/$', views.edit_match_score),
-	url(r'jogos/(?P<match_id>[0-9]+)/remover/(?P<match_score_id>[0-9]+)/$', views.remove_match_score),
-	url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/(?P<team_id>[0-9]+)/$', views.add_matchScore),
+	url(r'jogos/(?P<match_id>[0-9]+)/pontuar$', views.update_score),
+	# url(r'jogos/(?P<match_id>[0-9]+)/pontuar/(?P<match_score_id>[0-9]+)/$', views.edit_match_score),
+	# url(r'jogos/(?P<match_id>[0-9]+)/remover/(?P<match_score_id>[0-9]+)/$', views.remove_match_score),
+	# url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/(?P<team_id>[0-9]+)/$', views.add_matchScore),
 
 	url(r'minhas-partidas$', views.my_matches),
 	# url(r'resultados/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.match_score),

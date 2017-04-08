@@ -70,30 +70,30 @@ class Competition(models.Model):
 
 
 class Participant(models.Model):
+    id = models.CharField(max_length=20, primary_key=True)
     user = models.ForeignKey(User, null=True)
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=12)
     course = models.CharField(max_length=255)
     valid = models.BooleanField(default=False)
     year = models.IntegerField(choices=((1, '1º'), (2, '2º'), (3, '3º')))
-    school = models.CharField(max_length=255)
+    campus = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.school
+        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.campus
 
 
 class Team(models.Model):
     name = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    participants = models.ManyToManyField(Participant, related_name='teams')
+    members = models.ManyToManyField(Participant, related_name='teams')
     mix_team = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name + ' id = ' + str(self.id)
 
-    def str_participants(self):
-        return ', '.join([p.name for p in self.participants.all()])
+    def str_members(self):
+        return ', '.join([p.name for p in self.members.all()])
 
 
 class TeamGroup(models.Model):

@@ -12,8 +12,9 @@
                     <li><a href="/">Início</a></li>
                     <li><a href="/torneios">Torneios</a></li>
                     <li><a href="/resultados">Resultados</a></li>
-                    {% if user.is_authenticated and user.groups.0.name == 'admin' %}
+                    {% if user.is_authenticated and user.groups.all.0.name == 'admin' %}
                         <li><a href="/minhas-partidas">Minhas partidas</a></li>
+                        <li><a href="/equipes">Equipes</a></li>
                     {% endif %}
 					<!-- <li><a href="/rankings">Rankings</a></li> -->
                 </ul>

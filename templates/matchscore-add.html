@@ -25,7 +25,7 @@
 							{% for match_score in match_scores %}
 								<tr>
 									<td>{{ match_score.team }}</td>
-									<td>{{ match_score.team.str_participants }}</td>
+									<td>{{ match_score.team.str_members }}</td>
 									{% if match_scores.first.match.competition.category.need_score %}
 										<td>{{match_score.score}}</td>
 									{%endif%}
@@ -73,7 +73,7 @@
 							{% for team in teams_without_match_score %}
 								<tr onmouseover="Select(this);" title="Nova pontuação" onmouseout ="Diselect(this)" onclick="Click(this, '/pontuacao/'+'{{user.id}}'+'/'+'{{match.id}}'+'/'+'{{team.id}}')">
 									<td>{{team}}</td>
-									<td>{{team.str_participants}}</td>
+									<td>{{team.str_members}}</td>
 									{% if match_scores.first.match.competition.category.need_score %}
 										<td align="center">--</td>
 									{% endif %}
