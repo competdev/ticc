@@ -1,6 +1,6 @@
 {% if messages %}
     {% for message in messages %}
-        <div class="fade-in alert {% if message.tags == "error" %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissable">
+        <div class="fade-in alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissable">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
             {{ message }}
         </div>

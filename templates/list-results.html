@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                         {% for match in matches %}	                            
-                            {% if match.first_place and is_complete %}
+                            {% if match.finished %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td><a href="jogos/{{match.id}}" title="Detalhes da partida">{{ match }}</a></td>
@@ -30,7 +30,7 @@
 	                        	    <td>{{ match.competition }}</td>
 	                        	    <td>{{ match.campus }}</td>
 	                        	    <td>{{ match.competition.tournament }}</td>
-	                        	    <td>{{ match.first_place }}</td>
+	                        	    <td>{% if match.first_place %}{{ match.first_place }}{% else %}Nenhum{% endif %}</td>
 	                        	    <td>{{ match.responsible.get_full_name }}</td>
                                 </tr>
 							{% endif %}

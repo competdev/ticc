@@ -7,9 +7,9 @@
 			<div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Informações</h3>
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and user.groups.all.0.name == 'admin' %}
                         <div class="box-tools pull-right">
-                            <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar</a>
+                            <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar/Finalizar</a>
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
                                onclick="showDialog('Tem certeza que deseja excluir?', '/jogos/excluir/{{ match.id }}')">Excluir</a>
                         </div>
@@ -40,30 +40,43 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Equipes</h3>
                     <div class="box-tools pull-right">
-                        {% if perms.website.change_matchscore and request.user == responsible %}
+                        {% if request.user == match.responsible %}
+                            <a href="/jogos/{{ match.id }}/gerenciar-equipes" class="btn btn-box-tool">Gerenciar equipes</a>
                             <a href="/jogos/{{ match.id }}/pontuar" class="btn btn-box-tool">Definir pontuação</a>
                         {% endif %}
-                        {% if not match.intercampi and not user.is_authenticated %}
+                  <!--       {% if not match.intercampi and not user.is_authenticated %}
                             <a href="/jogos/participar/{{ match.id }}" class="btn btn-box-tool">Participar</a>
-                        {% endif %}
+                        {% endif %} -->
                     </div>
                 </div>
                 <div class="box-body">
-                {% if match_scores %}
+                {% if match.scores.all|length > 0 %}
                     <table class="table datatables">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
                                 <th>Integrantes</th>
+                                {% if match.competition.category.need_time %}
+                                    <th>Tempo</th>
+                                {% endif %}
+                                {% if match.competition.category.need_score %}
+                                    <th>Pontuação</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
-                        {% for match_score in match_scores %}
+                        {% for score in match.scores.all %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ match_score.team.name }}</td>
-                                <td>{{ match_score.team.str_participants }}</td>
+                                <td>{{ score.team.name }}</td>
+                                <td>{{ score.team.str_members }}</td>
+                                {% if match.competition.category.need_time %}
+                                    <td>{{ score.time }}</td>
+                                {% endif %}
+                                {% if match.competition.category.need_score %}
+                                    <td>{{ score.score }}</td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -83,15 +96,15 @@
                     {{ match.competition.category.rules|linebreaks }}
                 </div>
             </div>
-            {% if match.first_place or request.user.is_authenticated %}
+            {% if match.first_place %}
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Classificação</h3>
-                    <br><small>Ao publicar um resultado, este box com a classificação dos participantes será exibida para todos.</small>
-                    <div class="box-tools pull-right">
-                        {% if not match.first_place %}
+<!--                     <br><small>Ao publicar um resultado, este box com a classificação dos participantes será exibida para todos.</small>
+ -->                    <div class="box-tools pull-right">
+                       <!--  {% if not match.first_place %}
                             <a href="/jogos/{{ match.id }}/publicar" class="btn btn-box-tool">Publicar resultado</a>
-                        {% endif %}
+                        {% endif %} -->
                     </div>
                 </div>
                 <div class="box-body">

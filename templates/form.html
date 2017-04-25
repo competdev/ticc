@@ -32,12 +32,15 @@
                                         {{field}}
                                     </div>
                                 {% else %}
+                                    {% if field.help_text %}
+                                        <span class="help-block">{{ field.help_text }}</span>
+                                    {% endif %}
                                     {{ field }}
                                 {% endif %}
                                 {% if field.errors %}
                                     {% for error in field.errors %}
                                     <div class="form-group">
-                                        <span class="help-block text-red">{{error}}</span>
+                                        <span class="help-block text-red">{{ error }}</span>
                                     </div>
                                     {% endfor %}
                                 {% endif %}

@@ -2,19 +2,21 @@
 
 {% block content %}
         <div class="row">
-            <div class="col-md-6 col-md-offset-3">
+            <div class="col-md-8 col-md-offset-2">
+                <p><a class="crud-button" href="/equipes/nova">ADICIONAR EQUIPE</a></p>
                 <div class="box">
                     <div class="box-header">
                     {% if user.is_authenticated %}
-                        <div class="box-tools pull-right">
+                      <!--   <div class="box-tools pull-right">
                             <a href="/equipes/nova" class="btn btn-box-tool">Novo</a>
-                        </div>
-                    {% endif %}
+                        </div> -->
+                    {% endif %} 
                     </div>
                     <div class="box-body">
                         <table class="table">
                             <tr>
                                 <th>Nome</th>
+                                <th>Membros</th>
                                 <th>Categoria</th>
                             </tr>
                             {% if not teams %}
@@ -28,8 +30,9 @@
                             {% for team in teams %}
                                 <tr>
                                     <td>
-                                        <a href="/equipes/editar/{{team.id}}">{{ team.name }}</a>
+                                        <a href="/equipes/{{ team.id }}">{{ team.name }}</a>
                                     </td>
+                                    <td>{{ team.str_members }}</td>
                                     <td>{{ team.category }}</td>
                                 </tr>   
                             {% endfor %}

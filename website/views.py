@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Permission, Group
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
@@ -16,15 +16,6 @@ import json
 
 
 def home(request):
-    # A parte a seguir foi feita para evitar que cada integrante tenha que criar o grupo no seu repositório remoto
-    group, create = Group.objects.get_or_create(name='Judges')
-    perm = []
-    perm.append(Permission.objects.get(name='Can add match score'))
-    perm.append(Permission.objects.get(name='Can delete match score'))
-    perm.append(Permission.objects.get(name='Can change match score'))
-    for p in perm:
-        group.permissions.add(p)
-
     # Gets calendar data
     events = []
     for match in Match.objects.all():
@@ -52,7 +43,7 @@ def signup(request):
                 participant = Participant()
                 participant.user = user
                 participant.name = form.cleaned_data['name']
-                participant.code = form.cleaned_data['code']
+                participant.id = form.cleaned_data['id']
                 participant.course = form.cleaned_data['course']
                 participant.user.email = form.cleaned_data['email']
                 participant.year = form.cleaned_data['year']
@@ -74,8 +65,8 @@ def signup(request):
 @login_required
 def update_participant_info(request):
     participant = Participant.objects.get(user=request.user)
-    initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'code': participant.code,
-               'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email}
+    initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'id': participant.id,
+               'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email, 'campus': participant.campus}
     form = ParticipantForm(request.POST or None, initial=initial)
     form.fields['username'].widget = forms.HiddenInput()
 
@@ -93,7 +84,7 @@ def update_participant_info(request):
         if form.is_valid():
             try:
                 participant.name = form.cleaned_data['name']
-                participant.code = form.cleaned_data['code']
+                participant.id = form.cleaned_data['id']
                 participant.course = form.cleaned_data['course']
                 participant.user.email = form.cleaned_data['email']
                 participant.year = form.cleaned_data['year']
@@ -112,6 +103,8 @@ def update_participant_info(request):
     return render(request, 'signup.html', context)
 
 
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def teams(request):
     context = {
         'title': 'Equipes',
@@ -124,31 +117,40 @@ def teams(request):
     return render(request, 'teams.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_team(request):
+    participants = [p for p in Participant.objects.all()]
+    
     if request.method == 'POST':
         form = TeamForm(request.POST)
         if form.is_valid():
             team = form.save()
-            return redirect('/')
+            messages.success(request, 'Equipe criada com sucesso.')
+            return redirect('/equipes/' + str(team.id))
+        elif 'participants' in form.errors:
+            messages.error(request, 'Uma equipe precisa ter no mínimo um membro. Sua equipe não foi criada.')
     else:
         form = TeamForm()
 
     context = {
-        'title': "Nova Equipe",
+        'title': "Nova equipe",
         'action': '/equipes/nova',
-        'cancel': '/',
+        'cancel': '/equipes',
         'form': form,
+        'members': [],
+        'participants': participants,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
-            {'name': 'Equipes', 'link': '/'},
-            {'name': 'Novo'},
+            {'name': 'Equipes', 'link': '/equipes'},
+            {'name': 'Nova equipe'},
         ]
     }
-    return render(request, 'add-team.html', context)
+
+    return render(request, 'team-form.html', context)
 
 
-@login_required()
+@login_required
 def participant_filter(request):
     year = None
     max_number_of_teams = 3
@@ -202,6 +204,7 @@ def about(request):
 
 
 @login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def validate_participants(request, participant_school):
     if request.method == 'POST':
         for participant in Participant.objects.filter(school=participant_school):
@@ -227,7 +230,8 @@ def tournaments(request):
     }
     return render(request, 'tournaments.html', context)
 
-
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_group(request):
     tournaments_id = 1
     competitions = Competition.objects.filter(tournament=tournaments_id)
@@ -297,38 +301,45 @@ def edit_group(request):
     return render(request, 'edit-group.html', context)
 
 
-def edit_team(request, equipe_id):
-    team = get_object_or_404(Team, id=equipe_id)
-    participants = Participant.objects.filter(team_participants=equipe_id)
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def edit_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    members = [p for p in Participant.objects.all() if p in team.members.all()]
+    participants = [p for p in Participant.objects.all() if p not in members]
+    
     if request.method == 'POST':
         form = TeamForm(request.POST or None, instance=team)
-        if form.has_changed():
-            if not request.POST['participants']:
-                form.participants = team.participants
-                form.save()
-            else:
-                form.save()
+        if form.is_valid():
+            team = form.save()
+            messages.success(request, 'Equipe alterada com sucesso.')
+            members = [p for p in Participant.objects.all() if p in team.members.all()]
+            participants = [p for p in Participant.objects.all() if p not in members]
+        else:
+            messages.error(request, 'Uma equipe precisa ter no mínimo um membro. Suas alterações não foram salvas.')
     else:
         form = TeamForm(instance=team)
 
     context = {
         'title': "Editar Equipe",
-        'action': '/equipes/editar/' + equipe_id,
-        'cancel': '/',
+        'action': '/equipes/' + team_id,
+        'cancel': '/equipes',
         'form': form,
+        'members': members,
         'participants': participants,
+        'team': team,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Equipes', 'link': '/equipes'},
-            {'name': team, 'link': '/equipes/' + equipe_id},
-            {'name': 'Editar'},
+            {'name': team.name, 'link': '/equipes/' + team_id},
         ]
     }
 
-    return render(request, 'edit-team.html', context)
+    return render(request, 'team-form.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_tournament(request):
     if request.method == 'POST':
         form = TournamentForm(request.POST)
@@ -368,7 +379,8 @@ def tournament_details(request, tournament_id):
     return render(request, 'tournament-details.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_tournament(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == 'POST':
@@ -396,13 +408,15 @@ def edit_tournament(request, tournament_id):
     return render(request, 'form.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def remove_tournament(request, tournament_id):
     get_object_or_404(Tournament, id=tournament_id).delete()
     return redirect('/torneios')
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_competition(request, tournament_id):
     if request.method == 'POST':
         form = CompetitionForm(request.POST, tournament_id)
@@ -456,8 +470,8 @@ def competition_details(request, competition_id):
     return render(request, 'competition-details.html', context)
 
 
-@login_required()
-@permission_required('website.add_match', raise_exception=True)
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_match(request, competition_id):
     if request.method == 'POST':
         form = MatchForm(request.POST)
@@ -470,6 +484,9 @@ def add_match(request, competition_id):
             return redirect('/jogos/' + str(match.id))
     else:
         form = MatchForm(initial={'date': '', 'start': '', 'end': ''})
+
+    form.fields['first_place'].widget = forms.HiddenInput()
+    form.fields['finished'].widget = forms.HiddenInput()
 
     competition = get_object_or_404(Competition, id=competition_id)
     context = {
@@ -493,12 +510,9 @@ def add_match(request, competition_id):
 
 def match_details(request, match_id):
     match = get_object_or_404(Match, id=match_id)
-    match_scores = MatchScore.objects.filter(match=match).order_by('-score').all()
     context = {
         'title': match.type() + ' - ' + str(match.competition),
         'match': match,
-        'match_scores': match_scores,
-        'responsible': match.responsible,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
@@ -512,7 +526,8 @@ def match_details(request, match_id):
     return render(request, 'match-details.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user.username != match.responsible.username:
@@ -526,60 +541,13 @@ def edit_match(request, match_id):
     else:
         form = MatchForm(instance=match)
 
+    form.fields['first_place'].choices = [('', '---------')] + [(team.id, team.name + ' (' + team.str_members() + ')') 
+                                                                    for team in match.teams.all()]
     competition = get_object_or_404(Competition, id=match.competition.id)
+
     context = {
         'title': "Editar " + match.type(),
-        'action': '/competicoes/editar/' + match_id,
-        'cancel': '/competicoes/' + match_id,
-        'competition': competition,
-        'form': form,
-        'breadcrumb': [
-            {'name': 'Início', 'link': '/'},
-            {'name': 'Torneios', 'link': '/torneios'},
-            {'name': match.competition.tournament, 'link': '/torneios/' +
-             str(match.competition.tournament.id)},
-            {'name': 'Competições', 'link': '/torneios'},
-            {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
-            {'name': match.type(), 'link': '/competicoes/' + str(match.id)},
-            {'name': 'Editar'},
-        ]
-    }
-
-    return render(request, 'form.html', context)
-
-
-@login_required()
-def remove_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
-    if request.user.username != match.responsible.username:
-        return redirect('/')
-    competition_id = match.competition.id
-    match.delete()
-    messages.success(request, 'Partida removida com sucesso.')
-    return redirect('/competicoes/' + str(competition_id))
-
-
-def attend_to_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
-    competition = match.competition
-
-    if request.method == 'POST':
-        form = AttendForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            code = form.cleaned_data['code']
-            email = form.cleaned_data['email']
-            course = form.cleaned_data['course']
-            participant = Participant.objects.create(name=name, code=code, email=email, course=course)
-            MatchScore.objects.create(match=match, participant=participant)
-            match.participants.add(participant)
-            return redirect('/jogos/' + match_id)
-    else:
-        form = AttendForm()
-
-    context = {
-        'title': "Participar " + match.type(),
-        'action': '/jogos/participar/' + match_id,
+        'action': '/jogos/editar/' + match_id,
         'cancel': '/jogos/' + match_id,
         'competition': competition,
         'form': form,
@@ -591,14 +559,76 @@ def attend_to_match(request, match_id):
             {'name': 'Competições', 'link': '/torneios'},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
             {'name': match.type(), 'link': '/jogos/' + str(match.id)},
-            {'name': 'Participar'},
+            {'name': 'Editar'},
         ]
     }
 
     return render(request, 'form.html', context)
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def remove_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    if request.user.username != match.responsible.username:
+        return redirect('/')
+    competition_id = match.competition.id
+    match.delete()
+    messages.success(request, 'Partida removida com sucesso.')
+    return redirect('/competicoes/' + str(competition_id))
+
+
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def manage_teams(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    form = SignupTeamsForm(instance=match)
+
+    if request.method == 'POST':
+        form = SignupTeamsForm(request.POST or None, instance=match)
+        if form.is_valid():
+            form.save()
+            if 'teams' in request.POST:
+                to_delete = []
+
+                for team in match.teams.all():
+                    if not MatchScore.objects.filter(match=match, team=team).exists():
+                        match.scores.add(MatchScore.objects.create(match=match, team=team))
+                
+                for match_score in MatchScore.objects.filter(match=match).all():
+                    if match_score.team not in match.teams.all():
+                        to_delete.append(match_score)
+                
+                for match_score in to_delete:
+                    match_score.delete()
+
+            messages.success(request, 'Alteração realizada com sucesso.')
+            return redirect('/jogos/' + str(match.id))
+        else:
+            messages.error(request, 'Algo de errado ocorreu e não foi possível inscrever as equipes selecionadas.')
+    else:
+        form = SignupTeamsForm(instance=match)
+
+
+    context = {
+        'title': 'Inscrever equipe',
+        'teams': [t for t in Team.objects.all() if t not in match.teams.all() and t.category == match.competition.category],
+        'match': match,
+        'form': form,
+        'breadcrumb': [
+            {'name': 'Início', 'link': '/'},
+            {'name': 'Torneios', 'link': '/torneios'},
+            {'name': match.competition.tournament, 'link': '/torneios/' + str(match.competition.tournament.id)},
+            {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
+            {'name': match.type(), 'link': '/jogos/' + str(match.id)},
+            {'name': 'Inscrever equipes'}
+        ]
+    }
+
+    return render(request, 'signup-teams.html', context)
+
+
+@login_required
 def leave_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     match.teams.remove(request.user)
@@ -607,19 +637,24 @@ def leave_match(request, match_id):
     return redirect('/jogos/' + str(match_id))
 
 
-@login_required()
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def update_score(request, match_id):
     match = get_object_or_404(Match, id=match_id)
 
     if request.method == 'POST':
+        errors = False
         for score in match.scores.all():
-            p = request.POST.getlist(str(score.id))
-            score.pontos = p[0]
-            score.tempo = p[1]
-            score.save()
+            try:
+                score.score = request.POST['score-' + str(score.id)]
+                score.time = request.POST['time-' + str(score.id)]
+                score.save()
+            except:
+                errors = True
+                messages.error(request, 'Pontuação da equipe ' + score.team.name + ' é inválida.') 
 
-        messages.success(request, 'Pontuação atualizada com sucesso.')
-        return redirect('/jogos/' + str(match_id))
+        if not errors:
+            messages.success(request, 'Pontuação atualizada com sucesso.')
 
     context = {
         'title': 'Atualizar Pontuação',
@@ -629,7 +664,8 @@ def update_score(request, match_id):
             {'name': 'Torneios', 'link': '/torneios'},
             {'name': match.competition.tournament, 'link': '/torneios/' +
              str(match.competition.tournament.id)},
-            {'name': 'Jogos', 'link': '/competicoes/' + str(match.competition.id)},
+            {'name': match.competition.__str__(), 'link': '/competicoes/' + str(match.competition.id)},
+            {'name': 'Seletiva', 'link': '/jogos/' + str(match.id)},
             {'name': 'Atualizar'},
         ]
     }
@@ -662,23 +698,14 @@ def list_results(request):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def my_matches(request):
-    if request.user.groups.all().filter(name='Judges'):
-        match = Match.objects.all()
-        text = "Setor de Juízes - Acesso a todas as partidas"
-    else:
-        match = Match.objects.all().filter(responsible=request.user)
-        text = 'Minhas partidas (' + request.user.get_full_name() + ')'
-
     context = {
-        'title': text,
-        'ready_matches': Match.matches_ready_to_publish_result(match),
-        'not_ready_matches': Match.match_not_ready(match),
-        'already_published_matches': Match.match_already_published(match),
+        'title': 'Minhas partidas',
+        'finished_matches': Match.objects.filter(responsible=request.user, finished=True).all(),
+        'ongoing_matches': Match.objects.filter(responsible=request.user, finished=False).all(),
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
-            {'name': 'Resultados', 'link': '/resultados'},
             {'name': 'Minhas partidas'},
         ]
     }
@@ -687,6 +714,17 @@ def my_matches(request):
 
 
 @login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+def finish_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    match.finished = not match.finished
+    match.save()
+    messages.success(request, 'Operação realizada com sucesso.')
+    return redirect('/jogos/' + str(match_id))
+
+
+@login_required
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def publish_result(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user != match.responsible:
@@ -697,7 +735,7 @@ def publish_result(request, match_id):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def list_incomplete_scores(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if match.responsible != request.user:
@@ -731,7 +769,7 @@ def list_incomplete_scores(request, match_id):
 
 
 @login_required
-@permission_required('website.add_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_matchScore(request, user_id, match_id, team_id):
     user = User.objects.all().filter(id=user_id).first()
     if request.user != user:
@@ -784,7 +822,7 @@ def add_matchScore(request, user_id, match_id, team_id):
 
 
 @login_required
-@permission_required('website.change_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)
@@ -826,7 +864,7 @@ def edit_match_score(request, match_id, match_score_id):
 
 
 @login_required
-@permission_required('website.delete_matchscore', raise_exception=True)
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def remove_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)

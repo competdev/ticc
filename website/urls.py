@@ -15,10 +15,10 @@ urlpatterns = [
 	url(r'groups',views.edit_group),
 	url(r'(?P<tournament_id>[0-9]+)/(?P<competition_id>[0-9]+)$/groups', views.edit_group),
 
-	url(r'equipes$',views.teams),
-	url(r'equipes/nova', views.add_team),
+	url(r'equipes/$', views.teams),
+	url(r'equipes/nova$', views.add_team),
 	url(r'equipes/filtro_participantes$',views.participant_filter,name=' '),
-	url(r'equipes/editar/(?P<equipe_id>[0-9]+)$',views.edit_team),	
+	url(r'equipes/(?P<team_id>[0-9]+)$',views.edit_team),	
 	
 	url(r'torneios/novo', views.add_tournament),
 	url(r'torneios/(?P<tournament_id>[0-9]+)$', views.tournament_details),
@@ -27,23 +27,15 @@ urlpatterns = [
 
 	url(r'competicoes/novo/(?P<tournament_id>[0-9]+)$', views.add_competition),
 	url(r'competicoes/(?P<competition_id>[0-9]+)$', views.competition_details),
-	# url(r'competicoes/editar/(?P<competition_id>[0-9]+)$', views.edit_competition),
 	
 	url(r'jogos/(?P<match_id>[0-9]+)$', views.match_details),
 	url(r'jogos/novo/(?P<competition_id>[0-9]+)$', views.add_match),
 	url(r'jogos/editar/(?P<match_id>[0-9]+)$', views.edit_match),
 	url(r'jogos/excluir/(?P<match_id>[0-9]+)$', views.remove_match),
-	url(r'jogos/participar/(?P<match_id>[0-9]+)$', views.attend_to_match),
+	url(r'jogos/(?P<match_id>[0-9]+)/gerenciar-equipes$', views.manage_teams),
+	url(r'jogos/(?P<match_id>[0-9]+)/finalizar$', views.finish_match),
 	url(r'jogos/sair/(?P<match_id>[0-9]+)$', views.leave_match),
-
-	# url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.list_incomplete_scores),
-	url(r'jogos/(?P<match_id>[0-9]+)/pontuar$', views.list_incomplete_scores),
-	url(r'jogos/(?P<match_id>[0-9]+)/pontuar/(?P<match_score_id>[0-9]+)/$', views.edit_match_score),
-	url(r'jogos/(?P<match_id>[0-9]+)/remover/(?P<match_score_id>[0-9]+)/$', views.remove_match_score),
-	url(r'pontuacao/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/(?P<team_id>[0-9]+)/$', views.add_matchScore),
+	url(r'jogos/(?P<match_id>[0-9]+)/pontuar$', views.update_score),
 
 	url(r'minhas-partidas$', views.my_matches),
-	# url(r'resultados/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.match_score),
-	# url(r'resultados/publica/(?P<user_id>[0-9]+)/(?P<match_id>[0-9]+)/$', views.publish_result),
-	url(r'jogos/(?P<match_id>[0-9]+)/publicar$', views.publish_result),
 ]

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        {% include "message.html" %}
+            <form role="form" action="/jogos/{{ match.id }}/gerenciar-equipes" method="POST">
+               {% csrf_token %}
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Equipes participantes</h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table" id="current-teams-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Membros</th>
+                                    <th>Categoria</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for team in match.teams.all %}
+                                    <tr>
+                                        <td>{{ team.id }}</td>
+                                        <td>{{ team.name }}</td>
+                                        <td>{{ team.str_members }}</td>
+                                        <td>{{ team.category }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-danger remove-btn">Remover</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Todas as equipes inscritas na competição de {{ match.competition.category }}</h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table datatables" id="all-teams-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Membros</th>
+                                    <th>Categoria</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for team in teams %}
+                                    <tr>
+                                        <td>{{ team.id }}</td>
+                                        <td>{{ team.name }}</td>
+                                        <td>{{ team.str_members }}</td>
+                                        <td>{{ team.category }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-xs btn-primary add-btn">Adicionar</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{ form.teams }}
+                <a href="/jogos/{{ match.id }}" class="btn btn-danger">Cancelar</a>
+                <button type="submit" class="btn btn-primary pull-right">Salvar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script src="/static/dist/js/signup-teams.js"></script>
+{% endblock %}

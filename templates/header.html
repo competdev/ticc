@@ -12,8 +12,11 @@
                     <li><a href="/">Início</a></li>
                     <li><a href="/torneios">Torneios</a></li>
                     <li><a href="/resultados">Resultados</a></li>
-                    <li><a href="/minhas-partidas">Minhas partidas</a></li>
-					<li><a href="/rankings">Rankings</a></li>
+                    {% if user.is_authenticated and user.groups.all.0.name == 'admin' %}
+                        <li><a href="/equipes">Equipes</a></li>
+                        <li><a href="/minhas-partidas">Minhas partidas</a></li>
+                    {% endif %}
+					<!-- <li><a href="/rankings">Rankings</a></li> -->
                 </ul>
             </div>
             <div class="navbar-custom-menu">
@@ -22,7 +25,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}<span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/meu-cadastro">Meus dados</a></li>
+                            {% if user.groups.all|length == 0 %}
+                                <li><a href="/meu-cadastro">Meus dados</a></li>
+                            {% endif %}
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </li>
