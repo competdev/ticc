@@ -8,9 +8,9 @@ class Campus(models.Model):
 
     class Meta:
         verbose_name_plural = 'Campi'
-
+	
     location = models.CharField(max_length=255)
-    number = models.CharField(max_length=2)
+    number = models.CharField(max_length=2, blank=True)
 
     def __str__(self):
         return 'Campus ' + self.number + ' - ' + self.location
@@ -79,7 +79,7 @@ class Participant(models.Model):
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + self.campus
+        return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + str(self.campus)
 
 
 class Team(models.Model):
