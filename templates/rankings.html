@@ -66,6 +66,41 @@ $( document ).ready(function() {
 {% endblock js %}
 
 {% block content %}
+{% load mathfilters %}
+<div class="row">
+    <div class="col-md-12">
+         <div class="box">
+            <div class="box-body">
+                <table class="table datatables">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Campus</th>
+                            <th>Ouro</th>
+                            <th>Prata</th>
+                            <th>Bronze</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key,value in tuples %} 
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ key }} </td>
+                                    <td>{{ value|intdiv:100 }}</td>
+                                    <td>{{ value|mod:100|intdiv:10 }}</td>
+                                    <td>{{ value|mod:100|mod:10|intdiv:1 }}</td>
+                                    {% with gold=value|intdiv:100 silver=value|mod:100|intdiv:10 bronze=value|mod:100|mod:10|intdiv:1 %}
+                                    <td>{{ gold|add:silver|add:bronze}}</td>
+                                    {% endwith %}
+                                </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>  
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-6">
         <canvas id="pie-chart" width="500" height="300"></canvas>
