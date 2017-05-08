@@ -193,7 +193,7 @@ class ParticipantForm(forms.Form):
         label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
     course = forms.ChoiceField(
         label='Curso', widget=forms.Select(
-            attrs={'class': 'form-control'}), choices=((1, 'Eletrônica'), (2, 'Redes')))
+            attrs={'class': 'form-control'}), choices=((1, 'Eletrônica'), (2, 'Redes'), (1, 'Informática')))
     year = forms.ChoiceField(label='Ano', widget=forms.Select(
         attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
     new_participant = forms.IntegerField(widget=forms.HiddenInput(), initial=1)
