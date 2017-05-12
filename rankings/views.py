@@ -49,7 +49,7 @@ def statistics(request):
                     medal_board[str(participant.campus[i])][3] =  medal_board[str(participant.campus[i])][0] + medal_board[str(team.members.first().campus)][1] + medal_board[str(team.members.first().campus)][2]
 
 
-    medal_board = OrderedDict(sorted(medal_board.items(), key=lambda t: t[3], reverse=True))
+    medal_board = OrderedDict(sorted(medal_board.items(), key=lambda t: (t[1][0],t[1][1],t[1][2]), reverse=True))
     print(medal_board)
 
     campus_key = medal_board.keys()
