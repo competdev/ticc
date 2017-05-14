@@ -662,7 +662,7 @@ def update_score(request, match_id):
             messages.success(request, 'Pontuação atualizada com sucesso.')
 
     context = {
-        'title': 'Atualizar Pontuação',
+        'title': 'Inserir resultado',
         'match': match,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
@@ -754,7 +754,7 @@ def list_incomplete_scores(request, match_id):
             teams_incomplete_score.append(team)
 
     context = {
-        'title': 'Definir pontuação da partida',
+        'title': 'Inserir resultado da partida',
         'match': match,
         'match_scores': match_scores.order_by('-score'),
         'teams_without_match_score': teams_incomplete_score,
@@ -766,7 +766,7 @@ def list_incomplete_scores(request, match_id):
             {'name': 'Competições', 'link': '/torneios'},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
             {'name': match.type(), 'link': '/jogos/' + str(match.id)},
-            {'name': 'Definir pontuação'}
+            {'name': 'Inserir resultado'}
         ]
     }
 
