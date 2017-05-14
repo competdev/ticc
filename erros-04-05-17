@@ -1,0 +1,9 @@
+- A competição de jogos digitais envolve usuários da graduação, o campo 'Year' do model 'Participant' assume que os usuários são somente do técnico, deve-se deixar não obrigatório (blank=True, null=True) e fazer um Javascript para quando o usuário informar que é da graduação o campo de ano não é exibido para ele.
+- As competições de robótica não tem seletiva, devem ser trocados os nomes para partidas.
+- Fazer um roteiro do sistema.
+- Atualizar Pontuação -> Inserir resultado.
+- Bug ao inserir a pontuação, categoria SUMO.
+- Primeiro lugar deve ser definido pela pontuação, não há razão para a escolha desta posição.
+- Partidas devem ter estado de finalizada.
+- Quando é acessada as partidas de outro responsável as opções de Exclusão e Edição devem ser removidas.
+- Classificação na tela de partida está vago, o que era pra acontecer?

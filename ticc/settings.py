@@ -17,8 +17,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'website.apps.WebsiteConfig',
+    'rankings.apps.RankingsConfig',
     'captcha',
 	'chartjs',
+    'mathfilters',
 ]
 
 MIDDLEWARE_CLASSES = [

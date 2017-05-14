@@ -338,18 +338,6 @@ def edit_team(request, team_id):
     return render(request, 'team-form.html', context)
 
 
-def rankings(request):
-    context = {
-        'title': 'Rankings e Estatísticas',
-        'breadcrumb': [
-            {'name': 'Início', 'link': '/'},
-            {'name': 'Rankings'},
-        ],
-        "teste": 21
-    }
-    return render(request, 'rankings.html', context)
-
-
 @login_required
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_tournament(request):
