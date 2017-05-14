@@ -656,8 +656,10 @@ def update_score(request, match_id):
         errors = False
         for score in match.scores.all():
             try:
-                score.score = request.POST['score-' + str(score.id)]
-                score.time = request.POST['time-' + str(score.id)]
+                if match.competition.category.need_score:
+                    score.score = request.POST['score-' + str(score.id)]
+                if match.competition.category.need_time:
+                    score.time = request.POST['time-' + str(score.id)]
                 score.save()
             except:
                 errors = True
