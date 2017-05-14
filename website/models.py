@@ -25,6 +25,7 @@ class Category(models.Model):
     rules = models.TextField()
     need_score = models.BooleanField(default=False)
     need_time = models.BooleanField(default=False)
+    final_only = models.BooleanField(default=False)
     icon = models.CharField(default='trophy', max_length=32)
 
     def __str__(self):

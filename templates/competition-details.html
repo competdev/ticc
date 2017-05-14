@@ -5,6 +5,9 @@
             {% include "message.html" %}
             
             <h3>Final</h3>
+            {% if request.user.is_authenticated and user.groups.all.0.name == 'admin' %}
+                <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}?intercampi=True">ADICIONAR FINAL</a></p>
+            {% endif %}
             {% if intercampi %}
                 <div class="info-box">
                     <a href="/jogos/{{ intercampi.id }}">
@@ -21,7 +24,7 @@
             {% endif %}
             <hr>
             <h3>Seletivas</h3>
-            {% if request.user.is_authenticated  and user.groups.all.0.name == 'admin' %}
+            {% if request.user.is_authenticated and user.groups.all.0.name == 'admin' and not competition.category.final_only %}
                 <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}">ADICIONAR SELETIVA</a></p>
             {% endif %}
             {% for trial in trials %}

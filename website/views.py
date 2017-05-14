@@ -479,6 +479,11 @@ def add_match(request, competition_id):
             match = form.save(commit=False)
             match.intercampi = request.POST['intercampi']
             match.competition = Competition.objects.get(id=competition_id)
+
+            if not match.intercampi and match.competition.category.final_only:
+                messages.error(request, 'A categoria selecionada não permite seletivas.')
+                return redirect('/competicoes/' + str(competition_id))
+
             match.save()
             messages.success(request, 'Partida criada com sucesso.')
             return redirect('/jogos/' + str(match.id))
