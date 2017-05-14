@@ -96,45 +96,6 @@
                     {{ match.competition.category.rules|linebreaks }}
                 </div>
             </div>
-            {% if match.first_place %}
-            <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Classificação</h3>
-<!--                     <br><small>Ao publicar um resultado, este box com a classificação dos participantes será exibida para todos.</small>
- -->                    <div class="box-tools pull-right">
-                       <!--  {% if not match.first_place %}
-                            <a href="/jogos/{{ match.id }}/publicar" class="btn btn-box-tool">Publicar resultado</a>
-                        {% endif %} -->
-                    </div>
-                </div>
-                <div class="box-body">
-                    <table class= "table">
-                        <tr>
-                            <th>Colocação</th>
-                            <th>Equipe</th>
-                            {% if match_scores.first.match.competition.category.need_score %}
-                                <th>Pontuação</th>
-                            {%endif%}
-                            {% if match_scores.first.match.competiton.category.need_time %}
-                                <th>Tempo</th>
-                            {% endif %}
-                        </tr>
-                        {% for match_score in match_scores %}
-                        <tr>
-                            <td align="left">{{ forloop.counter }}</td>
-                            <td align="left"><a href="#" title='Detalhes da publicação' data-toggle="modal" data-target="#dialog" onclick="datetime_and_judge('{{match_score.judge.get_full_name}}','{{match_score.date_time}}')">{{ match_score.team }}</a></td>
-                            {% if match_scores.first.match.competition.category.need_score %}
-                                <td align="center">{{ match_score.score }}</td>
-                            {% endif %}
-                            {% if match_scores.first.match.competiton.category.need_time %}
-                                <td align="center">{{ match_score.time }}</td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
-            {% endif %}
         </div>
 	</div>
 {% endblock content %}
