@@ -44,9 +44,10 @@ def signup(request):
                 participant.user = user
                 participant.name = form.cleaned_data['name']
                 participant.id = form.cleaned_data['id']
-                participant.course = form.cleaned_data['course']
                 participant.user.email = form.cleaned_data['email']
-                participant.year = form.cleaned_data['year']
+                participant.campus = Campus.objects.get(id=int(form.cleaned_data['campus']))
+                participant.course = Course.objects.get(id=int(form.cleaned_data['course']))
+                participant.year = Year.objects.get(id=int(form.cleaned_data['year']))
                 user.save()
                 participant.save()
                 login_user(request, authenticate(username=form.cleaned_data[
@@ -66,9 +67,12 @@ def signup(request):
 def update_participant_info(request):
     participant = Participant.objects.get(user=request.user)
     initial = {'new_participant': 0, 'username': participant.user.username, 'name': participant.name, 'id': participant.id,
-               'course': participant.course, 'email': participant.user.email, 'year': participant.year, 'old_email': participant.user.email, 'campus': participant.campus}
+               'course': participant.course.id, 'email': participant.user.email, 'year': participant.year.id, 'campus': participant.campus.id}
     form = ParticipantForm(request.POST or None, initial=initial)
-    form.fields['username'].widget = forms.HiddenInput()
+
+    form.fields['username'].widget.attrs['readonly'] = True
+    form.fields['email'].widget.attrs['readonly'] = True
+    form.fields['id'].widget.attrs['readonly'] = True
 
     context = {
         'form': form,
@@ -84,10 +88,11 @@ def update_participant_info(request):
         if form.is_valid():
             try:
                 participant.name = form.cleaned_data['name']
-                participant.id = form.cleaned_data['id']
-                participant.course = form.cleaned_data['course']
-                participant.user.email = form.cleaned_data['email']
-                participant.year = form.cleaned_data['year']
+                # participant.id = form.cleaned_data['id']
+                # participant.user.email = form.cleaned_data['email']
+                participant.campus = Campus.objects.get(id=int(form.cleaned_data['campus']))
+                participant.year = Year.objects.get(id=int(form.cleaned_data['year']))
+                participant.course = Course.objects.get(id=int(form.cleaned_data['course']))
                 participant.user.set_password(form.cleaned_data['password'])
                 participant.user.save()
                 participant.save()

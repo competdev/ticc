@@ -3,6 +3,8 @@ from .models import *
 
 
 admin.site.register(Campus)
+admin.site.register(Year)
+admin.site.register(Course)
 admin.site.register(Category)
 admin.site.register(Tournament)
 admin.site.register(Competition)

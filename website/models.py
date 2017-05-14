@@ -16,6 +16,20 @@ class Campus(models.Model):
         return 'Campus ' + self.number + ' - ' + self.location
 
 
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class Year(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Category(models.Model):
 
     class Meta:
@@ -76,8 +90,9 @@ class Participant(models.Model):
     name = models.CharField(max_length=255)
     course = models.CharField(max_length=255)
     valid = models.BooleanField(default=False)
-    year = models.IntegerField(choices=((1, '1º'), (2, '2º'), (3, '3º')))
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
+    year = models.ForeignKey(Year)
+    course = models.ForeignKey(Course)
+    campus = models.ForeignKey(Campus)
 
     def __str__(self):
         return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + str(self.campus)

@@ -177,6 +177,10 @@ class MatchScoreForm(ModelForm):
 
 
 class ParticipantForm(forms.Form):
+    id = forms.CharField(
+        label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(
+        label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     username = forms.CharField(
         label='Usuário', widget=forms.TextInput(attrs={'class': 'form-control'}))
     name = forms.CharField(
@@ -185,28 +189,24 @@ class ParticipantForm(forms.Form):
         label='Senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     repassword = forms.CharField(
         label='Confirmar senha', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(
-        label='E-mail', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     campus = forms.ChoiceField(
         label='Campus', widget=forms.Select(attrs={'class': 'form-control'}))
-    id = forms.CharField(
-        label='Nº de Matrícula', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    year = forms.ChoiceField(
+        label='Ano', widget=forms.Select(attrs={'class': 'form-control'}))
     course = forms.ChoiceField(
-        label='Curso', widget=forms.Select(
-            attrs={'class': 'form-control'}), choices=((1, 'Eletrônica'), (2, 'Redes'), (1, 'Informática')))
-    year = forms.ChoiceField(label='Ano', widget=forms.Select(
-        attrs={'class': 'form-control'}), choices=((1, '1º'), (2, '2º'), (3, '3º')))
+        label='Curso', widget=forms.Select(attrs={'class': 'form-control'}))
     new_participant = forms.IntegerField(widget=forms.HiddenInput(), initial=1)
 
     def __init__(self, *args, **kwargs):
         super(ParticipantForm, self).__init__(*args, **kwargs)
-        self.fields['campus'].choices = [('', '---------')] + [(campus.id, campus.__str__())
-                                                               for campus in Campus.objects.all()]
+        self.fields['campus'].choices = [('', '---------')] + [(campus.id, campus.__str__()) for campus in Campus.objects.all()]
+        self.fields['course'].choices = [('', '---------')] + [(course.id, course.__str__()) for course in Course.objects.all()]
+        self.fields['year'].choices = [('', '---------')] + [(year.id, year.__str__()) for year in Year.objects.all()]
 
     def clean_email(self):
         data = self.cleaned_data['email']
         try:
-            if User.objects.filter(email=data).exists() and self.data['old_email'] != data:
+            if User.objects.filter(email=data).exists() and self.data['new_participant'] == 1:
                 raise ValidationError('E-mail já cadastrado.')
         except KeyError:
             raise ValidationError('Algo deu errado ao salvar seu e-mail. Por favor, tente novamente.')
