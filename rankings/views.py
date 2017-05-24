@@ -50,14 +50,13 @@ def statistics(request):
 
 
     medal_board = OrderedDict(sorted(medal_board.items(), key=lambda t: (t[1][0],t[1][1],t[1][2]), reverse=True))
-    print(medal_board)
 
     campus_key = medal_board.keys()
     campus_values = medal_board.values()
     tuples = zip(campus_key, campus_values)
 
     context = {
-        'title': 'Rankings e Estatísticas',
+        'title': 'Quadro de Medalhas',
         'tuples': tuples,
         'campis': campis,
 
