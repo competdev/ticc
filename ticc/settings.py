@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     'rankings.apps.RankingsConfig',
     'captcha',
 	'chartjs',
-    'mathfilters',
 ]
 
 MIDDLEWARE_CLASSES = [
