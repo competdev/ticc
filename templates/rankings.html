@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block js %}
+<!-- {% block js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript">
@@ -63,10 +63,9 @@ $( document ).ready(function() {
     var bars_chart = new Chart(ctx2, bars);
 });
 </script>
-{% endblock js %}
+{% endblock js %}-->
 
 {% block content %}
-{% load mathfilters %}
 <div class="row">
     <div class="col-md-12">
          <div class="box">
@@ -87,12 +86,10 @@ $( document ).ready(function() {
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ key }} </td>
-                                    <td>{{ value|intdiv:100 }}</td>
-                                    <td>{{ value|mod:100|intdiv:10 }}</td>
-                                    <td>{{ value|mod:100|mod:10|intdiv:1 }}</td>
-                                    {% with gold=value|intdiv:100 silver=value|mod:100|intdiv:10 bronze=value|mod:100|mod:10|intdiv:1 %}
-                                    <td>{{ gold|add:silver|add:bronze}}</td>
-                                    {% endwith %}
+                                    <td>{{ value.0 }}</td>
+                                    <td>{{ value.1 }}</td>
+                                    <td>{{ value.2 }}</td>
+                                    <td>{{ value.3 }}</td>
                                 </tr>
                         {% endfor %}
                     </tbody>
@@ -101,12 +98,12 @@ $( document ).ready(function() {
         </div>
     </div>
 </div>
-<div class="row">
+<!--<div class="row">
     <div class="col-md-6">
         <canvas id="pie-chart" width="500" height="300"></canvas>
     </div>
     <div class="col-md-6">
         <canvas id="bars-chart" width="500" height="300"></canvas>
     </div>
-</div>
+</div>-->
 {% endblock %}

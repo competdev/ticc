@@ -25,15 +25,15 @@ $(document).ready(function() {
 
     // Inits map
     var map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -20.172307, lng: -44.910105},
+	center: {lat: -19.795875, lng: -43.979034},
         zoom: 13
     });
     var info = new google.maps.InfoWindow({
-        content: '<h5>Centro Federal de Educação Tecnológica de Minas Gerais, <b>Campus V</b> - Divinópolis</h5>',
+        content: '<h5>Serviço Social do Comércio <b>SESC</b> - Belo Horizonte</h5>',
         maxWidth: 250
     });
     var marker = new google.maps.Marker({
-        position: {lat: -20.172307, lng: -44.910105},
+        position: {lat: -19.795875, lng: -43.979034},
         map: map,
         title: 'sede'
     });
