@@ -480,6 +480,7 @@ def competition_details(request, competition_id):
 def add_match(request, competition_id):
     if request.method == 'POST':
         form = MatchForm(request.POST)
+        form.intercampi = request.POST['intercampi']
         if form.is_valid():
             match = form.save(commit=False)
             match.intercampi = request.POST['intercampi']

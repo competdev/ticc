@@ -165,7 +165,7 @@ class Match(models.Model):
             return "Seletiva"
 
     def __str__(self):
-        return self.competition.category.name + ' (' + self.campus.__str__() + ')'
+        return self.competition.category.name + ' (' + self.campus.__str__() + ') - ' + self.type()
 
 
 class MatchScore(models.Model):

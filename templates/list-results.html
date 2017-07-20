@@ -30,7 +30,7 @@
 	                        	    <td>{{ match.competition }}</td>
 	                        	    <td>{{ match.campus }}</td>
 	                        	    <td>{{ match.competition.tournament }}</td>
-	                        	    <td>{% if match.first_place %}{{ match.first_place }}{% else %}Nenhum{% endif %}</td>
+	                        	    <td>{% if match.first_place %}{{ match.first_place.name }}{% else %}Nenhum{% endif %}</td>
 	                        	    <td>{{ match.responsible.get_full_name }}</td>
                                 </tr>
 							{% endif %}
