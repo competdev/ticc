@@ -122,7 +122,8 @@ class MatchForm(ModelForm):
     def clean_campus(self):
         campus = self.cleaned_data['campus']
         competition_id = self.data['competition_id']
-        if not self.data['intercampi']:
+
+        if self.data['intercampi'] == False:
             if not self.instance.id:
                 if Match.objects.filter(intercampi=False, competition__id=competition_id, campus=campus):
                     raise forms.ValidationError('Este campus já possui uma seletiva')
