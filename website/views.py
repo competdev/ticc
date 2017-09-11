@@ -521,9 +521,11 @@ def add_match(request, competition_id):
 
 def match_details(request, match_id):
     match = get_object_or_404(Match, id=match_id)
+    just = match.scores.all().order_by('-score')
     context = {
         'title': match.type() + ' - ' + str(match.competition),
         'match': match,
+        'teste': just,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
