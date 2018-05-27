@@ -122,6 +122,13 @@ class TeamGroup(models.Model):
         return self.name
 
 
+class ProblemCategory(models.Model):
+    name = models.TextField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Match(models.Model):
 
     class Meta:
@@ -139,6 +146,7 @@ class Match(models.Model):
     finished = models.BooleanField(default=False)
     first_place = models.ForeignKey(Team, blank=True, null=True)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
+    problem_categories = models.ManyToManyField(ProblemCategory)
 
     def status(self):
         now = datetime.now()
@@ -178,3 +186,20 @@ class MatchScore(models.Model):
 
     def __str__(self):
         return self.team.__str__() + ' - ' + self.match.__str__()
+
+
+class Submission(models.Model):
+    ACCEPTED, WRONG_ANSWER, COMPILATION_ERROR, RUNTIME_ERROR, PRESENTATION_ERROR, OTHER = range(1, 7)
+    Status = (
+        (ACCEPTED, 'Aceita'),
+        (WRONG_ANSWER, 'Resposta incorreta'),
+        (COMPILATION_ERROR, 'Erro de compilação'),
+        (RUNTIME_ERROR, 'Erro de execução'),
+        (PRESENTATION_ERROR, 'Erro de apresentação'),
+        (OTHER, 'Outro'),
+    )
+
+    submitted_in = models.IntegerField()
+    problem = models.IntegerField()
+    status = models.IntegerField(choices=Status)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='submissions')
