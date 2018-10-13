@@ -48,7 +48,7 @@ class Category(models.Model):
 
 class Tournament(models.Model):
     location = models.ForeignKey(Campus, on_delete=models.CASCADE, default=None, null=True)
-    responsible = models.ForeignKey(User, null=True)
+    responsible = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     start = models.DateField()
     end = models.DateField()
 
@@ -86,13 +86,13 @@ class Competition(models.Model):
 
 class Participant(models.Model):
     id = models.CharField(max_length=20, primary_key=True)
-    user = models.ForeignKey(User, null=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     course = models.CharField(max_length=255)
     valid = models.BooleanField(default=False)
-    year = models.ForeignKey(Year)
-    course = models.ForeignKey(Course)
-    campus = models.ForeignKey(Campus)
+    year = models.ForeignKey(Year, on_delete=models.PROTECT)
+    course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    campus = models.ForeignKey(Campus, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name + ' - ' + str(self.year) + 'º ano' + ' - ' + str(self.campus)
@@ -136,7 +136,7 @@ class Match(models.Model):
 
     competition = models.ForeignKey(Competition, on_delete=models.CASCADE, related_name='matches', null=True)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
-    responsible = models.ForeignKey(User, null=True)
+    responsible = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     date = models.DateField(default=date.today)
     start = models.TimeField(default=timezone.now)
     end = models.TimeField(default=timezone.now)
@@ -144,7 +144,7 @@ class Match(models.Model):
     teams = models.ManyToManyField(Team, related_name='matches', blank=True)
     intercampi = models.BooleanField(default=False)
     finished = models.BooleanField(default=False)
-    first_place = models.ForeignKey(Team, blank=True, null=True)
+    first_place = models.ForeignKey(Team, blank=True, null=True, on_delete=models.PROTECT)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
     problem_categories = models.ManyToManyField(ProblemCategory)
 
@@ -181,7 +181,7 @@ class MatchScore(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
     score = models.IntegerField(default=0, blank=True, null=True)
     time = models.IntegerField(default=0, blank=True, null=True)
-    judge = models.ForeignKey(User, null=True)
+    judge = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     date_time = models.DateTimeField(null=True)
 
     def __str__(self):

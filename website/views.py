@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.utils import formats
 from .models import *
