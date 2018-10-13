@@ -1,0 +1,16 @@
+- model: website.Year
+  pk: 1
+  fields:
+    name: 1° ano
+- model: website.Year
+  pk: 2
+  fields:
+    name: 2° ano
+- model: website.Year
+  pk: 3
+  fields:
+    name: 3° ano
+- model: website.Year
+  pk: 4
+  fields:
+    name: Graduação

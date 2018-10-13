@@ -1,0 +1,28 @@
+- model: website.Course
+  pk: 1
+  fields:
+    name: Eletrônica
+- model: website.Course
+  pk: 2
+  fields:
+    name: Eletrotécnica
+- model: website.Course
+  pk: 3
+  fields:
+    name: Informática
+- model: website.Course
+  pk: 4
+  fields:
+    name: Redes de computadores
+- model: website.Course
+  pk: 5
+  fields:
+    name: Informática para Internet
+- model: website.Course
+  pk: 6
+  fields:
+    name: Eletrônica
+- model: website.Course
+  pk: 7
+  fields:
+    name: Engenharia de Computação

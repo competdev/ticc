@@ -8,7 +8,7 @@ class Campus(models.Model):
 
     class Meta:
         verbose_name_plural = 'Campi'
-	
+
     location = models.CharField(max_length=255)
     number = models.CharField(max_length=2, blank=True)
 
@@ -122,7 +122,7 @@ class TeamGroup(models.Model):
         return self.name
 
 
-class ProblemCategory(models.Model):
+class ProblemType(models.Model):
     name = models.TextField(max_length=255, unique=True)
 
     def __str__(self):
