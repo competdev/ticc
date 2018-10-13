@@ -7,7 +7,7 @@ SECRET_KEY = 'rc%r*4pmo7&i^a2b@lsfp(cmxv5@3fcdd+ufq0j*clesun^0zo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.cefetmg.br', '127.0.0.1']
+ALLOWED_HOSTS = ['.cefetmg.br', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,14 +22,13 @@ INSTALLED_APPS = [
 	'chartjs',
 ]
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -61,7 +60,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ticc',
         'USER': 'luis',
-        'PASSWORD': '',
+        'PASSWORD': 'op',
         'HOST': 'localhost',
         'PORT': '',
     }
