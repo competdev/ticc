@@ -11,6 +11,7 @@ class Campus(models.Model):
 
     location = models.CharField(max_length=255)
     number = models.CharField(max_length=2, blank=True)
+    courses = models.ManyToManyField('Course', related_name='campi')
 
     def __str__(self):
         return 'Campus ' + self.number + ' - ' + self.location
@@ -18,6 +19,7 @@ class Campus(models.Model):
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
+    years = models.ManyToManyField('Year', related_name='courses')
 
     def __str__(self):
         return self.name
@@ -146,7 +148,7 @@ class Match(models.Model):
     finished = models.BooleanField(default=False)
     first_place = models.ForeignKey(Team, blank=True, null=True, on_delete=models.PROTECT)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
-    problem_categories = models.ManyToManyField(ProblemCategory)
+    problem_types = models.ManyToManyField(ProblemType)
 
     def status(self):
         now = datetime.now()
@@ -199,7 +201,9 @@ class Submission(models.Model):
         (OTHER, 'Outro'),
     )
 
-    submitted_in = models.IntegerField()
+    submitted_in = models.DateTimeField()
     problem = models.IntegerField()
     status = models.IntegerField(choices=Status)
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='submissions')
+    team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name='submissions')
+    problem_type = models.ForeignKey(ProblemType, on_delete=models.PROTECT, related_name='submissions')

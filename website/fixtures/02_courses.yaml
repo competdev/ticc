@@ -2,27 +2,53 @@
   pk: 1
   fields:
     name: Eletrônica
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 2
   fields:
     name: Eletrotécnica
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 3
   fields:
     name: Informática
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 4
   fields:
     name: Redes de computadores
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 5
   fields:
     name: Informática para Internet
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 6
   fields:
     name: Eletrônica
+    years:
+      - 1
+      - 2
+      - 3
 - model: website.Course
   pk: 7
   fields:
     name: Engenharia de Computação
+    years:
+      - 4

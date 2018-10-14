@@ -3,21 +3,31 @@
   fields:
     location: Belo Horizonte
     number: 1
+    courses:
+      - 3
+      - 4
 - model: website.Campus
   pk: 2
   fields:
     location: Belo Horizonte
     number: 2
+    courses:
+      - 7
 - model: website.Campus
   pk: 3
   fields:
     location: Leopoldina
     number: 3
+    courses:
+      - 3
 - model: website.Campus
   pk: 4
   fields:
     location: Araxá
     number: 4
+    courses:
+      - 3
+      - 4
 - model: website.Campus
   pk: 5
   fields:
