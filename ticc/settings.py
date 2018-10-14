@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'rest_framework',
     'website.apps.WebsiteConfig',
     'rankings.apps.RankingsConfig',
@@ -25,6 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -90,3 +92,5 @@ NOCAPTCHA = True
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
 }
+
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
