@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'website.apps.WebsiteConfig',
     'rankings.apps.RankingsConfig',
     'captcha',
@@ -85,3 +86,7 @@ DATE_INPUT_FORMATS = ("%d/%m/%Y", )
 RECAPTCHA_PUBLIC_KEY = '6LfVoCYTAAAAAH3rX3laFwniK21XMcKISfo31pbM'
 RECAPTCHA_PRIVATE_KEY = '6LfVoCYTAAAAABDstANhXJFfJEZocLvgWxjitqSe'
 NOCAPTCHA = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [],
+}
