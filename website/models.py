@@ -53,6 +53,7 @@ class Tournament(models.Model):
     responsible = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     start = models.DateField()
     end = models.DateField()
+    year = models.PositiveSmallIntegerField()
 
     def status(self):
         now = date.today()
@@ -65,9 +66,6 @@ class Tournament(models.Model):
 
     def __str__(self):
         return str(self.start.year)
-
-    def year(self):
-        return self.start.year
 
     def verbose_status(self):
         if self.status() == 'status-waiting':
