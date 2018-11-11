@@ -1,0 +1,65 @@
+- model: website.Campus
+  pk: 1
+  fields:
+    location: Belo Horizonte
+    number: 1
+    courses:
+      - 3
+      - 4
+- model: website.Campus
+  pk: 2
+  fields:
+    location: Belo Horizonte
+    number: 2
+    courses:
+      - 7
+- model: website.Campus
+  pk: 3
+  fields:
+    location: Leopoldina
+    number: 3
+    courses:
+      - 3
+- model: website.Campus
+  pk: 4
+  fields:
+    location: Araxá
+    number: 4
+    courses:
+      - 3
+      - 4
+- model: website.Campus
+  pk: 5
+  fields:
+    location: Divinópolis
+    number: V
+- model: website.Campus
+  pk: 6
+  fields:
+    location: Belo Horizonte
+    number: 6
+- model: website.Campus
+  pk: 7
+  fields:
+    location: Timóteo
+    number: 7
+- model: website.Campus
+  pk: 8
+  fields:
+    location: Varginha
+    number: 8
+- model: website.Campus
+  pk: 9
+  fields:
+    location: Nepomuceno
+    number: 9
+- model: website.Campus
+  pk: 10
+  fields:
+    location: Curvelo
+    number: 10
+- model: website.Campus
+  pk: 11
+  fields:
+    location: Contagem
+    number: 11

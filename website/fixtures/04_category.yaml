@@ -1,0 +1,5 @@
+- model: website.Category
+  pk: 1
+  fields:
+    name: Programação
+    need_score: true

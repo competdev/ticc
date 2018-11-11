@@ -1,0 +1,28 @@
+- model: website.ProblemType
+  pk: 2
+  fields:
+    name: ad hoc
+- model: website.ProblemType
+  pk: 3
+  fields:
+    name: Strings
+- model: website.ProblemType
+  pk: 4
+  fields:
+    name: Bibliotecas e estruturas de dados
+- model: website.ProblemType
+  pk: 5
+  fields:
+    name: Matemática
+- model: website.ProblemType
+  pk: 6
+  fields:
+    name: Paradigmas
+- model: website.ProblemType
+  pk: 7
+  fields:
+    name: Grafos
+- model: website.ProblemType
+  pk: 8
+  fields:
+    name: Geometria Computacional
