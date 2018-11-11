@@ -23,3 +23,4 @@ class Command(BaseCommand):
         models.Competition.objects.all().delete()
         models.ProblemType.objects.all().delete()
         User.objects.filter(is_superuser=False).all().delete()
+        print('Dados removidos.')

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Permission, Group
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, get_user
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
@@ -9,25 +10,33 @@ from django.contrib import messages
 from django.utils import formats
 from .models import *
 from .forms import *
+from .management.commands.create_match import create_match
+from .management.commands.calculate_scores import update_placements, calculate_match_scores
 from datetime import datetime
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, Http404
 import random
 import json
+from django.db.models import Count
+from math import ceil
 
 
 def home(request):
-    # Gets calendar data
     events = []
-    for match in Match.objects.all():
+    for match in Match.objects.select_related(
+        'competition', 'competition__category', 'competition__tournament', 'campus').all():
         start = formats.date_format(match.date, "Y-m-d")
         end = formats.date_format(match.date, "Y-m-d")
         title = match.__str__()
         events.append([start, end, title, '#5f5f7b', '/jogos/' + str(match.id)])
 
+    tournament = (Tournament.objects
+        .filter(start__year=datetime.now().year)
+        .prefetch_related('competitions', 'competitions__matches')
+        .first())
     context = {
         'title': 'Torneio Intercampi de Computação Competitiva (TICC)',
         'events': json.dumps(events),
-        'tournament': Tournament.objects.filter(start__year=datetime.now().year).first()
+        'tournament': tournament,
     }
     return render(request, 'home.html', context)
 
@@ -109,7 +118,7 @@ def update_participant_info(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def teams(request):
     context = {
         'title': 'Equipes',
@@ -123,7 +132,7 @@ def teams(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def add_team(request):
     participants = [p for p in Participant.objects.all()]
     
@@ -209,7 +218,7 @@ def about(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def validate_participants(request, participant_school):
     if request.method == 'POST':
         for participant in Participant.objects.filter(school=participant_school):
@@ -236,7 +245,7 @@ def tournaments(request):
     return render(request, 'tournaments.html', context)
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def edit_group(request):
     tournaments_id = 1
     competitions = Competition.objects.filter(tournament=tournaments_id)
@@ -307,7 +316,7 @@ def edit_group(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def edit_team(request, team_id):
     team = get_object_or_404(Team, id=team_id)
     members = [p for p in Participant.objects.all() if p in team.members.all()]
@@ -344,7 +353,7 @@ def edit_team(request, team_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def add_tournament(request):
     if request.method == 'POST':
         form = TournamentForm(request.POST)
@@ -372,7 +381,7 @@ def add_tournament(request):
 def tournament_details(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     context = {
-        'title': 'Torneio de ' + str(tournament.year()) + ' (' + tournament.location.__str__() + ')',
+        'title': 'Torneio de ' + str(tournament.year) + ' (' + tournament.location.__str__() + ')',
         'tournament': tournament,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
@@ -385,7 +394,7 @@ def tournament_details(request, tournament_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def edit_tournament(request, tournament_id):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == 'POST':
@@ -414,14 +423,14 @@ def edit_tournament(request, tournament_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def remove_tournament(request, tournament_id):
     get_object_or_404(Tournament, id=tournament_id).delete()
     return redirect('/torneios')
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def add_competition(request, tournament_id):
     if request.method == 'POST':
         form = CompetitionForm(request.POST, tournament_id)
@@ -455,14 +464,24 @@ def add_competition(request, tournament_id):
 
 
 def competition_details(request, competition_id):
-    competition = get_object_or_404(Competition, id=competition_id)
+    competition = (Competition.objects
+        .select_related('tournament', 'category')
+        .filter(pk=competition_id)
+        .first())
+    if not competition:
+        raise Http404
     tournament = competition.tournament
+
+    matches = competition.matches.select_related('campus')
+    trials = matches.filter(intercampi=False).all()
+    intercampi = matches.filter(intercampi=True).first()
+
     context = {
         'title': 'Partidas: ' + competition.__str__(),
         'competition': competition,
         'tournament': tournament,
-        'trials': competition.matches.filter(intercampi=False),
-        'intercampi': Match.objects.filter(competition=competition, intercampi=True).first(),
+        'trials': trials,
+        'intercampi': intercampi,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
@@ -476,7 +495,7 @@ def competition_details(request, competition_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def add_match(request, competition_id):
     if request.method == 'POST':
         form = MatchForm(request.POST)
@@ -519,13 +538,58 @@ def add_match(request, competition_id):
     return render(request, 'form.html', context)
 
 
+def map_submissions(submissions):
+    data = [dict(
+        problem=s.problem,
+        problem_type=s.problem_type.name,
+        team=s.team.name,
+        accepted=s.status == 1,
+        status=str(s)) for s in submissions]
+    headers=['Problema', 'Equipe', 'Tipo', 'Status']
+    return dict(data=data, headers=headers)
+
+
 def match_details(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
-    just = match.scores.all().order_by('-score')
+    match = (Match.objects
+        .select_related('competition', 'competition__tournament', 'competition__category', 'responsible')
+        .prefetch_related('scores', 'scores__team', 'scores__team__members')
+        .filter(pk=match_id)
+        .first())
+    if not match:
+        raise Http404
+
+    problems = [x for x in Submission.objects
+        .filter(status=1, match=match_id)
+        .values('problem_type__name')
+        .annotate(value=Count('problem_type'))
+        .order_by('-value')
+        .all()]
+    most_solved_problem = problems[0] if problems else None
+    least_solved_problem = problems[-1] if problems else None
+    submissions = match.submissions.order_by('-submitted_in').select_related('problem_type', 'team').all()
+    submissions_count = len(submissions)
+    submissions = map_submissions(submissions)
+    teams_count = match.teams.count()
+    accepted_submissions_count = sum([p['value'] for p in problems])
+    solved_problems_average = ceil(accepted_submissions_count / teams_count if teams_count else 0)
+    
+    problems = [x for x in Submission.objects
+        .filter(status=1, match=match_id)
+        .values('team_id', 'team__name')
+        .annotate(value=Count('team_id'))
+        .order_by('-value')
+        .all()]
+    best_team_solved_problems = problems[0] if problems else None
+    worst_team_solved_problems = problems[-1] if problems else None
+
+    accepted_submissions_ratio = dict(
+        percentage=round(100 * accepted_submissions_count / submissions_count, 2) if submissions_count else 0,
+        ratio=accepted_submissions_count,
+    )
+
     context = {
         'title': match.type() + ' - ' + str(match.competition),
         'match': match,
-        'teste': just,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
@@ -533,14 +597,25 @@ def match_details(request, match_id):
              str(match.competition.tournament.id)},
             {'name': match.competition, 'link': '/competicoes/' + str(match.competition.id)},
             {'name': match.type()},
-        ]
+        ],
+        'scoreboard': match.scoreboard,
+        'scores': match.scores.all(),
+        'submissions': submissions,
+        'most_solved_problem': most_solved_problem,
+        'least_solved_problem': least_solved_problem,
+        'best_team_solved_problems': best_team_solved_problems,
+        'worst_team_solved_problems': worst_team_solved_problems,
+        'solved_problems_average': solved_problems_average,
+        'accepted_submissions_ratio': accepted_submissions_ratio,
+        'problems_count': match.problem_types.count(),
+        'submissions_count': submissions_count,
     }
 
     return render(request, 'match-details.html', context)
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def edit_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user.username != match.responsible.username:
@@ -580,7 +655,7 @@ def edit_match(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def remove_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user.username != match.responsible.username:
@@ -592,9 +667,14 @@ def remove_match(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def manage_teams(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
+    match = (Match.objects
+        .select_related('competition', 'competition__tournament')
+        .filter(pk=match_id)
+        .first())
+    if not match:
+        raise Http404
     form = SignupTeamsForm(instance=match)
 
     if request.method == 'POST':
@@ -622,10 +702,13 @@ def manage_teams(request, match_id):
     else:
         form = SignupTeamsForm(instance=match)
 
+    match_teams = match.teams.select_related('category').prefetch_related('members').all()
+    teams = Team.objects.select_related('category').prefetch_related('members').exclude(id__in=match_teams).filter(category_id=match.competition.category_id).all()
 
     context = {
         'title': 'Inscrever equipe',
-        'teams': [t for t in Team.objects.all() if t not in match.teams.all() and t.category == match.competition.category],
+        'teams': teams,
+        'match_teams': match_teams,
         'match': match,
         'form': form,
         'breadcrumb': [
@@ -651,13 +734,20 @@ def leave_match(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def update_score(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
+    match = (Match.objects
+        .select_related('competition', 'competition__category')
+        .filter(pk=match_id)
+        .first())
+    if not match:
+        raise Http404
+
+    scores = match.scores.prefetch_related('team', 'team__members').all()
 
     if request.method == 'POST':
         errors = False
-        for score in match.scores.all():
+        for score in scores:
             try:
                 if match.competition.category.need_score:
                     score.score = request.POST['score-' + str(score.id)]
@@ -674,6 +764,7 @@ def update_score(request, match_id):
     context = {
         'title': 'Inserir resultado',
         'match': match,
+        'scores': scores,
         'breadcrumb': [
             {'name': 'Início', 'link': '/'},
             {'name': 'Torneios', 'link': '/torneios'},
@@ -713,7 +804,7 @@ def list_results(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def my_matches(request):
     context = {
         'title': 'Minhas partidas',
@@ -729,7 +820,7 @@ def my_matches(request):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def finish_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     match.finished = not match.finished
@@ -739,7 +830,7 @@ def finish_match(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def publish_result(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if request.user != match.responsible:
@@ -750,7 +841,7 @@ def publish_result(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def list_incomplete_scores(request, match_id):
     match = get_object_or_404(Match, id=match_id)
     if match.responsible != request.user:
@@ -784,7 +875,7 @@ def list_incomplete_scores(request, match_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def add_matchScore(request, user_id, match_id, team_id):
     user = User.objects.all().filter(id=user_id).first()
     if request.user != user:
@@ -837,7 +928,7 @@ def add_matchScore(request, user_id, match_id, team_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def edit_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)
@@ -879,7 +970,7 @@ def edit_match_score(request, match_id, match_score_id):
 
 
 @login_required
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+@user_passes_test(lambda user: user.is_staff)
 def remove_match_score(request, match_id, match_score_id):
     match = get_object_or_404(Match, id=match_id)
     match_score = get_object_or_404(MatchScore, id=match_score_id)
@@ -890,3 +981,29 @@ def remove_match_score(request, match_id, match_score_id):
     match_id = match_score.match.id
     match_score.delete()
     return redirect('/jogos/' + str(match_id) + '/pontuar')
+
+
+@login_required
+@user_passes_test(lambda user: user.is_staff)
+@require_http_methods(['POST'])
+def import_result(request, competition_id):
+    contest_id = request.POST
+    competition = Competition.objects.filter(pk=competition_id).first()
+    if not competition:
+        raise Http404
+    last_tournament = Tournament.objects.order_by('-year').first()
+    match, submissions = create_match(
+        teams=Team.objects.all()[:10],
+        tournaments_count=Tournament.objects.count() + 1,
+        competition=competition,
+        campus=None,
+        user=request.user,
+        tournament_year=last_tournament.year + 1
+    )
+    Submission.objects.bulk_create(submissions)
+
+    scores = calculate_match_scores(match)
+    MatchScore.objects.bulk_create(scores)
+    update_placements()
+
+    return redirect('/jogos/' + str(match.id))

@@ -104,7 +104,7 @@ class MatchForm(ModelForm):
 
     class Meta:
         model = Match
-        fields = ['campus', 'responsible', 'date', 'start', 'end', 'location', 'first_place', 'finished', 'problem_types']
+        fields = ['campus', 'responsible', 'date', 'start', 'end', 'location', 'first_place', 'finished']
         widgets = {
             'campus': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
             'responsible': forms.Select(attrs={'class': 'form-control select2', 'style': 'width: 100%;', 'widget': 'select'}),
@@ -151,7 +151,6 @@ class MatchForm(ModelForm):
         self.fields['location'].label = 'Localização'
         self.fields['first_place'].label = 'Primeiro lugar'
         self.fields['finished'].label = 'Finalizar partida'
-        self.fields['problem_types'].label = 'Categorias dos problemas'
 
 
 class MatchScoreForm(ModelForm):

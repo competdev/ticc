@@ -9,7 +9,7 @@ from django.db import transaction
 
 
 def _get_random_code():
-    return ''.join(random.choice(string.digits) for _ in range(20))
+    return ''.join(random.choice(string.digits) for _ in range(12))
 
 
 class Command(BaseCommand):
@@ -21,16 +21,14 @@ class Command(BaseCommand):
         fake = Faker('pt_BR')
 
         years = models.Year.objects.all()
-        # campi = models.Campus.objects.prefetch_related('courses').all()
-        campi = models.Campus.objects.all()
-        courses = models.Course.objects.all()
-        students_per_course = 20
+        campi = models.Campus.objects.prefetch_related('courses').all()
+        students_per_course = 21
 
         users = []
         participants = []
 
         for campus in campi:
-            # courses = campus.courses.all()
+            courses = campus.courses.all()
             for course in courses:
                 for year in years:
                     for _ in range(students_per_course):
@@ -40,7 +38,7 @@ class Command(BaseCommand):
                             email=fake.email(),
                         )
                         participant = models.Participant(
-                            id=code,
+                            code=code,
                             user=user,
                             name=fake.name(),
                             valid=True,
@@ -53,3 +51,4 @@ class Command(BaseCommand):
 
         User.objects.bulk_create(users)
         models.Participant.objects.bulk_create(participants)
+        print('Estudantes criados com sucesso.')

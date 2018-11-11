@@ -27,6 +27,7 @@ urlpatterns = [
 
 	url(r'competicoes/novo/(?P<tournament_id>[0-9]+)$', views.add_competition),
 	url(r'competicoes/(?P<competition_id>[0-9]+)$', views.competition_details),
+	url(r'competicoes/(?P<competition_id>[0-9]+)/importar_resultado$', views.import_result),
 	
 	url(r'jogos/(?P<match_id>[0-9]+)$', views.match_details),
 	url(r'jogos/novo/(?P<competition_id>[0-9]+)$', views.add_match),

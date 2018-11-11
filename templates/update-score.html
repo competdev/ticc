@@ -26,7 +26,7 @@
 			                    </tr>
 			                </thead>
 			                <tbody>
-			                    {% for score in match.scores.all %}
+			                    {% for score in scores %}
 					                <tr>
 					                    <td>{{ forloop.counter }}</td>
 					                    <td>{{ score.team.name }}</td>

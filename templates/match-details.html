@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 
+{% block css %}
+    <style type="text/css">
+        .mt-0 {
+            margin-top: 0;
+        }
+
+        .pt-0 {
+            padding-top: 0;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 	<div class="row">
         <div class="col-md-7">
@@ -7,7 +19,7 @@
 			<div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Informações</h3>
-                    {% if user.is_authenticated and user.groups.all.0.name == 'admin' %}
+                    {% if user.is_authenticated and user.is_staff %}
                         <div class="box-tools pull-right">
                             <a href="/jogos/editar/{{ match.id }}" class="btn btn-box-tool">Editar/Finalizar</a>
                             <a class="btn btn-box-tool text-red"  data-toggle="modal" data-target="#dialog"
@@ -36,59 +48,9 @@
                     </table>
                 </div>
             </div>
-			<div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Equipes</h3>
-                    <div class="box-tools pull-right">
-                        {% if request.user == match.responsible %}
-                            <a href="/jogos/{{ match.id }}/gerenciar-equipes" class="btn btn-box-tool">Gerenciar equipes</a>
-                            <a href="/jogos/{{ match.id }}/pontuar" class="btn btn-box-tool">Inserir resultado</a>
-                        {% endif %}
-                  <!--       {% if not match.intercampi and not user.is_authenticated %}
-                            <a href="/jogos/participar/{{ match.id }}" class="btn btn-box-tool">Participar</a>
-                        {% endif %} -->
-                    </div>
-                </div>
-                <div class="box-body">
-                {% if match.scores.all|length > 0 %}
-                    <table class="table datatables">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nome</th>
-                                <th>Integrantes</th>
-                                {% if match.competition.category.need_time %}
-                                    <th>Tempo</th>
-                                {% endif %}
-                                {% if match.competition.category.need_score %}
-                                    <th>Pontuação</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for score in teste %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ score.team.name }}</td>
-                                <td>{{ score.team.str_members }}</td>
-                                {% if match.competition.category.need_time %}
-                                    <td>{{ score.time }}</td>
-                                {% endif %}
-                                {% if match.competition.category.need_score %}
-                                    <td>{{ score.score }}</td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                Nenhuma equipe inscrita.
-                {% endif %}
-                </div>
-            </div>
-		</div>
-		<div class="col-md-5">
-			<div class="box">
+        </div>
+        <div class="col-md-5">
+            <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Regras</h3>
                 </div>
@@ -97,5 +59,167 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Mais resolvido</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ most_solved_problem.problem_type__name }}</h3>
+                    <h4>{{ most_solved_problem.value }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Menos resolvido</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ least_solved_problem.problem_type__name }}</h3>
+                    <h4>{{ least_solved_problem.value }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Resolveu mais problemas</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ best_team_solved_problems.value }} <small>de {{ problems_count }}</small></h3>
+                    <h4>{{ best_team_solved_problems.team__name }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Resolveu menos problemas</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ worst_team_solved_problems.value }} <small>de {{ problems_count }}</small></h3>
+                    <h4>{{ worst_team_solved_problems.team__name }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Média de problemas resolvidos</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ solved_problems_average }} <small>de {{ problems_count }}</small></h3>
+                    <h4>por equipe</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Taxa de acertos</h3>
+                </div>
+                <div class="box-body mt-0 pt-0">
+                    <h3 class="mt-0">{{ accepted_submissions_ratio.percentage }}%</h3>
+                    <h4>{{ accepted_submissions_ratio.ratio }} <small>de {{ submissions_count }}</small></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <h4>
+                <a target="_blank" href="https://ticc-analises.herokuapp.com/viz/problemas-resolvidos?match={{ match.id }}">
+                    ver análise completa
+                </a>
+            </h4>
+        </div>
+        <div class="col-md-12">
+			<div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Placar</h3>
+                    <div class="box-tools pull-right">
+                        {% if request.user.id == match.responsible_id %}
+                            <a href="/jogos/{{ match.id }}/gerenciar-equipes" class="btn btn-box-tool">Gerenciar equipes</a>
+                            <a href="/jogos/{{ match.id }}/pontuar" class="btn btn-box-tool">Inserir resultado</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="box-body">
+                {% if scores|length > 0 %}
+                   <table class="table" id="scoreboard">
+                        <thead>
+                            <tr>
+                                {% for header in scoreboard.headers %}
+                                    <td align="{% if forloop.counter <= 2 %}left{% else %}center{% endif %}"><strong>{{ header }}</strong></td>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in scoreboard.data %}
+                                <tr>
+                                    <td>{{ team.position }}</td>
+                                    <td>{{ team.name }}</td>
+                                    <td>{{ team.solved_problems }}</td>
+                                    <td>{{ team.score }}</td>
+                                    {% for problem in team.problems %}
+                                        <td align="center" class="bg-{{ problem.bg }}">
+                                            {{ problem.score }}
+                                            <br />
+                                            <small>{{ problem.tries }}</small>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                Nenhuma equipe inscrita.
+                {% endif %}
+                </div>
+            </div>
+		</div>
 	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Submissões</h3>
+                </div>
+                <div class="box-body">
+                    <table class="table" id="submissions">
+                        <thead>
+                            <tr>
+                                {% for header in submissions.headers %}
+                                    <td><strong>{{ header }}</strong></td>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions.data %}
+                                <tr>
+                                    <td>{{ submission.problem }}</td>
+                                    <td>{{ submission.team }}</td>
+                                    <td>{{ submission.problem_type }}</td>
+                                    <td class="{% if submission.accepted %}text-success{% else %}text-danger{% endif %}">
+                                        {{ submission.status }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock content %}
+
+{% block js %}
+    <script type="text/javascript">
+        $('#scoreboard').dataTable({
+        });
+        $('#submissions').dataTable({
+        });
+    </script>
+{% endblock %}

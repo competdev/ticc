@@ -85,7 +85,7 @@ class Competition(models.Model):
 
 
 class Participant(models.Model):
-    id = models.CharField(max_length=20, primary_key=True)
+    code = models.CharField(max_length=20)
     user = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     course = models.CharField(max_length=255)
@@ -104,6 +104,9 @@ class Team(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     members = models.ManyToManyField(Participant, related_name='teams')
     mix_team = models.BooleanField(default=False)
+    year = models.PositiveSmallIntegerField()
+    placement = models.PositiveSmallIntegerField(null=True, blank=True)
+    score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name + ' id = ' + str(self.id)
@@ -146,7 +149,7 @@ class Match(models.Model):
     finished = models.BooleanField(default=False)
     first_place = models.ForeignKey(Team, blank=True, null=True, on_delete=models.PROTECT)
     group = models.ForeignKey(TeamGroup, on_delete=models.CASCADE, null=True)
-    problem_types = models.ManyToManyField(ProblemType)
+    problem_types = models.ManyToManyField(ProblemType, through='MatchProblemType')
 
     def status(self):
         now = datetime.now()
@@ -175,6 +178,43 @@ class Match(models.Model):
     def __str__(self):
         return self.competition.category.name + ' (' + self.campus.__str__() + ') - ' + self.type()
 
+    @property
+    def scoreboard(self):
+        data = []
+        teams = self.teams.all()
+        scores = self.scores.select_related('team').order_by('-score').all()
+        problems = MatchProblemType.objects.filter(match=self).order_by('position').all()
+        submissions = self.submissions.select_related('team').all()
+        for i, score in enumerate(scores):
+            x = dict(
+                position=i + 1, 
+                name=score.team.name,
+                problems=[],
+                solved_problems=0,
+                score=score.score
+            )
+
+            for problem in problems:
+                _submissions = [s for s in submissions if 
+                    s.team == score.team and s.problem == problem.position]
+                solved = any([s.status == 1 for s in _submissions])
+                _score = sum([s.score for s in _submissions])
+                p = dict(
+                    score=_score,
+                    tries=len(_submissions),
+                    bg='success' if solved else 'danger'
+                )
+                x['problems'].append(p)
+                x['solved_problems'] += 1 if solved else 0
+            data.append(x)
+        headers = ['Ranking', 'Equipe', 'Problemas', 'Pontuação', *[p.position for p in problems]]
+        return dict(headers=headers, data=data)
+
+class MatchProblemType(models.Model):
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    problem_type = models.ForeignKey('ProblemType', on_delete=models.PROTECT)
+    position = models.IntegerField()
+
 
 class MatchScore(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='scores')
@@ -189,14 +229,15 @@ class MatchScore(models.Model):
 
 
 class Submission(models.Model):
-    ACCEPTED, WRONG_ANSWER, COMPILATION_ERROR, RUNTIME_ERROR, PRESENTATION_ERROR, OTHER = range(1, 7)
+    ACCEPTED, WRONG_ANSWER, COMPILATION_ERROR, RUNTIME_ERROR, PRESENTATION_ERROR, TIME_LIMIT, MEMORY_LIMIT = range(1, 8)
     Status = (
         (ACCEPTED, 'Aceita'),
         (WRONG_ANSWER, 'Resposta incorreta'),
         (COMPILATION_ERROR, 'Erro de compilação'),
         (RUNTIME_ERROR, 'Erro de execução'),
         (PRESENTATION_ERROR, 'Erro de apresentação'),
-        (OTHER, 'Outro'),
+        (TIME_LIMIT, 'Limite de tempo excedido'),
+        (MEMORY_LIMIT, 'Limite de memória excedido'),
     )
 
     submitted_in = models.DateTimeField()
@@ -205,3 +246,7 @@ class Submission(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='submissions')
     team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name='submissions')
     problem_type = models.ForeignKey(ProblemType, on_delete=models.PROTECT, related_name='submissions')
+    score = models.IntegerField()
+
+    def __str__(self):
+        return self.Status[self.status - 1][1]

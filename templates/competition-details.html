@@ -5,7 +5,7 @@
             {% include "message.html" %}
             
             <h3>Final</h3>
-            {% if request.user.is_authenticated and user.groups.all.0.name == 'admin' %}
+            {% if request.user.is_authenticated and user.is_staff %}
                 <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}?intercampi=True">ADICIONAR FINAL</a></p>
             {% endif %}
             {% if intercampi %}
@@ -24,7 +24,7 @@
             {% endif %}
             <hr>
             <h3>Seletivas</h3>
-            {% if request.user.is_authenticated and user.groups.all.0.name == 'admin' and not competition.category.final_only %}
+            {% if request.user.is_authenticated and user.is_staff and not competition.category.final_only %}
                 <p><a class="crud-button" href="/jogos/novo/{{ competition.id }}">ADICIONAR SELETIVA</a></p>
             {% endif %}
             {% for trial in trials %}
@@ -43,6 +43,22 @@
             {% endfor %}
         </div>
         <hr>
+        <div class="col-md-5">
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Importar resultados</h3>
+                </div>
+                <div class="box-body">
+                    <form method="POST" action="/competicoes/{{ competition.id }}/importar_resultado">
+                        <p>Utilize essa opção para importar os resultados de uma partida realizada no <a href="//maratona.decom.cefetmg.br" target="_blank">Bang</a>.</p><p>As equipes devem possuir os mesmos nomes.</p>
+                        {% csrf_token %}
+                        <label>ID da partida</label>
+                        <input type="number" name="bang_contest_id" />
+                        <button type="submit" class="btn btn-primary">Importar</button>
+                    </form>
+                </div>
+            </div>  
+        </div>
         <div class="col-md-5">
             <ul class="timeline"> 
                 <li class="time-label">
